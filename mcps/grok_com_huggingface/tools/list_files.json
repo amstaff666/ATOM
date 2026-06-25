@@ -1,0 +1,9 @@
+{
+  "name": "list_files",
+  "description": "List uploaded Hugging Face Bucket files with metadata and HTTPS URLs usable as Gradio File Inputs.",
+  "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  }
+}

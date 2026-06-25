@@ -1,0 +1,460 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+    FileText, Search, Folder, Download, ExternalLink, HardDrive,
+    Filter, Clock, CheckCircle2, Ticket, DollarSign, User, AlertCircle, MessageSquare
+} from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { CommentSection } from '@/components/shared/CommentSection';
+import { cn } from '@/lib/utils';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useToast } from '@/components/ui/use-toast';
+import { useMemorySearch } from '@/hooks/useMemorySearch';
+import { PipelineSettingsPanel } from '@/components/shared/PipelineSettingsPanel';
+import { RefreshCw, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLiveKnowledge, KnowledgeItem, SmartInsight } from '@/hooks/useLiveKnowledge';
+import { useSession } from 'next-auth/react';
+import { EntityTypeList } from '@/components/entity/EntityTypeList';
+import { EntityTypeGraphView } from '@/components/entity/EntityTypeGraphView';
+import GraphVisualization from '@/src/components/Graph/GraphVisualization';
+
+export const KnowledgeCommandCenter: React.FC = () => {
+    const { items, insights, loading, insightsLoading, refresh } = useLiveKnowledge();
+    const [search, setSearch] = useState('');
+    const [showSettings, setShowSettings] = useState(false);
+
+    // Unified Search
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    const { results: searchResults, isSearching, searchMemory, clearSearch } = useMemorySearch({ tag: 'knowledge' });
+
+    const [activeType, setActiveType] = useState<string>('all');
+    const [activePlatform, setActivePlatform] = useState<string>('all');
+    const [activeTab, setActiveTab] = useState<string>('knowledge');
+    const [showTypeGraph, setShowTypeGraph] = useState(false);
+    const { toast: uiToast } = useToast();
+    const { data: session } = useSession();
+    const workspaceId = (session as any)?.user?.workspace_id || 'default';
+
+    // WebSocket for Real-Time Refreshes
+    const { lastMessage, isConnected } = useWebSocket({
+        initialChannels: ['platform_status', 'communication_stats']
+    });
+
+    // Listen for real-time critical alerts and sync completions
+    useEffect(() => {
+        if (!lastMessage) return;
+
+        if (lastMessage.type === 'urgent_alert') {
+            toast.error(lastMessage.data?.message || 'Critical system alert', { duration: 5000 });
+            refresh();
+        } else if (lastMessage.type === 'status_update') {
+            toast.info('Intelligence sync complete. Refreshing data...');
+            refresh();
+        }
+    }, [lastMessage, refresh]);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const query = e.target.value;
+        setSearch(query);
+        if (query.length > 2) {
+            searchMemory(query);
+            setShowSearchResults(true);
+        } else {
+            setShowSearchResults(false);
+            clearSearch();
+        }
+    };
+    // ... rest of icons and badges ...
+    const getTypeIcon = (type: string) => {
+        // ... existing logic ...
+        switch (type) {
+            case 'file': return <FileText className="w-4 h-4 text-primary" />;
+            case 'task': return <CheckCircle2 className="w-4 h-4 text-blue-400" />;
+            case 'deal': return <DollarSign className="w-4 h-4 text-green-400" />;
+            case 'ticket': return <Ticket className="w-4 h-4 text-orange-400" />;
+            default: return <FileText className="w-4 h-4" />;
+        }
+    };
+
+    const getPlatformBadge = (platform: string) => {
+        // ... existing logic ...
+        const colors: Record<string, string> = {
+            gdrive: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+            jira: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+            salesforce: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+            zendesk: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            zoho_workdrive: 'bg-red-500/10 text-red-400 border-red-500/20',
+            asana: 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+        };
+        return (
+            <Badge variant="outline" className={cn("text-[10px] uppercase font-bold", colors[platform] || 'bg-black/5 dark:bg-white/5')}>
+                {platform.replace('_', ' ')}
+            </Badge>
+        );
+    };
+
+    const filteredItems = items.filter((item: KnowledgeItem) => {
+        const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+        const matchesType = activeType === 'all' || item.type === activeType;
+        const matchesPlatform = activePlatform === 'all' || item.platform === activePlatform;
+        return matchesSearch && matchesType && matchesPlatform;
+    });
+
+    const stats = {
+        total: items.length,
+        files: items.filter((i: KnowledgeItem) => i.type === 'file').length,
+        tasks: items.filter((i: KnowledgeItem) => i.type === 'task').length,
+        critical: items.filter((i: KnowledgeItem) => i.priority === 'High' || i.status === 'Urgent').length
+    };
+
+    return (
+        <div className="p-6 space-y-6 max-w-7xl mx-auto animate-in fade-in duration-700">
+            <div className="flex justify-between items-end">
+                <div>
+                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-white/60">
+                        Global Intelligence Hub
+                    </h1>
+                    <p className="text-muted-foreground mt-1">
+                        Cross-platform knowledge search and business intelligence.
+                    </p>
+                </div>
+                <div className="flex gap-3 text-gray-900 dark:text-white items-center">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10"
+                    >
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Sync Settings
+                    </Button>
+                    <div className="relative flex items-center gap-2">
+                        {/* Tab Navigation */}
+                        <button
+                            onClick={() => setActiveTab('knowledge')}
+                            className={cn(
+                                "px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all uppercase",
+                                activeTab === 'knowledge'
+                                    ? "bg-primary/20 border-primary text-primary"
+                                    : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground hover:text-white"
+                            )}
+                        >
+                            Knowledge
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('entity-types')}
+                            className={cn(
+                                "px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all uppercase",
+                                activeTab === 'entity-types'
+                                    ? "bg-primary/20 border-primary text-primary"
+                                    : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground hover:text-white"
+                            )}
+                        >
+                            Entity Types
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('graph')}
+                            className={cn(
+                                "px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all uppercase",
+                                activeTab === 'graph'
+                                    ? "bg-purple-500/20 border-purple-500 text-purple-400"
+                                    : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground hover:text-white"
+                            )}
+                        >
+                            Graph View
+                        </button>
+
+                        {activeTab === 'entity-types' && (
+                            <div className="h-4 w-[1px] bg-white/10 mx-1" />
+                        )}
+
+                        {activeTab === 'entity-types' && (
+                            <button
+                                onClick={() => setShowTypeGraph(!showTypeGraph)}
+                                className={cn(
+                                    "px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all uppercase flex items-center gap-2",
+                                    showTypeGraph
+                                        ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                                        : "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-muted-foreground hover:text-white"
+                                )}
+                            >
+                                <span className={cn("w-1.5 h-1.5 rounded-full", showTypeGraph ? "bg-emerald-400 animate-pulse" : "bg-white/20")} />
+                                Type Graph
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        className="flex items-center gap-2 px-3 py-2 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg text-primary text-xs font-bold hover:bg-primary/10 transition-colors uppercase"
+                        onClick={() => toast.success('Redirecting to Atom Agent for knowledge query...')}
+                    >
+                        <MessageSquare className="w-3 h-3" />
+                        Ask Atom
+                    </button>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input
+                            type="text"
+                            placeholder="Deep search across all systems..."
+                            className="pl-10 pr-10 py-2 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm w-96 text-gray-900 dark:text-white"
+                            value={search}
+                            onChange={handleSearch}
+                            disabled={activeTab !== 'knowledge'}
+                        />
+                        {search && (
+                            <button
+                                onClick={() => { setSearch(''); setShowSearchResults(false); clearSearch(); }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                            >
+                                <X className="w-4 h-4 text-muted-foreground hover:text-gray-900 dark:text-white" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <PipelineSettingsPanel isOpen={showSettings} />
+
+            {showSearchResults ? (
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Knowledge Search Results for &quot;{search}&quot;</h2>
+                        <button onClick={() => { setShowSearchResults(false); setSearch(''); clearSearch(); }} className="text-sm text-primary hover:underline">Clear Search</button>
+                    </div>
+                    {isSearching ? (
+                        <div className="flex items-center gap-2 text-muted-foreground"><Clock className="w-4 h-4 animate-spin" /> Searching global intelligence...</div>
+                    ) : searchResults.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-4">
+                            {searchResults.map((result) => (
+                                <Card key={result.id} className="bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-black/10 dark:bg-white/10 transition-colors pointer-cursor">
+                                    <CardContent className="p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="capitalize text-[10px]">{result.app_type}</Badge>
+                                                <span className="font-semibold text-gray-900 dark:text-white">{result.subject || result.sender}</span>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground">{new Date(result.timestamp).toLocaleString()}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-300 line-clamp-2">{result.content}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 text-muted-foreground border border-dashed border-black/10 dark:border-white/10 rounded-xl">
+                            No historical intelligence found for &quot;{search}&quot;.
+                        </div>
+                    )}
+                </div>
+            ) : activeTab === 'graph' ? (
+                <div className="w-full h-[800px] border border-black/10 dark:border-white/10 rounded-xl overflow-hidden shadow-2xl bg-black/40 backdrop-blur-xl">
+                    <GraphVisualization />
+                </div>
+            ) : activeTab === 'entity-types' ? (
+                <div className="w-full">
+                    {showTypeGraph ? (
+                        <EntityTypeGraphView workspaceId={workspaceId} />
+                    ) : (
+                        <EntityTypeList />
+                    )}
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div className="lg:col-span-3 space-y-6">
+                        {/* Filter Bar */}
+                        <div className="flex flex-wrap gap-2 items-center bg-black/5 dark:bg-white/5 p-2 rounded-xl border border-black/5 dark:border-white/5">
+                            <div className="flex bg-black/5 dark:bg-black/40 p-1 rounded-lg border border-black/5 dark:border-white/5 mr-2">
+                                {['all', 'file', 'task', 'deal', 'ticket'].map(type => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setActiveType(type)}
+                                        className={cn(
+                                            "px-3 py-1 text-xs rounded-md transition-all uppercase font-semibold",
+                                            activeType === type ? "bg-primary text-white" : "text-muted-foreground hover:text-white"
+                                        )}
+                                    >
+                                        {type}s
+                                    </button>
+                                ))}
+                            </div>
+                            <select
+                                value={activePlatform}
+                                onChange={(e) => setActivePlatform(e.target.value)}
+                                className="bg-black/5 dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-lg px-3 py-1 text-xs text-gray-900 dark:text-white focus:outline-none"
+                            >
+                                <option value="all">All Platforms</option>
+                                <option value="gdrive">Google Drive</option>
+                                <option value="jira">Jira</option>
+                                <option value="salesforce">Salesforce</option>
+                                <option value="zendesk">Zendesk</option>
+                                <option value="zoho_workdrive">Zoho</option>
+                            </select>
+                            <div className="flex-1" />
+                            <button
+                                onClick={() => { setActiveType('all'); setActivePlatform('all'); setSearch('') }}
+                                className="text-[10px] text-muted-foreground hover:text-gray-900 dark:text-white uppercase font-bold"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <Card className="bg-black/5 dark:bg-black/40 border-black/5 dark:border-white/5 backdrop-blur-xl">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                    <CardTitle className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Global Objects</CardTitle>
+                                    <HardDrive className="w-4 h-4 text-blue-400" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Across 6 platforms</p>
+                                </CardContent>
+                            </Card>
+                            <Card className="bg-black/5 dark:bg-black/40 border-black/5 dark:border-white/5 backdrop-blur-xl">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                    <CardTitle className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Tasks</CardTitle>
+                                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.tasks}</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Found in global scan</p>
+                                </CardContent>
+                            </Card>
+                            <Card className="bg-black/5 dark:bg-black/40 border-black/5 dark:border-white/5 backdrop-blur-xl">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                    <CardTitle className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Critical Alerts</CardTitle>
+                                    <AlertCircle className="w-4 h-4 text-red-400" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.critical + insights.filter(i => i.severity === 'critical').length}</div>
+                                    <p className="text-xs text-muted-foreground mt-1">Requiring action</p>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Smart Insights Panel */}
+                        {insights.length > 0 && (
+                            <div className="animate-in slide-in-from-top duration-500">
+                                <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 backdrop-blur-xl overflow-hidden">
+                                    <CardHeader className="pb-2 border-b border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5">
+                                        <div className="flex justify-between items-center">
+                                            <CardTitle className="text-xs font-bold text-primary uppercase tracking-tighter flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                                Smart Intelligence Insights
+                                            </CardTitle>
+                                            <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px]">AI POWERED</Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {insights.slice(0, 2).map((insight: SmartInsight, idx: number) => (
+                                                <div key={idx} className="bg-black/5 dark:bg-black/40 border border-black/5 dark:border-white/5 p-4 rounded-xl space-y-3 relative group overflow-hidden transition-all hover:border-primary/30">
+                                                    <div className={cn(
+                                                        "absolute top-0 right-0 w-1 h-full",
+                                                        insight.severity === 'critical' ? 'bg-red-500' : 'bg-orange-500'
+                                                    )} />
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <h3 className="font-bold text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors">{insight.title}</h3>
+                                                        <Badge variant="outline" className={cn(
+                                                            "text-[9px] uppercase",
+                                                            insight.severity === 'critical' ? 'text-red-400 border-red-500/20' : 'text-orange-400 border-orange-500/20'
+                                                        )}>
+                                                            {insight.severity}
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground leading-relaxed">{insight.description}</p>
+                                                    <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5">
+                                                        <p className="text-[10px] text-gray-900 dark:text-white/70 italic font-medium">💡 Recommendation: {insight.recommendation}</p>
+                                                    </div>
+                                                    <div className="flex justify-between items-center pt-2">
+                                                        <div className="flex gap-1">
+                                                            {insight.platforms.map((p: string, i: number) => (
+                                                                <span key={i} className="text-[9px] px-1.5 py-0.5 bg-black/5 dark:bg-white/5 rounded border border-black/10 dark:border-white/10 text-muted-foreground uppercase font-bold">{p}</span>
+                                                            ))}
+                                                        </div>
+                                                        <button className="text-[10px] text-primary hover:underline font-bold uppercase tracking-tighter">Take Action</button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+
+                        <Card className="bg-black/5 dark:bg-black/40 border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-black/5 dark:bg-white/5 text-muted-foreground">
+                                        <tr>
+                                            <th className="px-6 py-4 font-semibold uppercase text-[10px]">Title / Name</th>
+                                            <th className="px-6 py-4 font-semibold uppercase text-[10px]">Type</th>
+                                            <th className="px-6 py-4 font-semibold uppercase text-[10px]">Platform</th>
+                                            <th className="px-6 py-4 font-semibold uppercase text-[10px]">Status / Value</th>
+                                            <th className="px-6 py-4 font-semibold uppercase text-[10px]">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {filteredItems.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                                                    No intelligence found matching your criteria.
+                                                </td>
+                                            </tr>
+                                        ) : filteredItems.map((item: KnowledgeItem) => (
+                                            <tr key={item.id} className="hover:bg-black/5 dark:hover:bg-black/5 dark:bg-white/5 transition-colors group text-gray-900 dark:text-white">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        {getTypeIcon(item.type)}
+                                                        <span className="font-medium group-hover:text-primary transition-colors">{item.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs text-muted-foreground capitalize">{item.type}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {getPlatformBadge(item.platform)}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {item.type === 'deal' ? (
+                                                        <span className="text-green-400 font-mono font-semibold">${item.value?.toLocaleString()}</span>
+                                                    ) : item.status ? (
+                                                        <Badge variant="outline" className="text-[10px] bg-black/5 dark:bg-white/5">{item.status}</Badge>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-xs">{item.modified_at}</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex gap-4">
+                                                        <button
+                                                            className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group/btn"
+                                                            title="Ask Atom about this"
+                                                            onClick={() => toast.success(`Asking Atom about ${item.name}...`)}
+                                                        >
+                                                            <MessageSquare className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
+                                                            <span className="text-[10px] hidden group-hover:inline uppercase font-bold text-primary">Ask</span>
+                                                        </button>
+                                                        <button className="text-muted-foreground hover:text-gray-900 dark:text-white transition-colors">
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    </div>
+
+                    <div className="lg:col-span-1 h-[600px] lg:h-[calc(100vh-200px)] sticky top-6">
+                        <CommentSection channel="knowledge" title="Intelligence Collab" />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default KnowledgeCommandCenter;

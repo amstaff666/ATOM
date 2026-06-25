@@ -1,0 +1,795 @@
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, CheckCircle, AlertTriangle, Clock, ArrowRight, PlusSquare, Star, User, Settings, ChevronDown, Search, ChevronUp, Trash2, Edit, Eye, Mail, Phone, Calendar, MessageSquare } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+
+interface StripePayment {
+  id: string;
+  amount: number;
+  currency: string;
+  status: "succeeded" | "failed" | "pending";
+  customer: string;
+  description: string;
+  created: string;
+  receipt_url?: string;
+  metadata?: Record<string, string>;
+}
+
+interface StripeCustomer {
+  id: string;
+  email: string;
+  name: string;
+  description?: string;
+  created: string;
+  balance: number;
+  currency: string;
+  default_source?: string;
+  metadata?: Record<string, string>;
+  subscriptions_count?: number;
+  avatar_url?: string;
+}
+
+interface StripeSubscription {
+  id: string;
+  customer: string | StripeCustomer; // Can be ID or object expanded
+  status: "active" | "canceled" | "past_due" | "unpaid";
+  current_period_start: string;
+  current_period_end: string;
+  items: Array<{
+    price: {
+      product: string;
+      unit_amount: number;
+      currency: string;
+    };
+    quantity: number;
+  }>;
+  metadata?: Record<string, string>;
+  plan_name?: string;
+  plan_description?: string;
+  amount?: number;
+  interval?: string;
+  next_payment_date?: string;
+}
+
+interface StripeProduct {
+  id: string;
+  name: string;
+  description: string;
+  active: boolean;
+  metadata?: Record<string, string>;
+  created: string;
+  images?: string[];
+  price?: number;
+}
+
+interface StripeAnalytics {
+  totalRevenue: number;
+  monthlyRecurringRevenue: number;
+  activeCustomers: number;
+  totalPayments: number;
+  paymentSuccessRate: number;
+  averageOrderValue: number;
+  revenueGrowth: number;
+  customerGrowth: number;
+}
+
+const StripeIntegration: React.FC = () => {
+  const [payments, setPayments] = useState<StripePayment[]>([]);
+  const [customers, setCustomers] = useState<StripeCustomer[]>([]);
+  const [subscriptions, setSubscriptions] = useState<StripeSubscription[]>([]);
+  const [products, setProducts] = useState<StripeProduct[]>([]);
+  const [analytics, setAnalytics] = useState<StripeAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("payments");
+  const [isCreatePaymentOpen, setIsCreatePaymentOpen] = useState(false);
+  const [isCreateCustomerOpen, setIsCreateCustomerOpen] = useState(false);
+  const [isCreateProductOpen, setIsCreateProductOpen] = useState(false);
+  const [isCreateSubscriptionOpen, setIsCreateSubscriptionOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Form states
+  const [newPaymentAmount, setNewPaymentAmount] = useState("");
+  const [newPaymentCurrency, setNewPaymentCurrency] = useState("USD");
+  const [newPaymentDescription, setNewPaymentDescription] = useState("");
+
+  const [newCustomerName, setNewCustomerName] = useState("");
+  const [newCustomerEmail, setNewCustomerEmail] = useState("");
+
+  const [newProductName, setNewProductName] = useState("");
+  const [newProductDescription, setNewProductDescription] = useState("");
+  const [newProductPrice, setNewProductPrice] = useState("");
+
+  const [selectedCustomer, setSelectedCustomer] = useState<StripeCustomer | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<StripeProduct | null>(null);
+
+  const { toast } = useToast();
+
+  const loadStripeData = async () => {
+    setLoading(true);
+    try {
+      const { apiClient } = await import('../lib/api-client');
+
+      // Fetch all required data from backend
+      const [paymentsRes, customersRes, productsRes, analyticsRes] = await Promise.all([
+        apiClient.get("/api/stripe/payments") as Promise<any>,
+        apiClient.get("/api/stripe/customers") as Promise<any>,
+        apiClient.get("/api/stripe/products") as Promise<any>,
+        apiClient.get("/api/stripe/analytics") as Promise<any>
+      ]);
+
+      setPayments(paymentsRes.data?.payments || []);
+      setCustomers(customersRes.data?.customers || []);
+      setProducts(productsRes.data?.products || []);
+      setAnalytics(analyticsRes.data?.analytics || {
+        totalRevenue: 0,
+        monthlyRecurringRevenue: 0,
+        activeCustomers: 0,
+        totalPayments: 0,
+        paymentSuccessRate: 100,
+        averageOrderValue: 0,
+        revenueGrowth: 0,
+        customerGrowth: 0,
+      });
+
+      toast({
+        title: "Stripe data loaded",
+        variant: "success",
+        duration: 2000,
+      });
+    } catch (error: any) {
+      console.error("Error loading Stripe data:", error);
+
+      // Handle 401/404 specifically for unconfigured integrations
+      if (error.response?.status === 401 || error.response?.status === 404) {
+        toast({
+          title: "Stripe not configured",
+          description: "Please set up your Stripe API keys in the dashboard.",
+          variant: "error",
+        });
+      } else {
+        toast({
+          title: "Failed to load Stripe data",
+          description: "An unexpected error occurred. Please try again later.",
+          variant: "error",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createPayment = async (amount: number, currency: string, description: string) => {
+    try {
+      const { apiClient } = await import('../lib/api-client');
+      const response = await apiClient.post("/api/stripe/payments/create", {
+        amount: Math.round(amount * 100),
+        currency: currency.toLowerCase(),
+        description
+      }) as any;
+
+      if (response.data?.success) {
+        setPayments((prev) => [response.data.payment, ...prev]);
+        setIsCreatePaymentOpen(false);
+        setNewPaymentAmount("");
+        setNewPaymentDescription("");
+
+        toast({
+          title: "Payment created successfully",
+          variant: "success",
+        });
+      } else {
+        throw new Error(response.data?.message || "Failed to create payment");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Failed to create payment",
+        description: error.response?.data?.message || error.message,
+        variant: "error",
+      });
+    }
+  };
+
+  const createCustomer = async (name: string, email: string) => {
+    try {
+      const { apiClient } = await import('../lib/api-client');
+      const response = await apiClient.post("/api/stripe/customers/create", {
+        name,
+        email
+      }) as any;
+
+      if (response.data?.success) {
+        setCustomers((prev) => [response.data.customer, ...prev]);
+        setIsCreateCustomerOpen(false);
+        setNewCustomerName("");
+        setNewCustomerEmail("");
+
+        toast({
+          title: "Customer created successfully",
+          variant: "success",
+        });
+      } else {
+        throw new Error(response.data?.message || "Failed to create customer");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Failed to create customer",
+        description: error.response?.data?.message || error.message,
+        variant: "error",
+      });
+    }
+  };
+
+  const createProduct = async (name: string, description: string, price: number) => {
+    try {
+      const { apiClient } = await import('../lib/api-client');
+      const response = await apiClient.post("/api/stripe/products/create", {
+        name,
+        description,
+        price: Math.round(price * 100)
+      }) as any;
+
+      if (response.data?.success) {
+        setProducts((prev) => [response.data.product, ...prev]);
+        setIsCreateProductOpen(false);
+        setNewProductName("");
+        setNewProductDescription("");
+        setNewProductPrice("");
+
+        toast({
+          title: "Product created successfully",
+          variant: "success",
+        });
+      } else {
+        throw new Error(response.data?.message || "Failed to create product");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Failed to create product",
+        description: error.response?.data?.message || error.message,
+        variant: "error",
+      });
+    }
+  };
+
+  const handleSubscriptionAction = async (subId: string, action: string) => {
+    try {
+      const { apiClient } = await import('../lib/api-client');
+      await apiClient.post(`/api/stripe/subscriptions/${subId}/${action}`);
+
+      toast({
+        title: `Subscription ${action}ed`,
+        variant: 'success'
+      });
+      loadStripeData(); // Refresh data
+    } catch (error: any) {
+      toast({
+        title: `Failed to ${action} subscription`,
+        description: error.response?.data?.message || error.message,
+        variant: 'error'
+      });
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "succeeded":
+      case "active":
+        return "default";
+      case "failed":
+      case "canceled":
+      case "unpaid":
+        return "destructive";
+      case "pending":
+      case "past_due":
+        return "secondary";
+      default:
+        return "outline";
+    }
+  };
+
+  const formatCurrency = (amount: number = 0, currency: string = "usd") => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(amount / 100);
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const filteredPayments = payments.filter((payment) => {
+    const matchesSearch =
+      payment.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.customer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || payment.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  useEffect(() => {
+    loadStripeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (loading && payments.length === 0 && !analytics) {
+    return (
+      <div className="flex h-[400px] w-full flex-col items-center justify-center gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+        <p className="text-muted-foreground">Loading Stripe data...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-800 p-6">
+      <div className="max-w-[1400px] mx-auto space-y-8">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold">Stripe Integration</h1>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            Complete payment processing and financial management
+          </p>
+        </div>
+
+        {/* Quick Stats */}
+        {analytics && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+                  <div className="text-2xl font-bold">{formatCurrency(analytics.totalRevenue)}</div>
+                  <div className="flex items-center text-xs">
+                    {analytics.revenueGrowth > 0 ? (
+                      <ArrowRight className="mr-1 h-4 w-4 rotate-[-45deg] text-green-500" />
+                    ) : (
+                      <ArrowRight className="mr-1 h-4 w-4 rotate-[45deg] text-red-500" />
+                    )}
+                    <span className={analytics.revenueGrowth > 0 ? "text-green-500" : "text-red-500"}>
+                      {Math.abs(analytics.revenueGrowth)}%
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Monthly Recurring</p>
+                  <div className="text-2xl font-bold">{formatCurrency(analytics.monthlyRecurringRevenue)}</div>
+                  <p className="text-xs text-muted-foreground">Active subscriptions</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Active Customers</p>
+                  <div className="text-2xl font-bold">{analytics.activeCustomers}</div>
+                  <div className="flex items-center text-xs">
+                    {analytics.customerGrowth > 0 ? (
+                      <ArrowRight className="mr-1 h-4 w-4 rotate-[-45deg] text-green-500" />
+                    ) : (
+                      <ArrowRight className="mr-1 h-4 w-4 rotate-[45deg] text-red-500" />
+                    )}
+                    <span className={analytics.customerGrowth > 0 ? "text-green-500" : "text-red-500"}>
+                      {Math.abs(analytics.customerGrowth)}%
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
+                  <div className="text-2xl font-bold">{analytics.paymentSuccessRate}%</div>
+                  <p className="text-xs text-muted-foreground">
+                    Of {analytics.totalPayments} payments
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Main Content Tabs */}
+        <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-5 mb-4 max-w-2xl">
+            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="customers">Customers</TabsTrigger>
+            <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+            <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+
+          <Card>
+            <CardContent className="p-6">
+              {/* Payments Tab */}
+              <TabsContent value="payments" className="mt-0">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Payment Management</h2>
+                    <Button onClick={() => setIsCreatePaymentOpen(true)}>
+                      <PlusSquare className="mr-2 h-4 w-4" />
+                      Create Payment
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center space-x-4">
+                    <Input
+                      placeholder="Search payments..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="max-w-sm"
+                    />
+                    <Select
+                      value={statusFilter}
+                      onValueChange={(value) => setStatusFilter(value)}
+                    >
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="succeeded">Succeeded</SelectItem>
+                        <SelectItem value="failed">Failed</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="rounded-md border">
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-muted/50 text-muted-foreground">
+                        <tr>
+                          <th className="h-12 px-4 font-medium">ID</th>
+                          <th className="h-12 px-4 font-medium">Amount</th>
+                          <th className="h-12 px-4 font-medium">Customer</th>
+                          <th className="h-12 px-4 font-medium">Description</th>
+                          <th className="h-12 px-4 font-medium">Status</th>
+                          <th className="h-12 px-4 font-medium">Date</th>
+                          <th className="h-12 px-4 font-medium">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredPayments.map((payment) => (
+                          <tr key={payment.id} className="border-t hover:bg-muted/50">
+                            <td className="p-4 font-mono text-xs">
+                              {payment.id.substring(0, 12)}...
+                            </td>
+                            <td className="p-4">{formatCurrency(payment.amount)}</td>
+                            <td className="p-4">
+                              <span className="text-muted-foreground">{payment.customer}</span>
+                            </td>
+                            <td className="p-4">
+                              <span className="line-clamp-2 text-sm">
+                                {payment.description}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <Badge variant={payment.status === 'succeeded' ? 'default' : payment.status === 'failed' ? 'destructive' : 'secondary'}>
+                                {payment.status}
+                              </Badge>
+                            </td>
+                            <td className="p-4">{formatDate(payment.created)}</td>
+                            <td className="p-4">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  payment.receipt_url && window.open(payment.receipt_url, "_blank")
+                                }
+                              >
+                                Receipt
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Customers Tab */}
+              <TabsContent value="customers" className="mt-0">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Customer Management</h2>
+                    <Button onClick={() => setIsCreateCustomerOpen(true)}>
+                      <PlusSquare className="mr-2 h-4 w-4" />
+                      Add Customer
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {customers.map((customer) => (
+                      <Card key={customer.id}>
+                        <CardContent className="p-6">
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={customer.avatar_url} />
+                                <AvatarFallback>{customer.name[0]}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h3 className="font-semibold">{customer.name}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {customer.email}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 w-full">
+                              <div className="flex justify-between w-full">
+                                <span className="font-medium">Balance:</span>
+                                <span>{formatCurrency(customer.balance)}</span>
+                              </div>
+                              <div className="flex justify-between w-full">
+                                <span className="font-medium">Created:</span>
+                                <span className="text-sm">
+                                  {formatDate(customer.created)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => setSelectedCustomer(customer)}
+                            >
+                              View Details
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Subscriptions Tab */}
+              <TabsContent value="subscriptions" className="mt-0">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Subscription Management</h2>
+                    <Button onClick={() => setIsCreateSubscriptionOpen(true)}>
+                      <PlusSquare className="mr-2 h-4 w-4" />
+                      Create Subscription
+                    </Button>
+                  </div>
+                  <p className="text-muted-foreground">No subscriptions loaded.</p>
+                </div>
+              </TabsContent>
+
+              {/* Products Tab */}
+              <TabsContent value="products" className="mt-0">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Product Management</h2>
+                    <Button onClick={() => setIsCreateProductOpen(true)}>
+                      <PlusSquare className="mr-2 h-4 w-4" />
+                      Create Product
+                    </Button>
+                  </div>
+                  {products.length === 0 && <p className="text-muted-foreground">No products loaded.</p>}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                      <Card key={product.id}>
+                        <CardContent className="p-6">
+                          <div className="space-y-4">
+                            <h3 className="font-semibold text-lg">{product.name}</h3>
+                            <p className="text-sm text-muted-foreground">{product.description}</p>
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold">{formatCurrency(product.price)}</span>
+                              <Button size="sm" variant="outline" onClick={() => setSelectedProduct(product)}>Edit</Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-0">
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="rounded-full bg-muted p-4 mb-4">
+                    <Star className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold">Analytics Dashboard</h3>
+                  <p className="text-muted-foreground max-w-sm mt-2">
+                    Detailed analytics and reporting features coming soon.
+                  </p>
+                </div>
+              </TabsContent>
+
+            </CardContent>
+          </Card>
+        </Tabs>
+
+        {/* Create Payment Modal */}
+        <Dialog open={isCreatePaymentOpen} onOpenChange={setIsCreatePaymentOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Payment</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Amount</label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={newPaymentAmount}
+                  onChange={(e) => setNewPaymentAmount(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Currency</label>
+                <Input
+                  placeholder="USD"
+                  value={newPaymentCurrency}
+                  onChange={(e) => setNewPaymentCurrency(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Description</label>
+                <Textarea
+                  placeholder="Payment description"
+                  value={newPaymentDescription}
+                  onChange={(e) => setNewPaymentDescription(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreatePaymentOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() =>
+                  createPayment(
+                    parseFloat(newPaymentAmount),
+                    newPaymentCurrency,
+                    newPaymentDescription,
+                  )
+                }
+                disabled={!newPaymentAmount}
+              >
+                Create Payment
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Customer Modal */}
+        <Dialog open={isCreateCustomerOpen} onOpenChange={setIsCreateCustomerOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Customer</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Name</label>
+                <Input
+                  placeholder="Customer name"
+                  value={newCustomerName}
+                  onChange={(e) => setNewCustomerName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Email</label>
+                <Input
+                  type="email"
+                  placeholder="customer@example.com"
+                  value={newCustomerEmail}
+                  onChange={(e) => setNewCustomerEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateCustomerOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() =>
+                  createCustomer(newCustomerName, newCustomerEmail)
+                }
+                disabled={!newCustomerName || !newCustomerEmail}
+              >
+                Add Customer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Product Modal */}
+        <Dialog open={isCreateProductOpen} onOpenChange={setIsCreateProductOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Product</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Product Name</label>
+                <Input
+                  placeholder="Product name"
+                  value={newProductName}
+                  onChange={(e) => setNewProductName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Description</label>
+                <Textarea
+                  placeholder="Product description"
+                  value={newProductDescription}
+                  onChange={(e) => setNewProductDescription(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none">Price</label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={newProductPrice}
+                  onChange={(e) => setNewProductPrice(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateProductOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() =>
+                  createProduct(
+                    newProductName,
+                    newProductDescription,
+                    parseFloat(newProductPrice),
+                  )
+                }
+                disabled={!newProductName || !newProductPrice}
+              >
+                Add Product
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default StripeIntegration;

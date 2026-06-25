@@ -1,0 +1,10 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\polyval-02459601bf590d34.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\soft64.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\mulx.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\autodetect.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\clmul.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\libpolyval-02459601bf590d34.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\soft64.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\mulx.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\autodetect.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\clmul.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\lib.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\soft64.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\mulx.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\autodetect.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\polyval-0.6.2\src\backend\clmul.rs:

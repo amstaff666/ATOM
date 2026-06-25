@@ -1,0 +1,264 @@
+---
+pid: 74452
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "Stop-Process -Id 92432 -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2; cd \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\frontend-nextjs\" && npm run dev"
+started_at: 2026-06-17T15:34:27.927Z
+running_for_ms: 13925011 
+---
+
+> atomic-app@0.1.0-alpha.4 predev
+> python ../scripts/pre_dev.py
+
+pre_dev: running Atom self-heal...
+
+> atomic-app@0.1.0-alpha.4 dev
+> cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --webpack
+
+▲ Next.js 16.2.2 (webpack)
+⚠ Port 3000 is in use by process 81984, using available port 3002 instead.
+- Local:         http://localhost:3002
+- Network:       http://172.20.10.3:3002
+- Environments: .env.local
+✓ Ready in 440ms
+  Skipping creating a lockfile at I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\.next\dev\lock because we're using WASM bindings
+⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: \\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node is not a valid Win32 application.
+\\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+- Experiments (use with caution):
+  ✓ externalDir
+
+○ Compiling / ...
+ GET / 200 in 8.3s (next.js: 8.2s, proxy.ts: 10ms, application-code: 62ms)
+ GET / 304 in 353ms (next.js: 328ms, proxy.ts: 12ms, application-code: 14ms)
+ GET / 200 in 19ms (next.js: 2ms, proxy.ts: 4ms, application-code: 13ms)
+ GET / 304 in 27ms (next.js: 6ms, proxy.ts: 6ms, application-code: 16ms)
+ GET / 304 in 26ms (next.js: 3ms, proxy.ts: 6ms, application-code: 16ms)
+ GET /api/auth/session 200 in 426ms (next.js: 409ms, proxy.ts: 4ms, application-code: 14ms)
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 7ms (next.js: 3ms, proxy.ts: 2ms, application-code: 2ms)
+○ Compiling /automations ...
+[browser] ./node_modules/@reactflow/background/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/controls/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/minimap/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-resizer/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/reactflow/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+⨯ ./node_modules/@reactflow/background/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\.next\dev\cache\webpack\client-development-fallback.pack.gz: Error: incorrect header check
+[browser] ./node_modules/@reactflow/background/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/controls/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/minimap/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-resizer/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/reactflow/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+ GET /_next/data/development/automations.json 500 in 6.4s (next.js: 6.3s, proxy.ts: 5ms, application-code: 80ms)
+⨯ ./node_modules/@reactflow/background/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx
+ GET /automations 500 in 115ms (next.js: 2ms, proxy.ts: 3ms, application-code: 110ms)
+[browser] Uncaught Error: Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+ GET /automations 500 in 10ms (next.js: 2ms, proxy.ts: 4ms, application-code: 4ms)
+[browser] ./node_modules/@reactflow/background/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/controls/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/minimap/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-resizer/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/@reactflow/node-toolbar/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/reactflow/dist/esm/index.mjs
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+[browser] ./node_modules/reactflow/dist/esm/index.mjs
+Module not found: Can't resolve '@reactflow/core'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./components/Automations/WorkflowBuilder.tsx
+./components/WorkflowAutomation.tsx
+./pages/automations.tsx 
+'wmic' is not recognized as an internal or external command,
+operable program or batch file.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /automations 200 in 3.1s (next.js: 3.1s, proxy.ts: 2ms, application-code: 30ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /automations 200 in 11ms (next.js: 2ms, proxy.ts: 2ms, application-code: 6ms)
+ GET /automations 200 in 10ms (next.js: 1421µs, proxy.ts: 3ms, application-code: 6ms)
+ GET /automations 200 in 14ms (next.js: 3ms, proxy.ts: 4ms, application-code: 7ms)
+ GET /automations 304 in 19ms (next.js: 3ms, proxy.ts: 5ms, application-code: 11ms)
+ GET /api/auth/session 200 in 148ms (next.js: 131ms, proxy.ts: 9ms, application-code: 8ms)
+ GET /api/auth/session 200 in 13ms (next.js: 8ms, proxy.ts: 3ms, application-code: 1448µs)

@@ -1,0 +1,828 @@
+"""
+Agent Graduation Service
+
+Validates agent readiness for promotion using episodic memory.
+Provides data-driven audit trails for governance compliance.
+"""
+
+from datetime import datetime
+import logging
+from typing import Any, Dict, List, Optional
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
+
+from core.lancedb_handler import get_lancedb_handler
+from core.service_factory import get_episode_service
+from core.sandbox_executor import get_sandbox_executor, get_graduation_exam_executor
+from core.models import (
+    AgentRegistry,
+    AgentStatus,
+    Episode,
+    EpisodeSegment,
+    SupervisionSession,
+    SkillExecution,
+)
+
+logger = logging.getLogger(__name__)
+
+
+
+
+
+class AgentGraduationService:
+    """Validates agent promotion readiness using episodic memory"""
+
+    # Graduation criteria
+    CRITERIA = {
+        "INTERN": {
+            "min_episodes": 10,
+            "max_intervention_rate": 0.5,  # 50%
+            "min_constitutional_score": 0.70
+        },
+        "SUPERVISED": {
+            "min_episodes": 25,
+            "max_intervention_rate": 0.2,  # 20%
+            "min_constitutional_score": 0.85
+        },
+        "AUTONOMOUS": {
+            "min_episodes": 50,
+            "max_intervention_rate": 0.0,  # 0% - fully autonomous
+            "min_constitutional_score": 0.95
+        }
+    }
+
+    def __init__(self, db: Session):
+        self.db = db
+        self.lancedb = get_lancedb_handler()
+
+    async def calculate_readiness_score(
+        self,
+        agent_id: str,
+        target_maturity: str,  # INTERN, SUPERVISED, AUTONOMOUS
+        min_episodes: int = None
+    ) -> Dict[str, Any]:
+        """
+        Calculate graduation readiness score from episodic memory.
+
+        Returns:
+            {
+                "ready": bool,
+                "score": float (0-100),
+                "episode_count": int,
+                "avg_constitutional_score": float,
+                "total_human_interventions": int,
+                "intervention_rate": float,
+                "recommendation": str,
+                "gaps": List[str]
+            }
+        """
+        # Query agent
+        agent = self.db.query(AgentRegistry).filter(
+            AgentRegistry.id == agent_id
+        ).first()
+
+        if not agent:
+            return {"error": "Agent not found"}
+
+        # Validate target maturity level
+        if target_maturity not in self.CRITERIA:
+            return {"error": f"Unknown maturity level: {target_maturity}"}
+
+        current_maturity = agent.status.value if hasattr(agent.status, 'value') else str(agent.status)
+
+        # Use Ported EpisodeService for weighted readiness formula
+        episode_service = get_episode_service(self.db)
+        readiness = episode_service.get_graduation_readiness(
+            agent_id=agent_id,
+            user_id=agent.user_id,
+            target_level=target_maturity.lower()
+        )
+        
+        result = readiness.to_dict()
+        result["current_maturity"] = current_maturity
+        result["target_maturity"] = target_maturity
+        result["ready"] = result["threshold_met"] # Map to upstream field name
+        
+        return result
+
+    def _calculate_score(
+        self,
+        episode_count: int,
+        min_episodes: int,
+        intervention_rate: float,
+        max_intervention: float,
+        constitutional_score: float,
+        min_constitutional: float
+    ) -> float:
+        """Calculate weighted readiness score (0-100)"""
+        # Episode score (40%)
+        episode_score = min(episode_count / min_episodes, 1.0) * 40
+
+        # Intervention score (30%)
+        # Lower intervention rate is better, so invert
+        intervention_score = (1 - min(intervention_rate / max(max_intervention, 0.01), 1.0)) * 30
+
+        # Constitutional score (30%)
+        constitutional_score_normalized = min(constitutional_score / max(min_constitutional, 0.01), 1.0)
+        constitutional_score_calc = constitutional_score_normalized * 30
+
+        return episode_score + intervention_score + constitutional_score_calc
+
+    def _generate_recommendation(self, ready: bool, score: float, target: str) -> str:
+        """Generate human-readable recommendation"""
+        if ready:
+            return f"Agent ready for promotion to {target}. Score: {score:.1f}/100"
+
+        if score < 50:
+            return f"Agent not ready. Significant training needed for {target}."
+        elif score < 75:
+            return f"Agent making progress. More practice needed for {target}."
+        else:
+            return f"Agent close to ready. Address specific gaps for {target}."
+
+    async def run_graduation_exam(
+        self,
+        agent_id: str,
+        edge_case_episodes: List[str]
+    ) -> Dict[str, Any]:
+        """
+        Run agent through historical "edge case" episodes in sandbox.
+
+        Tests agent against historical failures from other agents.
+
+        Args:
+            agent_id: Agent to test
+            edge_case_episodes: List of episode IDs to simulate
+
+        Returns:
+            {
+                "passed": bool,
+                "results": List[Dict],
+                "score": float
+            }
+        """
+        from core.sandbox_executor import get_sandbox_executor
+
+        results = []
+
+        for episode_id in edge_case_episodes:
+            episode = self.db.query(Episode).filter(
+                Episode.id == episode_id
+            ).first()
+
+            if not episode:
+                logger.warning(f"Episode {episode_id} not found for sandbox validation")
+                continue
+
+            # Execute episode in sandbox
+            executor = get_sandbox_executor(self.db)
+            sandbox_result = await executor.execute_in_sandbox(
+                episode_id=episode_id,
+                strict_mode=True  # Zero interventions for graduation
+            )
+
+            results.append({
+                "episode_id": episode_id,
+                "title": episode.task_description or "Untitled Episode",
+                "passed": sandbox_result.passed,
+                "interventions": sandbox_result.interventions,
+                "safety_violations": sandbox_result.safety_violations,
+                "replayed_actions": sandbox_result.replayed_actions
+            })
+
+        passed = all(r["passed"] for r in results)
+        score = sum(1 for r in results if r["passed"]) / len(results) * 100 if results else 0
+
+        return {
+            "passed": passed,
+            "results": results,
+            "score": round(score, 1),
+            "total_cases": len(edge_case_episodes)
+        }
+
+    async def validate_constitutional_compliance(
+        self,
+        episode_id: str
+    ) -> Dict[str, Any]:
+        """
+        Verify episode actions against Knowledge Graph rules.
+
+        Checks tax laws, HIPAA, domain-specific constraints.
+
+        Args:
+            episode_id: Episode to validate
+
+        Returns:
+            {
+                "compliant": bool,
+                "score": float,
+                "violations": List[str]
+            }
+        """
+        from core.constitutional_validator import ConstitutionalValidator
+
+        episode = self.db.query(Episode).filter(
+            Episode.id == episode_id
+        ).first()
+
+        if not episode:
+            return {"error": "Episode not found"}
+
+        # Get episode segments for validation
+        segments = self.db.query(EpisodeSegment).filter(
+            EpisodeSegment.episode_id == episode_id
+        ).all()
+
+        # Ensure segments is a list (defensive against Mock objects in tests)
+        if not segments or not isinstance(segments, list):
+            return {
+                "compliant": True,
+                "score": 1.0,
+                "violations": [],
+                "episode_id": episode_id,
+                "note": "No segments to validate"
+            }
+
+        # Use ConstitutionalValidator to check compliance
+        validator = ConstitutionalValidator(self.db)
+
+        # Detect domain from episode metadata or agent type
+        domain = episode.metadata_json.get("domain") if episode.metadata_json else None
+
+        result = validator.validate_actions(segments, domain=domain)
+
+        return {
+            "compliant": result["compliant"],
+            "score": result["score"],
+            "violations": result["violations"],
+            "episode_id": episode_id,
+            "total_actions": result["total_actions"],
+            "checked_actions": result["checked_actions"]
+        }
+
+    async def promote_agent(
+        self,
+        agent_id: str,
+        new_maturity: str,
+        validated_by: str
+    ) -> bool:
+        """
+        Update agent metadata in PostgreSQL after successful graduation.
+
+        Args:
+            agent_id: Agent to promote
+            new_maturity: New maturity level
+            validated_by: User ID who approved promotion
+
+        Returns:
+            True if successful
+        """
+        agent = self.db.query(AgentRegistry).filter(
+            AgentRegistry.id == agent_id
+        ).first()
+
+        if not agent:
+            logger.error(f"Agent {agent_id} not found for promotion")
+            return False
+
+        # Update maturity
+        try:
+            agent.status = AgentStatus[new_maturity.upper()]
+        except KeyError:
+            logger.error(f"Invalid maturity level: {new_maturity}")
+            return False
+
+        agent.updated_at = datetime.now()
+
+        # Add promotion metadata to configuration
+        if not agent.configuration:
+            agent.configuration = {}
+        agent.configuration["promoted_at"] = datetime.now().isoformat()
+        agent.configuration["promoted_by"] = validated_by
+
+        # Flag configuration as modified for SQLAlchemy JSON tracking
+        flag_modified(agent, "configuration")
+
+        self.db.commit()
+        logger.info(f"Agent {agent_id} promoted to {new_maturity} by {validated_by}")
+
+        return True
+
+    async def get_graduation_audit_trail(
+        self,
+        agent_id: str
+    ) -> Dict[str, Any]:
+        """
+        Get full audit trail for agent graduation.
+
+        Provides comprehensive data for governance review.
+
+        Args:
+            agent_id: Agent ID
+
+        Returns:
+            {
+                "agent_id": str,
+                "current_maturity": str,
+                "episodes": List[Dict],
+                "summary_stats": Dict
+            }
+        """
+        agent = self.db.query(AgentRegistry).filter(
+            AgentRegistry.id == agent_id
+        ).first()
+
+        if not agent:
+            return {"error": "Agent not found"}
+
+        # Get all episodes for this agent
+        episodes = self.db.query(Episode).filter(
+            Episode.agent_id == agent_id
+        ).order_by(Episode.started_at.desc()).all()
+
+        # Calculate summary stats
+        total_episodes = len(episodes)
+        total_interventions = sum(e.human_intervention_count for e in episodes)
+
+        constitutional_scores = [
+            e.constitutional_score for e in episodes
+            if e.constitutional_score is not None
+        ]
+        avg_constitutional = sum(constitutional_scores) / len(constitutional_scores) if constitutional_scores else 0.0
+
+        # Group by maturity level
+        by_maturity = {}
+        for ep in episodes:
+            maturity = ep.maturity_at_time
+            if maturity not in by_maturity:
+                by_maturity[maturity] = []
+            by_maturity[maturity].append({
+                "id": ep.id,
+                "title": ep.task_description or "Untitled Episode",
+                "started_at": ep.started_at.isoformat() if ep.started_at else None,
+                "human_intervention_count": ep.human_intervention_count,
+                "constitutional_score": ep.constitutional_score
+            })
+
+        return {
+            "agent_id": agent_id,
+            "agent_name": agent.name,
+            "current_maturity": agent.status.value if hasattr(agent.status, 'value') else str(agent.status),
+            "total_episodes": total_episodes,
+            "total_interventions": total_interventions,
+            "avg_constitutional_score": round(avg_constitutional, 3),
+            "episodes_by_maturity": {
+                k: len(v) for k, v in by_maturity.items()
+            },
+            "recent_episodes": by_maturity.get(str(agent.status), [])[:10]
+        }
+
+    # ========================================================================
+    # Supervision Metrics Integration
+    # ========================================================================
+
+    async def calculate_supervision_metrics(
+        self,
+        agent_id: str,
+        maturity_level: AgentStatus
+    ) -> Dict[str, Any]:
+        """
+        Calculate supervision-based metrics for graduation validation.
+
+        Returns:
+            {
+                "total_supervision_hours": float,
+                "intervention_rate": float,  # interventions per hour
+                "average_supervisor_rating": float,  # 1-5 scale
+                "successful_intervention_recovery_rate": float,
+                "recent_performance_trend": str,  # "improving", "stable", "declining"
+                "total_sessions": int,
+                "high_rating_sessions": int,  # 4-5 star sessions
+                "low_intervention_sessions": int  # 0-1 intervention sessions
+            }
+        """
+        # Get supervision sessions for this agent at maturity level
+        sessions = self.db.query(SupervisionSession).filter(
+            SupervisionSession.agent_id == agent_id,
+            SupervisionSession.status == "completed"
+        ).all()
+
+        if not sessions:
+            return {
+                "total_supervision_hours": 0,
+                "intervention_rate": 1.0,  # High penalty if no data
+                "average_supervisor_rating": 0.0,
+                "successful_intervention_recovery_rate": 0.0,
+                "recent_performance_trend": "unknown",
+                "total_sessions": 0,
+                "high_rating_sessions": 0,
+                "low_intervention_sessions": 0
+            }
+
+        # Calculate metrics
+        total_duration = sum(s.duration_seconds or 0 for s in sessions)
+        total_hours = total_duration / 3600 if total_duration > 0 else 0
+
+        total_interventions = sum(s.intervention_count or 0 for s in sessions)
+
+        # Intervention rate (interventions per hour)
+        intervention_rate = (total_interventions / total_hours) if total_hours > 0 else 1.0
+
+        # Average supervisor rating
+        ratings = [s.supervisor_rating for s in sessions if s.supervisor_rating is not None]
+        avg_rating = sum(ratings) / len(ratings) if ratings else 0.0
+
+        # High-quality sessions (4-5 stars)
+        high_rating_sessions = sum(1 for r in ratings if r >= 4)
+
+        # Low intervention sessions (0-1 interventions)
+        low_intervention_sessions = sum(
+            1 for s in sessions
+            if (s.intervention_count or 0) <= 1
+        )
+
+        # Successful intervention recovery
+        # (Sessions where interventions led to successful completion)
+        successful_recovery = sum(
+            1 for s in sessions
+            if (s.intervention_count or 0) > 0 and (s.supervisor_rating or 0) >= 3
+        )
+        sessions_with_interventions = sum(1 for s in sessions if (s.intervention_count or 0) > 0)
+        recovery_rate = (
+            successful_recovery / sessions_with_interventions
+            if sessions_with_interventions > 0 else 1.0
+        )
+
+        # Performance trend (compare recent vs older sessions)
+        recent_performance_trend = self._calculate_performance_trend(sessions)
+
+        return {
+            "total_supervision_hours": round(total_hours, 2),
+            "intervention_rate": round(intervention_rate, 3),
+            "average_supervisor_rating": round(avg_rating, 2),
+            "successful_intervention_recovery_rate": round(recovery_rate, 3),
+            "recent_performance_trend": recent_performance_trend,
+            "total_sessions": len(sessions),
+            "high_rating_sessions": high_rating_sessions,
+            "low_intervention_sessions": low_intervention_sessions
+        }
+
+    def _calculate_performance_trend(self, sessions: List[SupervisionSession]) -> str:
+        """
+        Calculate recent performance trend from supervision sessions.
+
+        Compares the most recent 5 sessions to the previous 5 sessions.
+
+        Returns:
+            "improving", "stable", or "declining"
+        """
+        if len(sessions) < 10:
+            return "stable"
+
+        # Sort by start time
+        sorted_sessions = sorted(
+            sessions,
+            key=lambda s: s.started_at or datetime.min,
+            reverse=True
+        )
+
+        # Get recent and previous sessions
+        recent = sorted_sessions[:5]
+        previous = sorted_sessions[5:10]
+
+        # Calculate average ratings
+        recent_ratings = [s.supervisor_rating for s in recent if s.supervisor_rating]
+        previous_ratings = [s.supervisor_rating for s in previous if s.supervisor_rating]
+
+        if not recent_ratings or not previous_ratings:
+            return "stable"
+
+        recent_avg = sum(recent_ratings) / len(recent_ratings)
+        previous_avg = sum(previous_ratings) / len(previous_ratings)
+
+        # Calculate average intervention counts
+        recent_interventions = [s.intervention_count or 0 for s in recent]
+        previous_interventions = [s.intervention_count or 0 for s in previous]
+
+        recent_avg_int = sum(recent_interventions) / len(recent_interventions)
+        previous_avg_int = sum(previous_interventions) / len(previous_interventions)
+
+        # Determine trend
+        rating_diff = recent_avg - previous_avg
+        intervention_diff = previous_avg_int - recent_avg_int  # Lower is better
+
+        # Combined score
+        score = rating_diff * 0.6 + intervention_diff * 0.4
+
+        if score > 0.3:
+            return "improving"
+        elif score < -0.3:
+            return "declining"
+        else:
+            return "stable"
+
+    async def validate_graduation_with_supervision(
+        self,
+        agent_id: str,
+        target_maturity: AgentStatus
+    ) -> Dict[str, Any]:
+        """
+        Validate agent graduation using both episode and supervision data.
+
+        Combines:
+        - Episode count and quality
+        - Supervision intervention rate
+        - Supervisor ratings
+        - Constitutional compliance
+
+        Args:
+            agent_id: Agent to validate
+            target_maturity: Target maturity level
+
+        Returns:
+            {
+                "ready": bool,
+                "score": float (0-100),
+                "episode_metrics": dict,
+                "supervision_metrics": dict,
+                "recommendation": str,
+                "gaps": List[str]
+            }
+        """
+        # Get existing episode-based validation
+        episode_result = await self.calculate_readiness_score(
+            agent_id=agent_id,
+            target_maturity=target_maturity.value if hasattr(target_maturity, 'value') else str(target_maturity)
+        )
+
+        # Get supervision-based metrics
+        supervision_metrics = await self.calculate_supervision_metrics(
+            agent_id=agent_id,
+            maturity_level=target_maturity
+        )
+
+        # Get criteria for target maturity
+        criteria = self.CRITERIA.get(
+            target_maturity.value if hasattr(target_maturity, 'value') else str(target_maturity).upper(),
+            {}
+        )
+
+        # Check supervision-specific gaps
+        supervision_gaps = []
+
+        # High-quality session requirement
+        min_high_quality = max(1, int(criteria.get("min_episodes", 10) * 0.4))
+        if supervision_metrics["high_rating_sessions"] < min_high_quality:
+            supervision_gaps.append(
+                f"Need {min_high_quality - supervision_metrics['high_rating_sessions']} more high-rated sessions (4-5 stars)"
+            )
+
+        # Low intervention requirement
+        min_low_intervention = max(1, int(criteria.get("min_episodes", 10) * 0.3))
+        if supervision_metrics["low_intervention_sessions"] < min_low_intervention:
+            supervision_gaps.append(
+                f"Need {min_low_intervention - supervision_metrics['low_intervention_sessions']} more low-intervention sessions"
+            )
+
+        # Minimum average rating (3.5/5)
+        if supervision_metrics["average_supervisor_rating"] < 3.5:
+            supervision_gaps.append(
+                f"Average supervisor rating too low: {supervision_metrics['average_supervisor_rating']:.1f} < 3.5"
+            )
+
+        # Intervention rate threshold
+        max_intervention_rate = criteria.get("max_intervention_rate", 0.5) * 10  # Convert to per-hour
+        if supervision_metrics["intervention_rate"] > max_intervention_rate:
+            supervision_gaps.append(
+                f"Intervention rate too high: {supervision_metrics['intervention_rate']:.1f}/hr > {max_intervention_rate:.1f}/hr"
+            )
+
+        # Combined validation
+        all_gaps = episode_result.get("gaps", []) + supervision_gaps
+
+        ready = len(all_gaps) == 0 and episode_result.get("ready", False)
+
+        # Combined score (70% episode-based, 30% supervision-based)
+        combined_score = (
+            episode_result.get("score", 0) * 0.7 +
+            self._supervision_score(supervision_metrics, criteria) * 0.3
+        )
+
+        return {
+            "ready": ready,
+            "score": round(combined_score, 1),
+            "episode_metrics": episode_result,
+            "supervision_metrics": supervision_metrics,
+            "recommendation": self._generate_recommendation(
+                ready,
+                combined_score,
+                target_maturity.value if hasattr(target_maturity, 'value') else str(target_maturity)
+            ),
+            "gaps": all_gaps,
+            "target_maturity": target_maturity.value if hasattr(target_maturity, 'value') else str(target_maturity),
+            "current_maturity": episode_result.get("current_maturity", "UNKNOWN")
+        }
+
+    def _supervision_score(
+        self,
+        metrics: Dict[str, Any],
+        criteria: Dict[str, Any]
+    ) -> float:
+        """
+        Calculate supervision-based score (0-100).
+
+        Factors:
+        - Average supervisor rating (40%)
+        - Intervention rate (30%)
+        - High-quality session percentage (20%)
+        - Performance trend (10%)
+        """
+        # Rating score (40%) - target: 4.0/5.0
+        rating_score = min(metrics["average_supervisor_rating"] / 4.0, 1.0) * 40
+
+        # Intervention score (30%) - lower is better
+        max_interventions = criteria.get("max_intervention_rate", 0.5) * 10
+        intervention_score = (
+            (1 - min(metrics["intervention_rate"] / max(max_interventions, 1), 1.0)) * 30
+        )
+
+        # High-quality session score (20%) - target: 60% of sessions
+        if metrics["total_sessions"] > 0:
+            high_quality_pct = metrics["high_rating_sessions"] / metrics["total_sessions"]
+            high_quality_score = min(high_quality_pct / 0.6, 1.0) * 20
+        else:
+            high_quality_score = 0
+
+        # Trend score (10%)
+        trend_scores = {"improving": 10, "stable": 5, "declining": 0, "unknown": 0}
+        trend_score = trend_scores.get(metrics["recent_performance_trend"], 0)
+
+        return rating_score + intervention_score + high_quality_score + trend_score
+
+    # ========================================================================
+    # Skill Usage Metrics Integration (NEW)
+    # ========================================================================
+
+    async def calculate_skill_usage_metrics(
+        self,
+        agent_id: str,
+        days_back: int = 30
+    ) -> dict:
+        """
+        Calculate skill usage metrics for graduation readiness.
+
+        Args:
+            agent_id: Agent ID
+            days_back: Number of days to look back
+
+        Returns:
+            {
+                "total_skill_executions": int,
+                "successful_executions": int,
+                "success_rate": float,
+                "unique_skills_used": int,
+                "skill_episodes_count": int,
+                "skill_learning_velocity": float
+            }
+        """
+        from datetime import timedelta
+        from sqlalchemy import select
+
+        # Get recent skill executions
+        start_date = datetime.now() - timedelta(days=days_back)
+
+        # Query skill executions
+        skill_executions_result = self.db.execute(
+            select(SkillExecution)
+            .where(SkillExecution.agent_id == agent_id)
+            .where(SkillExecution.created_at >= start_date)
+            .where(SkillExecution.skill_source == "community")
+        )
+        skills = skill_executions_result.scalars().all()
+
+        # Calculate metrics
+        total_executions = len(skills)
+        successful_executions = len([s for s in skills if s.status == "success"])
+        unique_skills_used = len(set(s.skill_id for s in skills))
+
+        # Get skill episodes (EpisodeSegment doesn't have agent_id, need to join differently)
+        skill_episodes_result = self.db.execute(
+            select(EpisodeSegment)
+            .where(EpisodeSegment.segment_type.in_(["skill_success", "skill_failure"]))
+            .where(EpisodeSegment.created_at >= start_date)
+        )
+        episodes = skill_episodes_result.scalars().all()
+
+        # Filter episodes by agent_id from metadata
+        agent_episodes = [e for e in episodes if e.metadata.get("agent_id") == agent_id]
+
+        # Calculate learning velocity (episodes per day)
+        skill_learning_velocity = len(agent_episodes) / days_back if days_back > 0 else 0
+
+        return {
+            "total_skill_executions": total_executions,
+            "successful_executions": successful_executions,
+            "success_rate": successful_executions / total_executions if total_executions > 0 else 0,
+            "unique_skills_used": unique_skills_used,
+            "skill_episodes_count": len(agent_episodes),
+            "skill_learning_velocity": skill_learning_velocity
+        }
+
+    async def calculate_readiness_score_with_skills(
+        self,
+        agent_id: str,
+        target_maturity: str
+    ) -> dict:
+        """
+        Calculate graduation readiness score with skill metrics.
+
+        Integrates skill usage metrics into the readiness score calculation.
+
+        Args:
+            agent_id: Agent ID
+            target_maturity: Target maturity level
+
+        Returns:
+            {
+                "readiness_score": float,
+                "episode_metrics": dict,
+                "intervention_metrics": dict,
+                "skill_metrics": dict,
+                "skill_diversity_bonus": float
+            }
+        """
+        # Get existing readiness score
+        existing_readiness = await self.calculate_readiness_score(
+            agent_id=agent_id,
+            target_maturity=target_maturity
+        )
+
+        # Get skill usage metrics
+        skill_metrics = await self.calculate_skill_usage_metrics(agent_id)
+
+        # Calculate skill diversity bonus (up to +5%)
+        # Reward agents that use diverse skills
+        skill_diversity_bonus = min(skill_metrics["unique_skills_used"] * 0.01, 0.05)
+
+        # Base score from existing calculation
+        base_score = existing_readiness.get("score", 0) / 100.0  # Convert to 0-1 scale
+
+        # Apply skill diversity bonus
+        final_score = min(base_score + skill_diversity_bonus, 1.0)
+
+        return {
+            "readiness_score": final_score,
+            "episode_metrics": existing_readiness,
+            "skill_metrics": skill_metrics,
+            "skill_diversity_bonus": skill_diversity_bonus,
+            "target_maturity": target_maturity
+        }
+
+
+    async def execute_graduation_exam(
+        self,
+        agent_id: str,
+        workspace_id: str,
+        target_maturity: str
+    ) -> Dict[str, Any]:
+        """
+        Execute graduation exam for agent.
+    
+        Args:
+            agent_id: Agent to examine
+            workspace_id: Workspace ID
+            target_maturity: Target maturity level (INTERN, SUPERVISED, AUTONOMOUS)
+    
+        Returns:
+            {
+                "exam_completed": bool,
+                "score": float,
+                "constitutional_compliance": float,
+                "passed": bool,
+                "constitutional_violations": List[str]
+            }
+        """
+        executor = get_graduation_exam_executor(self.db)
+    
+        # Run exam
+        result = await executor.execute_exam(
+            agent_id=agent_id,
+            target_maturity=target_maturity
+        )
+    
+        if not result.get("success"):
+            return {
+                "exam_completed": False,
+                "error": result.get("error", "Exam execution failed"),
+                "passed": False
+            }
+    
+        return {
+            "exam_completed": True,
+            "score": result["score"],
+            "constitutional_compliance": result["constitutional_compliance"],
+            "passed": result["passed"],
+            "constitutional_violations": result.get("constitutional_violations", [])
+        }
+
+

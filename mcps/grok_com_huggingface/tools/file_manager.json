@@ -1,0 +1,9 @@
+{
+  "name": "file_manager",
+  "description": "Upload and manage files. Drop files here to send them to the server.",
+  "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  }
+}

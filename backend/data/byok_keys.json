@@ -1,0 +1,81 @@
+{
+  "keys": {
+    "anthropic_default_production": {
+      "provider_id": "anthropic",
+      "key_name": "default",
+      "encrypted_key": "gAAAAABqKfHaUHUN6Y-uvTIdsoRAC6AE6GOMc4RRj6QksNQcQzTAyaSbZo8AGEWmBfEET9AWiahLQHN1TW7ic-qbqr3bQq6jN5KgEQhfZ1bEWAM_nPPsIzcABpXVWYubN2lmV2baka4rjduk5md61MBXYOq6HIK_eNaiXsCkYaonzIjuMq5gDl1vh4UXQMQ94_tIXJjwrhw2oYKRJWoZ0O3OOL7dA7gzEg==",
+      "key_hash": "1da25c1bf324d19db49603308824ac3c9fcd84fcd52fb9e3bdaf610397a76650",
+      "created_at": "2026-06-11T02:23:06.723125",
+      "last_used": "2026-06-11T02:23:10.255235",
+      "is_active": true,
+      "usage_count": 2,
+      "environment": "production"
+    },
+    "openai_default_shared_production": {
+      "provider_id": "openai",
+      "key_name": "default_shared",
+      "encrypted_key": "gAAAAABqKfHasAMzIkcQbGp2sysxIlVHrCCa_JeKw_eP4CaYlww3utFil1R3tl6zhrvHDvhbzvHmwZl2oxuNuGfzbRzm-wCG02DeGKp7sRkTP1LNlTNZT315drWQ7O1sGhH68VElQqgSI5XqC1OgzJVPH2hRVYTzFg==",
+      "key_hash": "f3a3fac58fb2afd54f28e5f72fb11b90d2774fb32ca492451879eab82f65a91e",
+      "created_at": "2026-06-11T02:23:06.995917",
+      "last_used": null,
+      "is_active": true,
+      "usage_count": 0,
+      "environment": "production"
+    },
+    "openai_default_production": {
+      "provider_id": "openai",
+      "key_name": "default",
+      "encrypted_key": "gAAAAABqKfHakzX0-jNMp5uVQ81i-I67HKkitV3FWA-CHIwAb_hJT9PyFTeFLe5FWiuJETx3XA1a8-nXQzCmPwRr8Ga9LTu4pypVX_4R8-vpv1p-R9iN3e4zql1V7XB_hRC7jJvb4MSKed72mWIEVup_PZeAibOdhA==",
+      "key_hash": "f3a3fac58fb2afd54f28e5f72fb11b90d2774fb32ca492451879eab82f65a91e",
+      "created_at": "2026-06-11T02:23:06.997021",
+      "last_used": "2026-06-11T02:23:10.610429",
+      "is_active": true,
+      "usage_count": 3,
+      "environment": "production"
+    },
+    "deepseek_default_shared_production": {
+      "provider_id": "deepseek",
+      "key_name": "default_shared",
+      "encrypted_key": "gAAAAABqKfHb3DIEAc5YJfYLrTKZ7E47dAs8uLyBErdUEcPmEkpITwOr8jD3iFF6HU-EEgh0qc6mD1ZpCQnabKYB5Eaw6cKsinpHlAnqr4BcxakoRFivsgeQ7u1wqRw3y5Zg80Nw6dAI",
+      "key_hash": "fc8dddec5fc4d96181ba521e5730b64888b4db5e8dbd71f8b68fd0825870df4e",
+      "created_at": "2026-06-11T02:23:07.244103",
+      "last_used": null,
+      "is_active": true,
+      "usage_count": 0,
+      "environment": "production"
+    },
+    "deepseek_default_production": {
+      "provider_id": "deepseek",
+      "key_name": "default",
+      "encrypted_key": "gAAAAABqKfHbmwHE49rXcZbyFb1aEmsgb2F36YsQ3tZYNDHd21yua3x2q5XD9ez0E_6_6dAFTAska3mRUwB65FMew2FIUIXTFwt2iFladCrSgXeToC4RNZL2X5Cc_ufDdeNWx6D8rV8c",
+      "key_hash": "fc8dddec5fc4d96181ba521e5730b64888b4db5e8dbd71f8b68fd0825870df4e",
+      "created_at": "2026-06-11T02:23:07.245152",
+      "last_used": "2026-06-11T02:23:08.868534",
+      "is_active": true,
+      "usage_count": 2,
+      "environment": "production"
+    },
+    "openai_ai_employee_shared_production": {
+      "provider_id": "openai",
+      "key_name": "ai_employee_shared",
+      "encrypted_key": "gAAAAABqKfHeLsn-mHmvYsQhvJemJY4Ir0wan4qDApRdS_rcmkXuhK98xeraBwxOc4boPEW8Oq548F2s-uCCDUTISbu28LIXtexH7iySSAfu0C1SbSnikzlPucdxPmIXwtWuoxhTtj8c78NSUDVLbBfTLC-oEmewbA==",
+      "key_hash": "f3a3fac58fb2afd54f28e5f72fb11b90d2774fb32ca492451879eab82f65a91e",
+      "created_at": "2026-06-11T02:23:10.608612",
+      "last_used": null,
+      "is_active": true,
+      "usage_count": 0,
+      "environment": "production"
+    },
+    "deepseek_ai_employee_shared_production": {
+      "provider_id": "deepseek",
+      "key_name": "ai_employee_shared",
+      "encrypted_key": "gAAAAABqKfHeRm3h00vdGB5As1ovqLjW2o7Y54l6rwTOwlPXoCoAWfaqQU4tjlRJxmNOxtkJk0sNQSTRcDH-UIWoo3CbsTLBWjE1YGPFVgwhGsbNqV_dyupRBe41mwKCP12cYM-oj690",
+      "key_hash": "fc8dddec5fc4d96181ba521e5730b64888b4db5e8dbd71f8b68fd0825870df4e",
+      "created_at": "2026-06-11T02:23:10.964427",
+      "last_used": null,
+      "is_active": true,
+      "usage_count": 0,
+      "environment": "production"
+    }
+  }
+}

@@ -1,0 +1,999 @@
+---
+pid: 96232
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "Set-Location \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\"; $env:PYTHONPATH=\"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\"; python -m uvicorn main_api_app:app --host 127.0.0.1 --port 4490"
+started_at: 2026-06-17T16:27:07.107Z
+running_for_ms: 10765014 
+---
+Failed to decrypt API key anthropic_default_production: 
+Failed to decrypt API key openai_default_shared_production: 
+Failed to decrypt API key deepseek_default_shared_production: 
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\llm\byok_handler.py:258: SAWarning: relationship 'Machine.session' will copy column machines.id to column guacamole_sessions.machine_id, which conflicts with relationship(s): 'Machine.guacamole_sessions' (copies machines.id to guacamole_sessions.machine_id). If this is not the intention, consider if these relationships should be linked with back_populates, or if viewonly=True should be applied to one or more if they are read-only. For the less common case that foreign key constraints are partially overlapping, the orm.foreign() annotation can be used to isolate the columns that should be written towards.   To silence this warning, add the parameter 'overlaps="guacamole_sessions"' to the 'Machine.session' relationship. (Background on this warning at: https://sqlalche.me/e/20/qzyx) (This warning originated from the `configure_mappers()` process, which was invoked automatically in response to a user-initiated operation.)
+  ).all()
+LanceDB not initialized, chat history disabled
+Workflow automation integration unavailable
+Failed to decrypt API key anthropic_default_production: 
+Failed to decrypt API key openai_default_production: 
+Failed to decrypt API key deepseek_default_production: 
+WARNING: IntegrationLoader could not be imported (likely numpy/lancedb issue)WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+
+WARNING:ATOM_SERVER:Failed to load community skill routes: No module named 'frontmatter'
+{"level": "WARNING", "message": "Failed to register media tools: cannot import name 'tool_registry' from 'tools.registry' (I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\tools\\registry.py)", "timestamp": "2026-06-17T16:27:15.561723", "logger": "tools.media_tool", "module": "structured_logger", "function": "_log", "line": 118}
+WARNING:core.media.sonos_service:SoCo library not installed - Sonos functions will fail
+WARNING:tools.media_tool:Failed to register media tools: cannot import name 'tool_registry' from 'tools.registry' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\tools\registry.py)
+WARNING:ATOM_SERVER:Failed to load media routes: No module named 'api.authentication'
+WARNING:ATOM_SERVER:Failed to load media routes: No module named 'api.authentication'
+WARNING:ATOM_SERVER:Failed to load Episodic Memory routes: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Failed to load Canvas routes: No module named 'frontmatter'
+WARNING:core.app_secrets:Failed to initialize encryption: cannot import name 'PBKDF2' from 'cryptography.hazmat.primitives.kdf.pbkdf2' (C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\cryptography\hazmat\primitives\kdf\pbkdf2.py)
+WARNING:ATOM_SERVER:Failed to load Task Monitoring routes: No module named 'redis'
+ERROR:core.byok_endpoints:Failed to decrypt API key anthropic_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key openai_ai_employee_shared_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key deepseek_ai_employee_shared_production: 
+WARNING:ATOM_SERVER:Communication webhooks not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Demo routes not found: No module named 'api.demo_routes'
+WARNING:ATOM_SERVER:AI endpoints not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Workflow DNA Analytics not available: cannot import name 'WorkflowExecutionLog' from 'analytics.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\analytics\models.py)
+WARNING:integrations.workflow_automation_routes:Enhanced workflow automation components not available: No module named 'backend.python_api_service'
+WARNING:ATOM_SERVER:Auth endpoints or 2FA routes not found, skipping.
+WARNING:core.agent_communication:Redis not available, using in-memory pub/sub only
+WARNING:core.pii_redactor:Presidio not available. Install with: pip install presidio-analyzer presidio-anonymizer spacy. Falling back to regex-only redaction.
+WARNING:ATOM_SERVER:Channel routes not found: cannot import name 'Channel' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Competitor analysis routes not found: cannot import name 'CompetitorAnalysis' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Learning plan routes not found: cannot import name 'LearningPlan' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Chat routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Risk routes not found: cannot import name 'customer_protection' from 'core.risk_prevention' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\risk_prevention.py)
+WARNING:ATOM_SERVER:Messaging routes not found: cannot import name 'ProactiveMessageStatus' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:root:Discord integration services not available: No module named 'atom_ingestion_pipeline'
+WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+WARNING:ATOM_SERVER:Scheduled messaging routes not found: No module named 'frontmatter'
+WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+WARNING:ATOM_SERVER:Condition monitoring routes not found: No module named 'frontmatter'
+WARNING:root:Google Chat integration services not available: No module named 'atom_ingestion_pipeline'
+WARNING:integrations.adapters.signal_adapter:Signal adapter not configured or httpx not available
+WARNING:integrations.adapters.messenger_adapter:Facebook Messenger adapter not configured or httpx not available
+WARNING:integrations.adapters.line_adapter:LINE adapter not configured or httpx not available
+WARNING:ATOM_SERVER:Canvas routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Production health check routes not found: No module named 'prometheus_client'
+WARNING:ATOM_SERVER:Browser automation routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Device capabilities routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Edition routes not found: cannot import name 'get_db' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Agent coordination routes not found: No module named 'core.auth_routes'
+WARNING:ATOM_SERVER:Custom components routes not found: cannot import name 'ComponentVersion' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Auto-installation routes not found: No module named 'docker'
+WARNING:ATOM_SERVER:User workflow templates routes not found: cannot import name 'TemplateVersion' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WhatsApp Business: DEMO MODE - Use real API credentials for productionWARNING:core.token_storage:Initializing DEPRECATED TokenStorage. Please migrate to ConnectionService.
+WARNING:ATOM_SERVER:Live Command Center APIs not found: cannot import name 'microsoft365_service' from 'integrations.microsoft365_service' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\integrations\microsoft365_service.py)
+WARNING:ATOM_SERVER:Workflow DNA plugin not found: cannot import name 'WorkflowExecutionLog' from 'analytics.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\analytics\models.py)
+WARNING:integrations.whatsapp_configuration_setup:Missing required WhatsApp configuration, using demo mode
+ERROR:integrations.whatsapp_configuration_setup:Error creating WhatsApp configuration: [Errno 2] No such file or directory: '/tmp/whatsapp_demo_config.json'
+
+WARNING:integrations.whatsapp_business_integration:Database connection failed in demo mode: connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+Is the server running on that host and accepting TCP/IP connections?
+
+ERROR:integrations.whatsapp_service_manager:Error registering WhatsApp service: [Errno 2] No such file or directory: '/tmp/whatsapp_business_registration.json'
+WARNING:root:Enterprise services not available: No module named 'ai_enhanced_service'. Using stubs/None.
+ERROR:core.byok_endpoints:Failed to decrypt API key anthropic_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key openai_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key deepseek_default_production: 
+WARNING:ATOM_SERVER:Demo routes not found: No module named 'api.demo_routes'
+WARNING:ATOM_SERVER:Email Verification routes not found: email-validator is not installed, run `pip install 'pydantic[email]'`
+WARNING:ATOM_SERVER:Tenant routes not found: No module named 'api.tenant_routes'
+WARNING:ATOM_SERVER:Admin routes not found: email-validator is not installed, run `pip install 'pydantic[email]'`
+INFO:     Started server process [16092]
+INFO:     Waiting for application startup.
+WARNING:core.lazy_integration_registry:✗ oauth not available: No module named 'oauth_routes'
+WARNING:core.lazy_integration_registry:✗ openai not available: No module named 'integrations.openai_routes'
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:4490 (Press CTRL+C to quit)
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     127.0.0.1:45812 - "POST /api/documents/upload HTTP/1.1" 200 OK
+WARNING:advanced_workflow_orchestrator:Could not initialize AI service: No module named 'frontmatter'
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+WARNING:core.lazy_integration_registry:✗ chat not available: No module named 'frontmatter'
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/chat/history/session_1781713841309_c2ks27vld?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:29037 - "WebSocket /ws?token=dev-token" [accepted]
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:47854 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25580 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:42956 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:13866 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/chat/history/session_1781713903352_shpa6k3b2?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:3248 - "WebSocket /ws?token=dev-token" [accepted]
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:20586 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:56357 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:9307 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:9307 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60235 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:60235 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52197 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48128 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25762 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:53961 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:53961 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:53961 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:37478 - "GET /health/live HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:12020 - "GET /health/live HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+WARNING:core.auth:⚠️ Using local development auth fallback user
+C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\PyPDF2\_cmap.py:142: PdfReadWarning: Advanced encoding /GBK-EUC-H not implemented yet
+  warnings.warn(
+INFO:     ::1:0 - "POST /api/documents/upload HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/documents/034034f7-5ed1-429e-a629-3cda63c15e60 HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents/034034f7-5ed1-429e-a629-3cda63c15e60 HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:36976 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56437 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:61971 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61971 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:45875 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:21599 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:64413 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:64413 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:64413 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:46057 - "POST /api/documents/upload HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     127.0.0.1:10567 - "POST /api/documents/upload HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     127.0.0.1:25640 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:25640 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:26069 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:12143 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64867 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:51073 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:64867 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:9015 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:34571 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:34571 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents/034034f7-5ed1-429e-a629-3cda63c15e60 HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents/034034f7-5ed1-429e-a629-3cda63c15e60 HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57403 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:16337 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/integrations/gdrive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gdrive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781714309532_jgbhcsloc?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:29937 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:59490 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/chat/history/session_1781714312644_ench5efa3?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     127.0.0.1:25379 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781714314412_064nrfk5v?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:22044 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:38907 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:33320 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "POST /api/chat/message HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:7007 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:24693 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     127.0.0.1:3119 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost()
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost()>
+Traceback (most recent call last):
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\events.py", line 94, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/chat/history/session_1781716064274_vr6dgbkse?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:41576 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49938 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:61646 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35915 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/workflow-templates/template_26d1a8bb11d0 HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates/template_26d1a8bb11d0 HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61867 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:34067 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:61867 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:34067 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51262 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:51262 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51262 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:4823 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/loop/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/integrations/code/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/delay/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/approval/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/http/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/tables/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/subflow/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/storage/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_calendar/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/google_drive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/mailchimp/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gemini/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/openai/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/v1/external-integrations HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:4823 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:20057 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:20057 - "GET /api/agent-governance/agents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51262 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:4823 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     127.0.0.1:51262 - "GET /api/v1/external-integrations/ HTTP/1.1" 200 OK
+ERROR:integrations.bridge.node_bridge_service:Failed to fetch catalog from Node engine: All connection attempts failed
+INFO:     ::1:0 - "GET /api/integrations/gdrive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gdrive/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/gmail/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/dropbox/health HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/integrations/outlook/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:11480 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:7725 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:23614 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:37324 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "POST /api/documents/upload HTTP/1.1" 200 OK
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     ::1:0 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62103 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62103 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+ERROR:core.workflow_template_system:Failed to create workflow from template 00c445dd-1d6e-5da3-9a41-dc0b1289d936: Required parameter 'trigger_type' is missing
+INFO:     ::1:0 - "POST /api/workflow-templates/00c445dd-1d6e-5da3-9a41-dc0b1289d936/import HTTP/1.1" 422 Unprocessable Content
+WARNING:core.base_routes:API Error: VALIDATION_ERROR - Required parameter 'trigger_type' is missing
+INFO:     ::1:0 - "GET /api/workflow-templates?category=Productivity HTTP/1.1" 307 Temporary Redirect
+WARNING:core.base_routes:API Error: VALIDATION_ERROR - Invalid category: Productivity
+INFO:     127.0.0.1:59852 - "GET /api/workflow-templates/?category=Productivity HTTP/1.1" 500 Internal Server Error
+ERROR:api.workflow_template_routes:Failed to list templates: 422: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Invalid category: Productivity', 'timestamp': '2026-06-17T19:09:27.917359', 'details': {'field': 'category', 'provided_category': 'Productivity'}, 'stack_trace': ['  File "<frozen runpy>", line 198, in _run_module_as_main\n', '  File "<frozen runpy>", line 88, in _run_code\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\__main__.py", line 4, in <module>\n    uvicorn.main()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1161, in __call__\n    return self.main(*args, **kwargs)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1082, in main\n    rv = self.invoke(ctx)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1443, in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 788, in invoke\n    return __callback(*args, **kwargs)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\main.py", line 433, in main\n    run(\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\main.py", line 606, in run\n    server.run()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\server.py", line 75, in run\n    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\runners.py", line 204, in run\n    return runner.run(main)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\runners.py", line 127, in run\n    return self._loop.run_until_complete(task)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 706, in run_until_complete\n    self.run_forever()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 677, in run_forever\n    self._run_once()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 2057, in _run_once\n    handle._run()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\events.py", line 94, in _run\n    self._context.run(self._callback, *self._args)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\base.py", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\cors.py", line 96, in __call__\n    await self.simple_response(scope, receive, send, request_headers=headers)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\cors.py", line 154, in simple_response\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\trustedhost.py", line 51, in __call__\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\exceptions.py", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\_exception_handler.py", line 42, in wrapped_app\n    await app(scope, receive, sender)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py", line 18, in __call__\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 660, in __call__\n    await self.middleware_stack(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 680, in app\n    await route.handle(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 276, in handle\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 134, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\_exception_handler.py", line 42, in wrapped_app\n    await app(scope, receive, sender)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 120, in app\n    response = await f(request)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 674, in app\n    raw_response = await run_endpoint_function(\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 328, in run_endpoint_function\n    return await dependant.call(**values)\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\api\\workflow_template_routes.py", line 109, in list_templates\n    raise router.validation_error(\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\core\\base_routes.py", line 228, in validation_error\n    return self.error_response(\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\core\\base_routes.py", line 188, in error_response\n    error_body["error"]["stack_trace"] = traceback.format_stack()\n']}}
+WARNING:core.base_routes:API Error: INTERNAL_ERROR - Failed to list templates
+INFO:     ::1:0 - "GET /api/workflow-templates?category=Marketing HTTP/1.1" 307 Temporary Redirect
+WARNING:core.base_routes:API Error: VALIDATION_ERROR - Invalid category: Marketing
+INFO:     127.0.0.1:59852 - "GET /api/workflow-templates/?category=Marketing HTTP/1.1" 500 Internal Server Error
+ERROR:api.workflow_template_routes:Failed to list templates: 422: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Invalid category: Marketing', 'timestamp': '2026-06-17T19:09:31.555423', 'details': {'field': 'category', 'provided_category': 'Marketing'}, 'stack_trace': ['  File "<frozen runpy>", line 198, in _run_module_as_main\n', '  File "<frozen runpy>", line 88, in _run_code\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\__main__.py", line 4, in <module>\n    uvicorn.main()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1161, in __call__\n    return self.main(*args, **kwargs)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1082, in main\n    rv = self.invoke(ctx)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 1443, in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\click\\core.py", line 788, in invoke\n    return __callback(*args, **kwargs)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\main.py", line 433, in main\n    run(\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\main.py", line 606, in run\n    server.run()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\uvicorn\\server.py", line 75, in run\n    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\runners.py", line 204, in run\n    return runner.run(main)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\runners.py", line 127, in run\n    return self._loop.run_until_complete(task)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 706, in run_until_complete\n    self.run_forever()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 677, in run_forever\n    self._run_once()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\base_events.py", line 2057, in _run_once\n    handle._run()\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\asyncio\\events.py", line 94, in _run\n    self._context.run(self._callback, *self._args)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\base.py", line 144, in coro\n    await self.app(scope, receive_or_disconnect, send_no_error)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\cors.py", line 96, in __call__\n    await self.simple_response(scope, receive, send, request_headers=headers)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\cors.py", line 154, in simple_response\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\trustedhost.py", line 51, in __call__\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\middleware\\exceptions.py", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\_exception_handler.py", line 42, in wrapped_app\n    await app(scope, receive, sender)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\middleware\\asyncexitstack.py", line 18, in __call__\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 660, in __call__\n    await self.middleware_stack(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 680, in app\n    await route.handle(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\routing.py", line 276, in handle\n    await self.app(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 134, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\starlette\\_exception_handler.py", line 42, in wrapped_app\n    await app(scope, receive, sender)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 120, in app\n    response = await f(request)\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 674, in app\n    raw_response = await run_endpoint_function(\n', '  File "C:\\Users\\info\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\fastapi\\routing.py", line 328, in run_endpoint_function\n    return await dependant.call(**values)\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\api\\workflow_template_routes.py", line 109, in list_templates\n    raise router.validation_error(\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\core\\base_routes.py", line 228, in validation_error\n    return self.error_response(\n', '  File "I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\core\\base_routes.py", line 188, in error_response\n    error_body["error"]["stack_trace"] = traceback.format_stack()\n']}}
+WARNING:core.base_routes:API Error: INTERNAL_ERROR - Failed to list templates
+INFO:     ::1:0 - "POST /api/workflow-templates/cc81d55d-7e98-51cb-b6dc-c6dab6be1014/import HTTP/1.1" 422 Unprocessable Content
+ERROR:core.workflow_template_system:Failed to create workflow from template cc81d55d-7e98-51cb-b6dc-c6dab6be1014: Required parameter 'target_company' is missing
+WARNING:core.base_routes:API Error: VALIDATION_ERROR - Required parameter 'target_company' is missing
+INFO:     ::1:0 - "POST /api/workflow-templates/cc81d55d-7e98-51cb-b6dc-c6dab6be1014/import HTTP/1.1" 422 Unprocessable Content
+ERROR:core.workflow_template_system:Failed to create workflow from template cc81d55d-7e98-51cb-b6dc-c6dab6be1014: Required parameter 'target_company' is missing
+WARNING:core.base_routes:API Error: VALIDATION_ERROR - Required parameter 'target_company' is missing
+INFO:     127.0.0.1:20553 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:15039 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     127.0.0.1:46141 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/chat/history/session_1781723476382_qnsnorxrj?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781723478335_0nekzyk32?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:9379 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:20627 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781723485381_t97kyl8n3?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:11445 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:44965 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781723490427_suyycvx9c?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64070 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:19753 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     connection closed
+INFO:     127.0.0.1:32825 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/chat/history/session_1781723614316_ebp7fmeu5?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:21516 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/executions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/services HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/v1/workflow-ui/definitions HTTP/1.1" 200 OK
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724329657_5y81kv3ge?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     ::1:0 - "GET /api/workflow-templates HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:33723 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:17431 - "WebSocket /ws?token=dev-token" [accepted]
+INFO:     127.0.0.1:33723 - "GET /api/workflow-templates/ HTTP/1.1" 200 OK
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:54577 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724348949_abxravc73?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38850 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     127.0.0.1:8179 - "WebSocket /ws?token=dev-token" [accepted]
+WARNING:core.websockets:WebSocket dev-token bypass used in non-production environment
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found
+INFO:     ::1:0 - "GET /api/chat/history/session_1781724354334_j3ymgz2nw?user_id=anonymous HTTP/1.1" 404 Not Found

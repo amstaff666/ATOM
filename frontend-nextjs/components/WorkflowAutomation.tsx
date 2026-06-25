@@ -1,0 +1,1493 @@
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Plus,
+  CheckCircle,
+  X,
+  Edit,
+  Trash2,
+  Eye,
+  ArrowRight,
+  Settings,
+  Clock,
+  MessageSquare,
+  Mail,
+  Paperclip,
+  ChevronDown,
+  RefreshCw,
+  Loader2,
+  Layout as LayoutIcon,
+  List,
+  Play,
+  AlertTriangle,
+  FileText,
+  Activity,
+  History, // [Lesson 3]
+  GitBranch, // [Lesson 3]
+} from "lucide-react";
+
+interface WorkflowTemplate {
+  id: string;
+  template_id?: string; // For backend parity
+  name: string;
+  description: string;
+  category: string;
+  icon: string;
+  steps: WorkflowStep[];
+  input_schema: any;
+}
+
+interface WorkflowStep {
+  id: string;
+  type: string;
+  service?: string;
+  action?: string;
+  parameters: Record<string, any>;
+  name: string;
+}
+
+interface WorkflowDefinition {
+  id: string;
+  name: string;
+  description: string;
+  created_from_template?: string;
+  steps: WorkflowStep[];
+  input_schema: any;
+  created_at: string;
+  updated_at: string;
+  steps_count?: number;
+}
+
+interface WorkflowExecution {
+  execution_id: string;
+  workflow_id: string;
+  status: "pending" | "running" | "completed" | "failed" | "cancelled" | "paused";
+  start_time: string;
+  end_time?: string;
+  current_step: number;
+  total_steps: number;
+  trigger_data?: Record<string, any>;
+  results?: Record<string, any>;
+  errors?: string[];
+  has_errors?: boolean;
+}
+
+interface ServiceInfo {
+  name: string;
+  actions: string[];
+  description: string;
+}
+
+import WorkflowBuilder from "./Automations/WorkflowBuilder";
+
+
+const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) => {
+  const [templates, setTemplates] = useState<WorkflowTemplate[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([]);
+  const [executions, setExecutions] = useState<WorkflowExecution[]>([]);
+  const [services, setServices] = useState<Record<string, ServiceInfo>>({});
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<WorkflowTemplate | null>(null);
+  const [selectedWorkflow, setSelectedWorkflow] =
+    useState<WorkflowDefinition | null>(null);
+  const [activeExecution, setActiveExecution] =
+    useState<WorkflowExecution | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [executing, setExecuting] = useState(false);
+  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [activeTab, setActiveTab] = useState("templates");
+  const [viewMode, setViewMode] = useState<"classic" | "builder">("classic");
+
+  // Modal states
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isExecutionModalOpen, setIsExecutionModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [resumeExecutionId, setResumeExecutionId] = useState<string | null>(null);
+
+  const [builderInitialData, setBuilderInitialData] = useState<any>(null); // For AI generated workflows
+  const [genPrompt, setGenPrompt] = useState("");
+
+  // [Lesson 3] Time-Travel State
+  const [isForkModalOpen, setIsForkModalOpen] = useState(false);
+  const [forkStepId, setForkStepId] = useState<string | null>(null);
+  const [forkVariables, setForkVariables] = useState<Record<string, any>>({});
+  // [Lesson 3] UX: Raw string state for editable text area
+  const [forkVariablesJson, setForkVariablesJson] = useState<string>("{}");
+  const { toast } = useToast();
+
+  // Fetch initial data
+  useEffect(() => {
+    fetchWorkflowData();
+  }, []);
+
+  // Open visual builder when parent's "New Automation" button is clicked
+  useEffect(() => {
+    if (triggerNew && triggerNew > 0) {
+      setBuilderInitialData(null);
+      setSelectedWorkflow(null);
+      setViewMode('builder');
+    }
+  }, [triggerNew]);
+
+  // Check for draft in URL
+  const router = useRouter();
+  useEffect(() => {
+    if (router.query.draft) {
+      try {
+        const draftData = JSON.parse(router.query.draft as string);
+        setBuilderInitialData(draftData);
+        setViewMode("builder");
+        toast({ title: "Draft Loaded", description: "Loaded workflow from chat." });
+        // Clean URL
+        router.replace('/automation', undefined, { shallow: true });
+      } catch (e) {
+        console.error("Failed to parse draft", e);
+      }
+    }
+  }, [router.query.draft]);
+
+  // Poll for execution updates when modal is open or executions are running
+  useEffect(() => {
+    const hasRunning = executions.some(e => e.status === 'running');
+    if (isExecutionModalOpen || hasRunning) {
+      const interval = setInterval(fetchExecutions, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [isExecutionModalOpen, executions]);
+
+  // Sync activeExecution with updated list
+  useEffect(() => {
+    if (activeExecution) {
+      const updated = executions.find(e => e.execution_id === activeExecution.execution_id);
+      if (updated && JSON.stringify(updated) !== JSON.stringify(activeExecution)) {
+        setActiveExecution(updated);
+      }
+    }
+  }, [executions]);
+
+  const handleGenerativeCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!genPrompt.trim()) return;
+
+    setLoading(true);
+    // Mock AI Generation Logic
+    // In real app, this would call an LLM endpoint
+    setTimeout(() => {
+      const generatedNodes = [
+        { id: '1', type: 'trigger', position: { x: 250, y: 0 }, data: { label: 'Start: ' + genPrompt.substring(0, 15) + '...', integration: 'Webhook' } },
+        { id: '2', type: 'ai_node', position: { x: 250, y: 200 }, data: { label: 'Process Request', prompt: 'Analyze: ' + genPrompt } },
+        { id: '3', type: 'action', position: { x: 250, y: 400 }, data: { service: 'Slack', action: 'Notify User' } }
+      ];
+      const generatedEdges = [
+        { id: 'e1-2', source: '1', target: '2' },
+        { id: 'e2-3', source: '2', target: '3' }
+      ];
+
+      setBuilderInitialData({ nodes: generatedNodes, edges: generatedEdges });
+      setViewMode("builder");
+      toast({ title: "Workflow Generated", description: "AI created a draft workflow based on your prompt." });
+      setLoading(false);
+      setGenPrompt("");
+    }, 1000);
+  };
+
+  const fetchWorkflowData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([
+        fetchTemplates(),
+        fetchWorkflows(),
+        fetchExecutions(),
+        fetchServices(),
+      ]);
+    } catch (error) {
+      console.error("Error fetching workflow data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load workflow data",
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTemplates = async () => {
+    try {
+      const response = await fetch("/api/workflow-templates/"); // Fixed endpoint with trailing slash
+      if (response.ok) {
+        const data = await response.json();
+        // The API returns the list directly, not { success: true, templates: ... }
+        // Also map template_id -> id for frontend compatibility
+        const mapped = Array.isArray(data) ? data.map((t: any) => ({
+          ...t,
+          id: t.template_id
+        })) : [];
+        setTemplates(mapped);
+      }
+    } catch (e) {
+      console.error("Failed to fetch templates", e);
+    }
+  };
+
+  const fetchWorkflows = async () => {
+    try {
+      const response = await fetch("/api/workflows/definitions");
+      const data = await response.json();
+      if (data.success) {
+        setWorkflows(data.workflows);
+      }
+    } catch (e) {
+      console.error("Failed to fetch workflows", e);
+    }
+  };
+
+  const fetchExecutions = async () => {
+    try {
+      const response = await fetch("/api/workflows/executions");
+      const data = await response.json();
+      if (data.success) {
+        setExecutions(data.executions);
+      }
+    } catch (e) {
+      console.error("Failed to fetch executions", e);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch("/api/workflows/services");
+      const data = await response.json();
+      if (data.success) {
+        setServices(data.services);
+      }
+    } catch (e) {
+      console.error("Failed to fetch services", e);
+    }
+
+  };
+
+  const handleBuilderSave = async (builderData: { nodes: any[]; edges: any[] }) => {
+    try {
+      setLoading(true);
+      const generatedName = `Visual Workflow ${new Date().toLocaleTimeString()}`;
+
+      const response = await fetch("/api/workflows/definitions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: generatedName,
+          description: "Created via Visual Builder",
+          definition: builderData,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast({
+          title: "Workflow Saved",
+          description: "Your visual workflow has been saved to the database.",
+        });
+        await fetchWorkflowData(); // Refresh list
+
+        // Update current selected workflow so builder has the ID
+        if (data.workflow_id || data.id) {
+          const newId = data.workflow_id || data.id;
+          const newWorkflow = {
+            id: newId,
+            name: generatedName,
+            description: "Created via Visual Builder",
+            steps: builderData.nodes.map((n: any) => ({
+              id: n.id,
+              name: n.data?.label || n.id,
+              type: n.type,
+              service: n.data?.service,
+              action: n.data?.action,
+              parameters: n.data
+            })),
+            input_schema: {},
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setSelectedWorkflow(newWorkflow as WorkflowDefinition);
+        }
+
+      } else {
+        throw new Error(data.error || "Failed to save");
+      }
+    } catch (e) {
+      console.error("Save error", e);
+      toast({ title: "Error", description: "Failed to save workflow", variant: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTemplateSelect = (template: WorkflowTemplate) => {
+    setSelectedTemplate(template);
+    setFormData({});
+    setIsTemplateModalOpen(true);
+  };
+
+  const handleWorkflowSelect = (workflow: WorkflowDefinition) => {
+    setSelectedWorkflow(workflow);
+    setFormData({});
+    setIsCreateModalOpen(true);
+  };
+
+  const handleExecuteWorkflow = async (
+    workflowId: string,
+    inputData: Record<string, any> = {},
+  ) => {
+    try {
+      setExecuting(true);
+      const response = await fetch("/api/workflows/execute", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workflow_id: workflowId,
+          input: inputData,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast({
+          title: "Workflow Started",
+          description: `Execution ${data.execution_id} has started`,
+        });
+
+        // Refresh executions list
+        await fetchExecutions();
+
+        // Show execution details
+        setActiveExecution(data);
+        setIsExecutionModalOpen(true);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error("Error executing workflow:", error);
+      toast({
+        title: "Error",
+        description: "Failed to execute workflow",
+        variant: "error",
+      });
+    } finally {
+      setExecuting(false);
+    }
+  };
+
+  const handleCancelExecution = async (executionId: string) => {
+    try {
+      const response = await fetch(
+        `/api/workflows/executions/${executionId}/cancel`,
+        {
+          method: "POST",
+        },
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        toast({
+          title: "Execution Cancelled",
+          description: `Execution ${executionId} has been cancelled`,
+        });
+        await fetchExecutions();
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error("Error cancelling execution:", error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel execution",
+        variant: "error",
+      });
+    }
+  };
+
+  const handleResumeWorkflow = async (
+    executionId: string,
+    inputs: Record<string, any> = {}
+  ) => {
+    try {
+      setExecuting(true);
+      const response = await fetch(
+        `/api/workflows/executions/${executionId}/resume`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ inputs }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        toast({
+          title: "Execution Resumed",
+          description: `Execution ${executionId} has been resumed`,
+        });
+        await fetchExecutions();
+        setIsResumeModalOpen(false);
+        setResumeExecutionId(null);
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      console.error("Error resuming execution:", error);
+      toast({
+        title: "Error",
+        description: "Failed to resume execution",
+        variant: "error",
+      });
+    } finally {
+      setExecuting(false);
+    }
+  };
+
+  // [Lesson 3] Time-Travel / Fork Handler
+  const handleForkWorkflow = async (stepId?: string, variables?: Record<string, any>) => {
+    const targetStepId = stepId || forkStepId;
+    const targetVariables = variables || forkVariables;
+
+    if (!activeExecution || !targetStepId) return;
+
+    try {
+      setExecuting(true);
+      const response = await fetch(
+        `/api/time-travel/workflows/${activeExecution.execution_id}/fork`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            step_id: targetStepId,
+            new_variables: targetVariables
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        toast({
+          title: "Timeline Forked! 🌌",
+          description: `Created parallel universe: ${data.new_execution_id}`,
+        });
+        await fetchExecutions(); // Refresh list
+        setIsForkModalOpen(false);
+        setIsExecutionModalOpen(false); // Close details
+      } else {
+        throw new Error(data.detail || "Fork failed");
+      }
+    } catch (error) {
+      console.error("Fork Error:", error);
+      toast({
+        title: "Time-Travel Failed",
+        description: "Could not fork timeline.",
+        variant: "error",
+      });
+    } finally {
+      setExecuting(false);
+    }
+  };
+  const handleFormChange = (field: string, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const renderServiceIcon = (service: string) => {
+    const iconClass = "w-4 h-4 mr-2";
+    switch (service) {
+      case "calendar":
+        return <Clock className={`${iconClass} text-blue-500`} />;
+      case "tasks":
+        return <CheckCircle className={`${iconClass} text-green-500`} />;
+      case "messages":
+        return <MessageSquare className={`${iconClass} text-purple-500`} />;
+      case "email":
+        return <Mail className={`${iconClass} text-red-500`} />;
+      case "documents":
+        return <Paperclip className={`${iconClass} text-orange-500`} />;
+      case "asana":
+      case "trello":
+      case "notion":
+        return <LayoutIcon className={`${iconClass} text-teal-500`} />;
+      case "dropbox":
+        return <ChevronDown className={`${iconClass} text-blue-500`} />;
+      default:
+        return <Settings className={`${iconClass} text-gray-500 dark:text-gray-400`} />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-500 hover:bg-green-600";
+      case "running":
+        return "bg-blue-500 hover:bg-blue-600";
+      case "failed":
+        return "bg-red-500 hover:bg-red-600";
+      case "cancelled":
+        return "bg-orange-500 hover:bg-orange-600";
+      case "pending":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "paused":
+        return "bg-amber-500 hover:bg-amber-600";
+      default:
+        return "bg-gray-500 hover:bg-gray-600";
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "default"; // Green-ish usually or customize
+      case "running":
+        return "secondary";
+      case "failed":
+        return "destructive";
+      case "cancelled":
+        return "outline";
+      case "pending":
+        return "secondary";
+      case "paused":
+        return "outline"; // Distinction
+      default:
+        return "outline";
+    }
+  };
+
+  const renderInputField = (field: string, schema: any) => {
+    const fieldSchema = schema.properties[field];
+    const isRequired = schema.required?.includes(field);
+
+    switch (fieldSchema.type) {
+      case "string":
+        if (fieldSchema.format === "email") {
+          return (
+            <div key={field} className="space-y-2">
+              <Label htmlFor={field}>
+                {fieldSchema.title} {isRequired && "*"}
+              </Label>
+              <Input
+                id={field}
+                type="email"
+                value={formData[field] || ""}
+                onChange={(e) => handleFormChange(field, e.target.value)}
+                placeholder={fieldSchema.title}
+                required={isRequired}
+              />
+              {fieldSchema.description && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {fieldSchema.description}
+                </p>
+              )}
+            </div>
+          );
+        } else if (fieldSchema.format === "date") {
+          return (
+            <div key={field} className="space-y-2">
+              <Label htmlFor={field}>
+                {fieldSchema.title} {isRequired && "*"}
+              </Label>
+              <Input
+                id={field}
+                type="date"
+                value={formData[field] || ""}
+                onChange={(e) => handleFormChange(field, e.target.value)}
+                required={isRequired}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <div key={field} className="space-y-2">
+              <Label htmlFor={field}>
+                {fieldSchema.title} {isRequired && "*"}
+              </Label>
+              <Input
+                id={field}
+                type="text"
+                value={formData[field] || ""}
+                onChange={(e) => handleFormChange(field, e.target.value)}
+                placeholder={fieldSchema.title}
+                required={isRequired}
+              />
+              {fieldSchema.description && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {fieldSchema.description}
+                </p>
+              )}
+            </div>
+          );
+        }
+
+      case "array":
+        return (
+          <div key={field} className="space-y-2">
+            <Label htmlFor={field}>
+              {fieldSchema.title} {isRequired && "*"}
+            </Label>
+            <Textarea
+              id={field}
+              value={
+                Array.isArray(formData[field]) ? formData[field].join(", ") : ""
+              }
+              onChange={(e) =>
+                handleFormChange(
+                  field,
+                  e.target.value.split(",").map((s) => s.trim()),
+                )
+              }
+              placeholder={`Enter ${fieldSchema.title} separated by commas`}
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Separate multiple values with commas
+            </p>
+          </div>
+        );
+
+      default:
+        return (
+          <div key={field} className="space-y-2">
+            <Label htmlFor={field}>
+              {fieldSchema.title} {isRequired && "*"}
+            </Label>
+            <Input
+              id={field}
+              type="text"
+              value={formData[field] || ""}
+              onChange={(e) => handleFormChange(field, e.target.value)}
+              placeholder={fieldSchema.title}
+              required={isRequired}
+            />
+          </div>
+        );
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+        <p className="text-gray-600 dark:text-gray-400">Loading workflow automation...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-8 space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Workflow Automation
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            Automate your tasks and processes across all connected services
+          </p>
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setViewMode(viewMode === "classic" ? "builder" : "classic")}
+          >
+            {viewMode === "classic" ? (
+              <>
+                <LayoutIcon className="w-4 h-4 mr-2" />
+                Visual Builder
+              </>
+            ) : (
+              <>
+                <List className="w-4 h-4 mr-2" />
+                Classic View
+              </>
+            )}
+          </Button>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Workflow
+          </Button>
+        </div>
+      </div>
+
+      {viewMode === "builder" ? (
+        <WorkflowBuilder
+          initialData={builderInitialData || (selectedWorkflow ? {
+            nodes: selectedWorkflow.steps.map((s, i) => ({
+              id: s.id,
+              type: s.type === 'trigger' ? 'trigger' : 'action',
+              position: { x: 250, y: i * 200 + 50 },
+              data: {
+                label: s.name,
+                service: s.service || 'system',
+                action: s.action || 'execute',
+                ...s.parameters
+              }
+            })),
+            edges: selectedWorkflow.steps.slice(0, -1).map((s, i) => ({
+              id: `e${s.id}-${selectedWorkflow.steps[i + 1].id}`,
+              source: s.id,
+              target: selectedWorkflow.steps[i + 1].id,
+              type: 'addStepEdge'
+            }))
+          } : undefined)}
+          workflowId={selectedWorkflow?.id || selectedTemplate?.id}
+        />
+      ) : (
+        /* Main Content */
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="workflows">My Workflows</TabsTrigger>
+            <TabsTrigger value="executions">Executions</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
+          </TabsList>
+
+          {/* Templates Tab */}
+          <TabsContent value="templates" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {templates.map((template) => (
+                <Card
+                  key={template.id}
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center">
+                        {renderServiceIcon(template.category)}
+                        <CardTitle className="text-lg">{template.name}</CardTitle>
+                      </div>
+                      <Badge variant="secondary">
+                        {template.steps.length} steps
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="mb-4 min-h-[40px]">
+                      {template.description}
+                    </CardDescription>
+                    <div className="space-y-2">
+                      {(template.steps || []).slice(0, 3).map((step, index) => (
+                        <div key={step.id || index} className="flex items-center text-sm">
+                          <Badge
+                            variant="outline"
+                            className="mr-2 w-5 h-5 flex items-center justify-center p-0"
+                          >
+                            {index + 1}
+                          </Badge>
+                          <span className="truncate">{step.name}</span>
+                        </div>
+                      ))}
+                      {(template.steps || []).length > 3 && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 pl-7">
+                          +{(template.steps || []).length - 3} more steps
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full"
+                      onClick={() => handleTemplateSelect(template)}
+                    >
+                      Use Template
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={() => router.push(`/workflows/editor/${template.template_id}`)}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit in Builder
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* My Workflows Tab */}
+          <TabsContent value="workflows" className="mt-6">
+            <div className="space-y-4">
+              {workflows.map((workflow) => (
+                <Card key={workflow.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <CardTitle>{workflow.name}</CardTitle>
+                        <CardDescription>{workflow.description}</CardDescription>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">
+                          {workflow.steps_count || workflow.steps?.length || 0}{" "}
+                          steps
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => router.push(`/workflows/editor/${workflow.created_from_template || workflow.id}`)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleWorkflowSelect(workflow)}
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Run
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Created:{" "}
+                      {new Date(workflow.created_at).toLocaleDateString()}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+              {workflows.length === 0 && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>No workflows yet</AlertTitle>
+                  <AlertDescription>
+                    Create your first workflow using a template or from scratch.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Executions Tab */}
+          <TabsContent value="executions" className="mt-6">
+            <div className="space-y-4">
+              {executions.map((execution) => (
+                <Card key={execution.execution_id}>
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col md:flex-row justify-between gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Badge
+                            className={getStatusColor(execution.status)}
+                            variant="secondary"
+                          >
+                            {execution.status}
+                          </Badge>
+                          <span className="font-semibold">
+                            {execution.workflow_id}
+                            {/* [Lesson 3] UX: Visual indicator for forked workflows */}
+                            {
+                              execution.execution_id.includes("-forked-") && (
+                                <span className="text-xs text-purple-500 ml-1 font-normal">
+                                  (forked)
+                                </span>
+                              )
+                            }
+                          </span >
+                        </div >
+                        <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                          <p>
+                            Started:{" "}
+                            {new Date(execution.start_time).toLocaleString()}
+                          </p>
+                          {execution.end_time && (
+                            <p>
+                              Ended:{" "}
+                              {new Date(execution.end_time).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      </div >
+
+                      <div className="flex items-center space-x-4 min-w-[300px]">
+                        <div className="flex-1 space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span>Progress</span>
+                            <span>
+                              {execution.current_step}/{execution.total_steps}
+                            </span>
+                          </div>
+                          <Progress
+                            value={
+                              (execution.current_step / execution.total_steps) *
+                              100
+                            }
+                            className="h-2"
+                          />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          {execution.status === "running" && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() =>
+                                handleCancelExecution(execution.execution_id)
+                              }
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                          {execution.status === "paused" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setResumeExecutionId(execution.execution_id);
+                                setFormData({}); // Clear form for new inputs
+                                setIsResumeModalOpen(true);
+                              }}
+                            >
+                              <Play className="w-3 h-3 mr-1" /> Resume
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setActiveExecution(execution);
+                              setIsExecutionModalOpen(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div >
+                  </CardContent >
+                </Card >
+              ))}
+              {
+                executions.length === 0 && (
+                  <Alert>
+                    <Activity className="h-4 w-4" />
+                    <AlertTitle>No executions yet</AlertTitle>
+                    <AlertDescription>
+                      Execute a workflow to see execution history here.
+                    </AlertDescription>
+                  </Alert>
+                )
+              }
+            </div >
+          </TabsContent >
+
+          {/* Services Tab */}
+          < TabsContent value="services" className="mt-6" >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.entries(services).map(([serviceName, serviceInfo]) => (
+                <Card key={serviceName}>
+                  <CardHeader>
+                    <div className="flex items-center">
+                      {renderServiceIcon(serviceName)}
+                      <CardTitle className="text-lg capitalize">
+                        {serviceName}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 min-h-[40px]">
+                      {serviceInfo.description}
+                    </p>
+                    <div className="space-y-2">
+                      <p className="font-semibold text-sm">Available Actions:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {serviceInfo.actions.slice(0, 5).map((action) => (
+                          <Badge key={action} variant="secondary">
+                            {action}
+                          </Badge>
+                        ))}
+                        {serviceInfo.actions.length > 5 && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                            +{serviceInfo.actions.length - 5} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Badge variant="outline" className="ml-auto">
+                      {serviceInfo.actions.length} actions
+                    </Badge>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </TabsContent >
+        </Tabs >
+      )}
+
+      {/* Template Execution Modal */}
+      <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Use Template: {selectedTemplate?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedTemplate && (
+            <div className="space-y-6">
+              <p className="text-gray-600 dark:text-gray-400">{selectedTemplate.description}</p>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Workflow Steps:</h3>
+                <div className="space-y-2 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+                  {selectedTemplate.steps.map((step, index) => (
+                    <div key={step.id} className="flex items-start space-x-3">
+                      <Badge variant="outline" className="mt-0.5">
+                        {index + 1}
+                      </Badge>
+                      <div>
+                        <p className="font-medium text-sm">{step.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {step.service}.{step.action}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold">Input Parameters:</h3>
+                <div className="space-y-4">
+                  {selectedTemplate.input_schema?.properties &&
+                    Object.keys(selectedTemplate.input_schema.properties).map(
+                      (field) =>
+                        renderInputField(field, selectedTemplate.input_schema),
+                    )}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsTemplateModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedTemplate) {
+                  handleExecuteWorkflow(selectedTemplate.id, formData);
+                  setIsTemplateModalOpen(false);
+                }
+              }}
+              disabled={executing}
+            >
+              {executing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Execute Workflow
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Workflow Execution Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Execute Workflow: {selectedWorkflow?.name}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedWorkflow && (
+            <div className="space-y-6">
+              <p className="text-gray-600 dark:text-gray-400">{selectedWorkflow.description}</p>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold">Workflow Steps:</h3>
+                <div className="space-y-2 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+                  {selectedWorkflow.steps?.map((step, index) => (
+                    <div key={step.id} className="flex items-start space-x-3">
+                      <Badge variant="outline" className="mt-0.5">
+                        {index + 1}
+                      </Badge>
+                      <div>
+                        <p className="font-medium text-sm">{step.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {step.service}.{step.action}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold">Input Parameters:</h3>
+                <div className="space-y-4">
+                  {selectedWorkflow.input_schema?.properties &&
+                    Object.keys(selectedWorkflow.input_schema.properties).map(
+                      (field) =>
+                        renderInputField(field, selectedWorkflow.input_schema),
+                    )}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (selectedWorkflow) {
+                  handleExecuteWorkflow(selectedWorkflow.id, formData);
+                  setIsCreateModalOpen(false);
+                }
+              }}
+              disabled={executing}
+            >
+              {executing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Execute Workflow
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Resume Execution Modal */}
+      <Dialog open={isResumeModalOpen} onOpenChange={setIsResumeModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Resume Execution</DialogTitle>
+            <DialogDescription>
+              Provide missing parameters to resume the workflow.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Parameters</Label>
+              {Object.keys(formData).map((key) => (
+                <div key={key} className="flex items-center space-x-2">
+                  <Input
+                    placeholder="Key"
+                    value={key}
+                    disabled
+                    className="flex-1"
+                  />
+                  <Input
+                    placeholder="Value"
+                    value={formData[key]}
+                    onChange={(e) => handleFormChange(key, e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const newData = { ...formData };
+                      delete newData[key];
+                      setFormData(newData);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+
+              <div className="flex items-center space-x-2">
+                <Input
+                  placeholder="New Parameter Key"
+                  id="new-param-key"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    const keyInput = document.getElementById('new-param-key') as HTMLInputElement;
+                    if (keyInput && keyInput.value) {
+                      handleFormChange(keyInput.value, "");
+                      keyInput.value = "";
+                    }
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Add keys for any missing parameters required by the workflow step.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsResumeModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (resumeExecutionId) {
+                  handleResumeWorkflow(resumeExecutionId, formData);
+                }
+              }}
+              disabled={executing}
+            >
+              {executing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Resume
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Execution Details Modal */}
+      <Dialog
+        open={isExecutionModalOpen}
+        onOpenChange={setIsExecutionModalOpen}
+      >
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Execution Details</DialogTitle>
+          </DialogHeader>
+          {activeExecution && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="font-bold">
+                    Execution ID: {activeExecution.execution_id}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Workflow: {activeExecution.workflow_id}
+                  </p>
+                </div>
+                <Badge className={getStatusColor(activeExecution.status)}>
+                  {activeExecution.status}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500 dark:text-gray-400">Started:</span>{" "}
+                  {new Date(activeExecution.start_time).toLocaleString()}
+                </div>
+                {activeExecution.end_time && (
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400">Ended:</span>{" "}
+                    {new Date(activeExecution.end_time).toLocaleString()}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>
+                    Step {activeExecution.current_step} of{" "}
+                    {activeExecution.total_steps}
+                  </span>
+                </div>
+                <Progress
+                  value={
+                    (activeExecution.current_step /
+                      activeExecution.total_steps) *
+                    100
+                  }
+                  className="h-2"
+                />
+              </div>
+
+              {activeExecution.results &&
+                Object.keys(activeExecution.results).length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Step Results:</h3>
+                    <Accordion type="multiple" className="w-full">
+                      {Object.entries(activeExecution.results).map(
+                        ([stepId, result]) => (
+                          <AccordionItem key={stepId} value={stepId}>
+                            <AccordionTrigger>Step: {stepId}</AccordionTrigger>
+                            <AccordionContent>
+                              <div className="flex justify-between items-center mb-2">
+                                <span className="font-semibold text-xs text-gray-500 dark:text-gray-400">
+                                  Captured State
+                                </span>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-6 text-xs bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100"
+                                  onClick={() => {
+                                    setForkStepId(stepId);
+                                    // [Lesson 3] UX Enhancement: Pre-fill with existing data so user can edit
+                                    // [Lesson 4] Safe Mode: Strip system keys to prevent accidents
+                                    const systemKeys = ['status', 'error', 'timestamp', 'execution_time_ms', 'step_id', 'step_type', 'notes', 'requires_confirmation'];
+                                    const safeVariables = { ...result };
+                                    systemKeys.forEach(key => delete safeVariables[key]);
+
+                                    setForkVariables(safeVariables);
+                                    setForkVariablesJson(JSON.stringify(safeVariables, null, 2));
+                                    setIsForkModalOpen(true);
+                                  }}
+                                >
+                                  <GitBranch className="w-3 h-3 mr-1" />
+                                  Fork & Time Travel
+                                </Button>
+                              </div>
+                              <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-xs">
+                                {JSON.stringify(result, null, 2)}
+                              </pre>
+                            </AccordionContent >
+                          </AccordionItem >
+                        ),
+                      )}
+                    </Accordion >
+                  </div >
+                )}
+              {
+                activeExecution.errors && activeExecution.errors.length > 0 && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Errors</AlertTitle>
+                    <div className="mt-2">
+                      {activeExecution.errors.map((error, index) => (
+                        <AlertDescription key={index} className="block">
+                          {error}
+                        </AlertDescription>
+                      ))}
+                    </div>
+                  </Alert>
+                )
+              }
+            </div >
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsExecutionModalOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent >
+      </Dialog >
+
+
+      {/* [Lesson 3] Fork / Time Travel Modal */}
+      < Dialog open={isForkModalOpen} onOpenChange={setIsForkModalOpen} >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <History className="w-5 h-5 mr-2 text-purple-500" />
+              Time Travel: Fork from Step {forkStepId}
+            </DialogTitle>
+            <DialogDescription>
+              Create a parallel universe starting from this step. You can patch variables to fix errors.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Alert className="bg-purple-50 border-purple-200">
+              <GitBranch className="h-4 w-4 text-purple-600" />
+              <AlertTitle className="text-purple-800">Branching Timeline</AlertTitle>
+              <AlertDescription className="text-purple-700 text-xs">
+                Original execution {activeExecution?.execution_id} will be preserved. A new execution will function as a &quot;Clone&quot;.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <Label>Hyperparameters & Variables</Label>
+                <Badge variant="outline" className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                  {Object.keys(forkVariables).length} params
+                </Badge>
+              </div>
+
+              {Object.keys(forkVariables).length === 0 ? (
+                <div className="text-center py-6 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-md">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No tunable parameters found for this step.</p>
+                  <p className="text-xs text-gray-400 mt-1">Forking will proceed with original state.</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                  {Object.entries(forkVariables).map(([key, value]) => (
+                    <div key={key} className="space-y-1">
+                      <Label htmlFor={`param-${key}`} className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                        {key}
+                      </Label>
+                      <Input
+                        id={`param-${key}`}
+                        className="h-8 text-sm"
+                        value={typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                        onChange={(e) => {
+                          const newVal = e.target.value;
+                          // Try to conserve types (number/bool) if possible, otherwise string
+                          let typedVal: any = newVal;
+                          if (newVal === 'true') typedVal = true;
+                          else if (newVal === 'false') typedVal = false;
+                          else if (!isNaN(Number(newVal)) && newVal.trim() !== '') typedVal = Number(newVal);
+
+                          setForkVariables(prev => ({ ...prev, [key]: typedVal }));
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsForkModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={() => {
+                // [Lesson 4] Safe Mode: Direct Object Submission
+                // No parsing needed, form keeps object in sync
+                handleForkWorkflow(forkStepId!, forkVariables);
+              }}
+              disabled={executing}
+            >
+              {executing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <GitBranch className="w-4 h-4 mr-2" />}
+              Fork Timeline
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog >
+
+    </div >
+  );
+};
+
+export default WorkflowAutomation;

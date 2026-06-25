@@ -1,0 +1,17 @@
+{
+  "name": "hf_hub_query",
+  "description": "Read-only Hugging Face Hub navigator for discovery, lookup, filtering, ranking, counts, field-constrained extraction, and relationship questions across users, orgs, models, datasets, spaces, collections, discussions, daily papers, recent activity, followers/following, likes, and likers. Good for structured raw outputs and compact results. Generated helper calls can explicitly bound limit, scan_limit, max_pages, and ranking_window for brevity or broader coverage, and the tool can also be asked about its supported helpers, canonical fields, defaults, and coverage behavior.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "message"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

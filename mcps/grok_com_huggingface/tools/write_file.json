@@ -1,0 +1,81 @@
+{
+  "name": "write_file",
+  "description": "Write string content as a file to a Hugging Face bucket, model, dataset, or Space.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "string",
+        "description": "String content to write to the Hub."
+      },
+      "repo_id": {
+        "type": "string",
+        "description": "Hub repo id, or bucket id when repo_type is bucket."
+      },
+      "path_in_repo": {
+        "type": "string",
+        "description": "File path to create in the repo, or object path in the bucket."
+      },
+      "repo_type": {
+        "type": "string",
+        "enum": [
+          "model",
+          "dataset",
+          "space",
+          "bucket"
+        ],
+        "description": "Repository type: model, dataset, space, or bucket.",
+        "default": "model"
+      },
+      "create_if_missing": {
+        "type": "boolean",
+        "description": "Create the repo or bucket if it does not already exist.\nThis matches the default behavior of `hf upload` for repos.",
+        "default": true
+      },
+      "private": {
+        "description": "Optional privacy setting when creating the repo or bucket.",
+        "default": null
+      },
+      "space_sdk": {
+        "type": "string",
+        "enum": [
+          "static",
+          "gradio",
+          "streamlit",
+          "docker"
+        ],
+        "description": "Space SDK to use when creating a Space.",
+        "default": "static"
+      },
+      "revision": {
+        "description": "Branch or revision for repo uploads.",
+        "default": null
+      },
+      "create_pr": {
+        "type": "boolean",
+        "description": "Open repo uploads as a pull request instead of committing directly.",
+        "default": false
+      },
+      "commit_message": {
+        "description": "Optional commit message for repo uploads.",
+        "default": null
+      },
+      "commit_description": {
+        "description": "Optional commit description for repo uploads.",
+        "default": null
+      },
+      "encoding": {
+        "type": "string",
+        "description": "Text encoding used to convert the string to bytes.",
+        "default": "utf-8"
+      }
+    },
+    "required": [
+      "content",
+      "repo_id",
+      "path_in_repo"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

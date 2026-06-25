@@ -1,0 +1,137 @@
+---
+pid: 92432
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "cd \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\frontend-nextjs\" && npm run dev"
+started_at: 2026-06-17T15:25:16.387Z
+running_for_ms: 14475000 
+---
+
+> atomic-app@0.1.0-alpha.4 predev
+> python ../scripts/pre_dev.py
+
+pre_dev: running Atom self-heal...
+
+> atomic-app@0.1.0-alpha.4 dev
+> cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --webpack
+
+▲ Next.js 16.2.2 (webpack)
+⚠ Port 3000 is in use by process 81984, using available port 3001 instead.
+- Local:         http://localhost:3001
+- Network:       http://172.20.10.3:3001
+- Environments: .env.local
+✓ Ready in 317ms
+⚠ `eslint` configuration in next.config.js is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+⚠ Invalid next.config.js options detected: 
+⚠     Unrecognized key(s) in object: 'eslint'
+⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+  Skipping creating a lockfile at I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\.next\dev\lock because we're using WASM bindings
+⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: \\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node is not a valid Win32 application.
+\\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+- Experiments (use with caution):
+⚠ Duplicate page detected. pages\finance.tsx and pages\finance\index.tsx resolve to /finance
+⚠ Duplicate page detected. pages\finance.tsx and pages\finance\index.tsx resolve to /finance
+  ✓ externalDir
+
+○ Compiling / ...
+ GET / 200 in 6.9s (next.js: 6.7s, proxy.ts: 86ms, application-code: 69ms)
+ GET / 200 in 40ms (next.js: 4ms, proxy.ts: 14ms, application-code: 22ms)
+ GET / 304 in 19ms (next.js: 6ms, proxy.ts: 5ms, application-code: 9ms)
+ GET /api/auth/session 200 in 321ms (next.js: 304ms, proxy.ts: 4ms, application-code: 14ms)
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 9ms (next.js: 3ms, proxy.ts: 3ms, application-code: 3ms)
+ GET /_next/data/development/documents.json 200 in 2.1s (next.js: 2.1s, proxy.ts: 7ms, application-code: 42ms)
+ GET /_next/data/development/documents.json 304 in 24ms (next.js: 4ms, proxy.ts: 6ms, application-code: 13ms)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async fetchDocuments (webpack-internal:///(pages-dir-browser)/./pages/documents.tsx:70:30) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async fetchDocuments (webpack-internal:///(pages-dir-browser)/./pages/documents.tsx:70:30) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] Failed to fetch documents AxiosError: Network Error
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20)
+    at async fetchDocuments (webpack-internal:///(pages-dir-browser)/./pages/documents.tsx:70:30) (webpack-internal:///(pages-dir-browser)
+[browser] [API Error] {
+  code: 'ERR_NETWORK',
+  message: 'Network Error',
+  status: undefined,
+  url: '/api/documents'
+} 
+    at eval (webpack-internal:///(pages-dir-browser)/./lib/api.ts:56:13)
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20) (webpack-internal:///(pages-dir-browser)
+[browser] Failed to fetch documents AxiosError: Network Error
+    at async response.maxAttempts (webpack-internal:///(pages-dir-browser)/./lib/api.ts:78:20)
+    at async fetchDocuments (webpack-internal:///(pages-dir-browser)/./pages/documents.tsx:70:30) (webpack-internal:///(pages-dir-browser)
+ GET / 200 in 71ms (next.js: 59ms, proxy.ts: 3ms, application-code: 10ms)
+⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+▲ Next.js 16.2.2 (webpack)
+- Local:         http://localhost:3001
+- Network:       http://172.20.10.3:3001
+- Environments: .env.local
+✓ Ready in 276ms
+  Skipping creating a lockfile at I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\.next\dev\lock because we're using WASM bindings
+⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: \\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node is not a valid Win32 application.
+\\?\I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+- Experiments (use with caution):
+⚠ Duplicate page detected. pages\finance.tsx and pages\finance\index.tsx resolve to /finance
+⚠ Duplicate page detected. pages\finance.tsx and pages\finance\index.tsx resolve to /finance
+  ✓ externalDir
+
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+○ Compiling middleware ...
+○ Compiling /documents ...
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /documents 200 in 3.3s (next.js: 3.2s, proxy.ts: 21ms, application-code: 43ms)
+ GET /documents 304 in 405ms (next.js: 380ms, proxy.ts: 9ms, application-code: 16ms)

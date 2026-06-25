@@ -1,0 +1,47 @@
+{
+  "started_at": "2026-06-25T09:43:31.048713+00:00",
+  "platform": "win32",
+  "python": "3.14.4",
+  "issues": [
+    {
+      "id": "backend_import_failed",
+      "category": "backend",
+      "severity": "error",
+      "message": "ModuleNotFoundError: No module named 'main_api_app'",
+      "fixable": true,
+      "fixed": false,
+      "fix_action": "install_python_deps"
+    },
+    {
+      "id": "missing_pkg_main_api_app",
+      "category": "backend",
+      "severity": "error",
+      "message": "Missing Python package: main_api_app",
+      "fixable": true,
+      "fixed": false,
+      "fix_action": "install_python_deps"
+    },
+    {
+      "id": "frontend_typecheck",
+      "category": "frontend",
+      "severity": "warning",
+      "message": "TypeScript check: 0 syntax error(s), 200 total error(s)",
+      "fixable": false,
+      "fixed": false,
+      "fix_action": null
+    }
+  ],
+  "fixes_applied": [],
+  "verification": {
+    "typescript": {
+      "ok": false,
+      "syntax_errors": 0,
+      "total_errors": 200,
+      "output_tail": "yBufferLike>'.\n          The types of 'slice(...).buffer' are incompatible between these types.\n            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.\n              Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength\nsrc/lib/tokenEncryption.ts(123,31): error TS2769: No overload matches this call.\n  Overload 1 of 4, '(algorithm: CipherGCMTypes, key: CipherKey, iv: BinaryLike, options?: CipherGCMOptions): DecipherGCM', gave the following error.\n    Argument of type 'string' is not assignable to parameter of type 'CipherGCMTypes'.\n  Overload 2 of 4, '(algorithm: string, key: CipherKey, iv: BinaryLike, options?: TransformOptions): Decipher', gave the following error.\n    Argument of type 'Buffer' is not assignable to parameter of type 'CipherKey'.\n      Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike> | KeyObject'.\n        Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike>'.\n          The types of 'slice(...).buffer' are incompatible between these types.\n            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.\n              Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength\nsrc/lib/tokenEncryption.ts(126,27): error TS2345: Argument of type 'Buffer' is not assignable to parameter of type 'ArrayBufferView'.\n  Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike>'.\n    Type 'Buffer' is not assignable to type 'Uint8Array<ArrayBufferLike>'.\n      The types of 'slice(...).buffer' are incompatible between these types.\n        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.\n          Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength\n"
+    },
+    "backend_import_ok": false,
+    "typescript_syntax_ok": true
+  },
+  "success": false,
+  "finished_at": "2026-06-25T09:43:46.200849+00:00"
+}

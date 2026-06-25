@@ -1,0 +1,677 @@
+"""
+Governance Cache
+
+High-performance in-memory cache for governance decisions to minimize database lookups.
+Features:
+- 60-second TTL for cached decisions
+- Async cache operations
+- Auto-invalidation on agent status changes
+- Thread-safe implementation
+- Target >90% cache hit rate, <10ms lookup latency
+"""
+
+import asyncio
+from collections import OrderedDict
+from datetime import datetime, timedelta
+from functools import wraps
+import logging
+import threading
+import time
+from typing import Any, Dict, Optional, Tuple
+
+logger = logging.getLogger(__name__)
+
+
+class GovernanceCache:
+    """
+    Thread-safe LRU cache for governance decisions with TTL.
+
+    Cache key format: "{agent_id}:{action_type}"
+    Cache value: {"allowed": bool, "data": dict, "cached_at": timestamp}
+    """
+
+    def __init__(
+        self,
+        max_size: int = 1000,
+        ttl_seconds: int = 60
+    ):
+        """
+        Initialize governance cache.
+
+        Args:
+            max_size: Maximum number of cached entries (LRU eviction)
+            ttl_seconds: Time-to-live for cache entries (default 60s)
+        """
+        self.max_size = max_size
+        self.ttl_seconds = ttl_seconds
+
+        # OrderedDict for LRU eviction (thread-safe operations)
+        self._cache: OrderedDict[str, Dict[str, Any]] = OrderedDict()
+        self._lock = threading.Lock()
+
+        # Statistics
+        self._hits = 0
+        self._misses = 0
+        self._evictions = 0
+        self._invalidations = 0
+
+        # Directory-specific statistics
+        self._directory_hits = 0
+        self._directory_misses = 0
+
+        # Start background cleanup task
+        self._cleanup_task = None
+        self._start_cleanup_task()
+
+    def _start_cleanup_task(self):
+        """Start background task to expire stale entries."""
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                self._cleanup_task = loop.create_task(self._cleanup_expired())
+        except Exception as e:
+            logger.warning(f"Could not start cleanup task: {e}")
+
+    async def _cleanup_expired(self):
+        """Background task to remove expired entries."""
+        while True:
+            try:
+                await asyncio.sleep(30)  # Run every 30 seconds
+                self._expire_stale()
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in cleanup task: {e}")
+
+    def _expire_stale(self):
+        """Remove expired entries from cache."""
+        try:
+            with self._lock:
+                now = time.time()
+                expired_keys = []
+
+                for key, value in self._cache.items():
+                    cached_at = value.get("cached_at", 0)
+                    if now - cached_at > self.ttl_seconds:
+                        expired_keys.append(key)
+
+                for key in expired_keys:
+                    del self._cache[key]
+                    self._evictions += 1
+
+                if expired_keys:
+                    logger.debug(f"Expired {len(expired_keys)} stale cache entries")
+        except Exception as e:
+            logger.error(f"Error expiring stale entries: {e}")
+
+    def _make_key(self, agent_id: str, action_type: str) -> str:
+        """Generate cache key from agent_id and action_type."""
+        return f"{agent_id}:{action_type.lower()}"
+
+    def get(self, agent_id: str, action_type: str) -> Optional[Dict[str, Any]]:
+        """
+        Get cached governance decision.
+
+        Args:
+            agent_id: Agent ID
+            action_type: Action type (e.g., "stream_chat", "present_chart", "dir:/tmp")
+
+        Returns:
+            Cached decision dict or None if not found/expired
+        """
+        key = self._make_key(agent_id, action_type)
+
+        with self._lock:
+            if key not in self._cache:
+                self._misses += 1
+                # Track directory-specific misses
+                if action_type.startswith("dir:"):
+                    self._directory_misses += 1
+                return None
+
+            entry = self._cache[key]
+            cached_at = entry.get("cached_at", 0)
+            age_seconds = time.time() - cached_at
+
+            # Check if expired
+            if age_seconds > self.ttl_seconds:
+                del self._cache[key]
+                self._misses += 1
+                # Track directory-specific misses
+                if action_type.startswith("dir:"):
+                    self._directory_misses += 1
+                return None
+
+            # Move to end (mark as recently used)
+            self._cache.move_to_end(key)
+            self._hits += 1
+            # Track directory-specific hits
+            if action_type.startswith("dir:"):
+                self._directory_hits += 1
+
+            return entry["data"]
+
+    def set(
+        self,
+        agent_id: str,
+        action_type: str,
+        data: Dict[str, Any]
+    ) -> bool:
+        """
+        Cache governance decision.
+
+        Args:
+            agent_id: Agent ID
+            action_type: Action type
+            data: Governance decision data to cache
+
+        Returns:
+            True if cached successfully
+        """
+        key = self._make_key(agent_id, action_type)
+
+        try:
+            with self._lock:
+                # Evict oldest if at capacity
+                if len(self._cache) >= self.max_size and key not in self._cache:
+                    oldest_key = next(iter(self._cache))
+                    del self._cache[oldest_key]
+                    self._evictions += 1
+
+                # Store entry
+                self._cache[key] = {
+                    "data": data,
+                    "cached_at": time.time()
+                }
+
+                # Move to end
+                self._cache.move_to_end(key)
+
+                return True
+        except Exception as e:
+            logger.error(f"Error caching governance decision: {e}")
+            return False
+
+    def invalidate(self, agent_id: str, action_type: Optional[str] = None):
+        """
+        Invalidate cache entries for an agent.
+
+        Args:
+            agent_id: Agent ID to invalidate
+            action_type: Specific action type to invalidate (None = all actions)
+        """
+        try:
+            with self._lock:
+                if action_type:
+                    # Invalidate specific action
+                    key = self._make_key(agent_id, action_type)
+                    if key in self._cache:
+                        del self._cache[key]
+                        self._invalidations += 1
+                else:
+                    # Invalidate all actions for agent
+                    keys_to_delete = [
+                        k for k in self._cache.keys()
+                        if k.startswith(f"{agent_id}:")
+                    ]
+                    for key in keys_to_delete:
+                        del self._cache[key]
+                        self._invalidations += 1
+
+                logger.debug(f"Invalidated cache for agent {agent_id}" + (f":{action_type}" if action_type else ""))
+        except Exception as e:
+            logger.error(f"Error invalidating cache: {e}")
+
+    def invalidate_agent(self, agent_id: str):
+        """Convenience method to invalidate all cache entries for an agent."""
+        self.invalidate(agent_id, action_type=None)
+
+    def clear(self):
+        """Clear all cache entries."""
+        with self._lock:
+            count = len(self._cache)
+            self._cache.clear()
+            logger.info(f"Cleared {count} cache entries")
+
+    def check_directory(
+        self,
+        agent_id: str,
+        directory: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Check directory permission from cache.
+
+        Wrapper for directory permission cache with specialized key format.
+
+        Args:
+            agent_id: Agent ID
+            directory: Directory path to check
+
+        Returns:
+            Cached directory permission dict or None if not found/expired
+        """
+        # Use special "dir:" prefix to avoid collision with action_type keys
+        action_type = f"dir:{directory}"
+        return self.get(agent_id, action_type)
+
+    def cache_directory(
+        self,
+        agent_id: str,
+        directory: str,
+        permission_data: Dict[str, Any]
+    ) -> bool:
+        """
+        Cache directory permission result.
+
+        Args:
+            agent_id: Agent ID
+            directory: Directory path
+            permission_data: Permission decision data to cache
+
+        Returns:
+            True if cached successfully
+        """
+        # Use special "dir:" prefix to avoid collision with action_type keys
+        action_type = f"dir:{directory}"
+        return self.set(agent_id, action_type, permission_data)
+
+    def get_stats(self) -> Dict[str, Any]:
+        """
+        Get cache statistics.
+
+        Returns:
+            Dict with hit rate, size, and other metrics
+        """
+        with self._lock:
+            total_requests = self._hits + self._misses
+            hit_rate = (self._hits / total_requests * 100) if total_requests > 0 else 0
+
+            # Directory-specific hit rate
+            dir_total = self._directory_hits + self._directory_misses
+            dir_hit_rate = (self._directory_hits / dir_total * 100) if dir_total > 0 else 0
+
+            return {
+                "size": len(self._cache),
+                "max_size": self.max_size,
+                "hits": self._hits,
+                "misses": self._misses,
+                "hit_rate": round(hit_rate, 2),
+                "directory_hits": self._directory_hits,
+                "directory_misses": self._directory_misses,
+                "directory_hit_rate": round(dir_hit_rate, 2),
+                "evictions": self._evictions,
+                "invalidations": self._invalidations,
+                "ttl_seconds": self.ttl_seconds
+            }
+
+    def get_hit_rate(self) -> float:
+        """Get current cache hit rate percentage."""
+        stats = self.get_stats()
+        return stats["hit_rate"]
+
+
+# Global cache instance
+_governance_cache: Optional[GovernanceCache] = None
+
+
+def get_governance_cache() -> GovernanceCache:
+    """Get global governance cache instance."""
+    global _governance_cache
+    if _governance_cache is None:
+        _governance_cache = GovernanceCache()
+        logger.info("Initialized global governance cache")
+    return _governance_cache
+
+
+def cached_governance_check(func):
+    """
+    Decorator to cache governance check results.
+
+    Usage:
+        @cached_governance_check
+        async def check_agent_permission(agent_id, action_type):
+            # ... expensive DB check ...
+            return {"allowed": True, ...}
+    """
+    @wraps(func)
+    async def wrapper(agent_id: str, action_type: str, *args, **kwargs):
+        cache = get_governance_cache()
+
+        # Try cache first
+        cached_result = cache.get(agent_id, action_type)
+        if cached_result is not None:
+            logger.debug(f"Cache HIT for {agent_id}:{action_type}")
+            return cached_result
+
+        # Cache miss - call original function
+        logger.debug(f"Cache MISS for {agent_id}:{action_type}")
+        result = await func(agent_id, action_type, *args, **kwargs)
+
+        # Cache the result
+        cache.set(agent_id, action_type, result)
+
+        return result
+
+    return wrapper
+
+
+class AsyncGovernanceCache:
+    """
+    Async wrapper around GovernanceCache for async contexts.
+
+    Provides the same interface but with async methods for consistency
+    in async codebases.
+    """
+
+    def __init__(self, cache: Optional[GovernanceCache] = None):
+        self._cache = cache or get_governance_cache()
+
+    async def get(self, agent_id: str, action_type: str) -> Optional[Dict[str, Any]]:
+        """Async get - delegates to sync cache (thread-safe)."""
+        return self._cache.get(agent_id, action_type)
+
+    async def set(self, agent_id: str, action_type: str, data: Dict[str, Any]) -> bool:
+        """Async set - delegates to sync cache (thread-safe)."""
+        return self._cache.set(agent_id, action_type, data)
+
+    async def invalidate(self, agent_id: str, action_type: Optional[str] = None):
+        """Async invalidate - delegates to sync cache (thread-safe)."""
+        self._cache.invalidate(agent_id, action_type)
+
+    async def invalidate_agent(self, agent_id: str):
+        """Async invalidate agent - delegates to sync cache (thread-safe)."""
+        self._cache.invalidate_agent(agent_id)
+
+    async def get_stats(self) -> Dict[str, Any]:
+        """Async get stats - delegates to sync cache (thread-safe)."""
+        return self._cache.get_stats()
+
+    async def get_hit_rate(self) -> float:
+        """Async get hit rate - delegates to sync cache (thread-safe)."""
+        return self._cache.get_hit_rate()
+
+
+def get_async_governance_cache() -> AsyncGovernanceCache:
+    """Get async governance cache wrapper."""
+    return AsyncGovernanceCache(get_governance_cache())
+
+
+# ============================================================================
+# Messaging-Specific Cache Extensions
+# ============================================================================
+
+class MessagingCache:
+    """
+    Specialized cache for messaging platform data.
+
+    Caches:
+    - Platform send capabilities
+    - Monitor definitions
+    - Template renders
+    - Platform features
+
+    Target: <1ms lookup for cached items
+    """
+
+    def __init__(self, max_size: int = 500, ttl_seconds: int = 300):
+        """
+        Initialize messaging cache.
+
+        Args:
+            max_size: Maximum number of cached entries (default 500)
+            ttl_seconds: Time-to-live for cache entries (default 5 minutes)
+        """
+        self.max_size = max_size
+        self.ttl_seconds = ttl_seconds
+
+        # Separate OrderedDict for different cache types
+        self._capabilities: OrderedDict[str, Dict[str, Any]] = OrderedDict()
+        self._monitors: OrderedDict[str, Dict[str, Any]] = OrderedDict()
+        self._templates: OrderedDict[str, str] = OrderedDict()
+        self._features: OrderedDict[str, Dict[str, Any]] = OrderedDict()
+
+        self._lock = threading.Lock()
+
+        # Statistics
+        self._stats = {
+            "capabilities_hits": 0,
+            "capabilities_misses": 0,
+            "monitors_hits": 0,
+            "monitors_misses": 0,
+            "templates_hits": 0,
+            "templates_misses": 0,
+            "features_hits": 0,
+            "features_misses": 0,
+        }
+
+    def get_platform_capabilities(
+        self,
+        platform: str,
+        agent_maturity: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get cached platform capabilities for a maturity level.
+
+        Args:
+            platform: Platform name (slack, discord, etc.)
+            agent_maturity: Agent maturity level
+
+        Returns:
+            Cached capabilities or None
+        """
+        key = f"{platform}:{agent_maturity}"
+
+        with self._lock:
+            if key not in self._capabilities:
+                self._stats["capabilities_misses"] += 1
+                return None
+
+            entry = self._capabilities[key]
+            if self._is_expired(entry):
+                del self._capabilities[key]
+                self._stats["capabilities_misses"] += 1
+                return None
+
+            self._stats["capabilities_hits"] += 1
+            self._capabilities.move_to_end(key)
+            return entry["data"]
+
+    def set_platform_capabilities(
+        self,
+        platform: str,
+        agent_maturity: str,
+        capabilities: Dict[str, Any]
+    ):
+        """Cache platform capabilities."""
+        key = f"{platform}:{agent_maturity}"
+
+        with self._lock:
+            self._ensure_capacity(self._capabilities)
+            self._capabilities[key] = {
+                "data": capabilities,
+                "cached_at": time.time()
+            }
+
+    def get_monitor_definition(
+        self,
+        monitor_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get cached monitor definition.
+
+        Args:
+            monitor_id: Monitor ID
+
+        Returns:
+            Cached monitor or None
+        """
+        with self._lock:
+            if monitor_id not in self._monitors:
+                self._stats["monitors_misses"] += 1
+                return None
+
+            entry = self._monitors[monitor_id]
+            if self._is_expired(entry):
+                del self._monitors[monitor_id]
+                self._stats["monitors_misses"] += 1
+                return None
+
+            self._stats["monitors_hits"] += 1
+            self._monitors.move_to_end(monitor_id)
+            return entry["data"]
+
+    def set_monitor_definition(
+        self,
+        monitor_id: str,
+        monitor_data: Dict[str, Any]
+    ):
+        """Cache monitor definition."""
+        with self._lock:
+            self._ensure_capacity(self._monitors)
+            self._monitors[monitor_id] = {
+                "data": monitor_data,
+                "cached_at": time.time()
+            }
+
+    def invalidate_monitor(self, monitor_id: str):
+        """Invalidate cached monitor."""
+        with self._lock:
+            if monitor_id in self._monitors:
+                del self._monitors[monitor_id]
+
+    def get_template_render(
+        self,
+        template_key: str
+    ) -> Optional[str]:
+        """
+        Get cached template render.
+
+        Args:
+            template_key: Unique key for template (hash of template + variables)
+
+        Returns:
+            Cached rendered string or None
+        """
+        with self._lock:
+            if template_key not in self._templates:
+                self._stats["templates_misses"] += 1
+                return None
+
+            entry = self._templates[template_key]
+            # Templates have longer TTL (10 minutes)
+            if time.time() - entry.get("cached_at", 0) > 600:
+                del self._templates[template_key]
+                self._stats["templates_misses"] += 1
+                return None
+
+            self._stats["templates_hits"] += 1
+            self._templates.move_to_end(template_key)
+            return entry["data"]
+
+    def set_template_render(
+        self,
+        template_key: str,
+        rendered: str
+    ):
+        """Cache template render."""
+        with self._lock:
+            self._ensure_capacity(self._templates)
+            self._templates[template_key] = {
+                "data": rendered,
+                "cached_at": time.time()
+            }
+
+    def get_platform_features(
+        self,
+        platform: str
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get cached platform features.
+
+        Args:
+            platform: Platform name
+
+        Returns:
+            Cached features or None
+        """
+        with self._lock:
+            if platform not in self._features:
+                self._stats["features_misses"] += 1
+                return None
+
+            entry = self._features[platform]
+            # Features have longer TTL (10 minutes)
+            if time.time() - entry.get("cached_at", 0) > 600:
+                del self._features[platform]
+                self._stats["features_misses"] += 1
+                return None
+
+            self._stats["features_hits"] += 1
+            self._features.move_to_end(platform)
+            return entry["data"]
+
+    def set_platform_features(
+        self,
+        platform: str,
+        features: Dict[str, Any]
+    ):
+        """Cache platform features."""
+        with self._lock:
+            self._ensure_capacity(self._features)
+            self._features[platform] = {
+                "data": features,
+                "cached_at": time.time()
+            }
+
+    def _is_expired(self, entry: Dict[str, Any]) -> bool:
+        """Check if cache entry is expired."""
+        age = time.time() - entry.get("cached_at", 0)
+        return age > self.ttl_seconds
+
+    def _ensure_capacity(self, cache: OrderedDict):
+        """Ensure cache doesn't exceed max size (LRU eviction)."""
+        while len(cache) >= self.max_size:
+            cache.popitem(last=False)
+
+    def get_stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        with self._lock:
+            total_hits = sum(v for k, v in self._stats.items() if "hits" in k)
+            total_misses = sum(v for k, v in self._stats.items() if "misses" in k)
+            total_requests = total_hits + total_misses
+            hit_rate = (total_hits / total_requests * 100) if total_requests > 0 else 0
+
+            return {
+                "capabilities_cache_size": len(self._capabilities),
+                "monitors_cache_size": len(self._monitors),
+                "templates_cache_size": len(self._templates),
+                "features_cache_size": len(self._features),
+                "total_hit_rate": round(hit_rate, 2),
+                "stats": self._stats.copy(),
+                "ttl_seconds": self.ttl_seconds,
+                "max_size": self.max_size
+            }
+
+    def clear(self):
+        """Clear all messaging caches."""
+        with self._lock:
+            total = len(self._capabilities) + len(self._monitors) + len(self._templates) + len(self._features)
+            self._capabilities.clear()
+            self._monitors.clear()
+            self._templates.clear()
+            self._features.clear()
+            logger.info(f"Cleared {total} messaging cache entries")
+
+
+# Global messaging cache instance
+_messaging_cache: Optional[MessagingCache] = None
+
+
+def get_messaging_cache() -> MessagingCache:
+    """Get global messaging cache instance."""
+    global _messaging_cache
+    if _messaging_cache is None:
+        _messaging_cache = MessagingCache()
+        logger.info("Initialized global messaging cache")
+    return _messaging_cache
+

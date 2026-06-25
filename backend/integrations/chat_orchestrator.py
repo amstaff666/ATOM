@@ -1,0 +1,1237 @@
+"""
+Chat Orchestrator - Central coordinator for all ATOM features through chat interface
+
+This module provides a unified chat interface that connects all ATOM capabilities:
+- 33+ platform integrations
+- AI-powered NLP, data intelligence, and automation
+- Specialized UIs (Search, Communication, Tasks, Workflows, Scheduling)
+- Multi-agent coordination
+- Cross-platform workflow execution
+"""
+import logging
+from enum import Enum
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+from services.agent_service import agent_service
+
+# LLM Service Integration
+try:
+    from core.llm_service import LLMService
+    LLM_SERVICE_AVAILABLE = True
+except ImportError:
+    LLM_SERVICE_AVAILABLE = False
+
+# Legacy Agent Definitions for Chat Mapping
+AGENTS = {
+    "competitive_intel": {
+        "name": "Competitive Intelligence Agent",
+        "description": "Tracks competitor pricing and product changes",
+        "category": "Market Intelligence"
+    },
+    "inventory_reconcile": {
+        "name": "Inventory Reconciliation Agent",
+        "description": "Reconciles inventory counts across systems",
+        "category": "Operations"
+    },
+    "payroll_guardian": {
+        "name": "Payroll Guardian Agent",
+        "description": "Verifies payroll accuracy and compliance",
+        "category": "Finance"
+    }
+}
+
+from core.workflow_endpoints import load_workflows
+from ai.automation_engine import AutomationEngine
+from ai.workflow_scheduler import workflow_scheduler
+import uuid
+
+logger = logging.getLogger(__name__)
+
+REGULATORY_DISCLAIMER = "\n\n---\n*Disclaimer: ATOM's financial features are powered by AI and intended for strategic guidance. This system is not a licensed CPA or tax advisor. All automated records should be reviewed by a qualified professional before filing.*"
+
+
+class FeatureType(Enum):
+    """Types of ATOM features that can be accessed through chat"""
+    SEARCH = "search"
+    COMMUNICATION = "communication"
+    TASKS = "tasks"
+    WORKFLOWS = "workflows"
+    SCHEDULING = "scheduling"
+    INTEGRATIONS = "integrations"
+    AI_ANALYTICS = "ai_analytics"
+    AUTOMATION = "automation"
+    DOCUMENTS = "documents"
+    FINANCE = "finance"
+    CRM = "crm"
+    SOCIAL_MEDIA = "social_media"
+    HR = "hr"
+    ECOMMERCE = "ecommerce"
+    BUSINESS_HEALTH = "business_health"
+    AGENT = "agent"  # Phase 30: Atom Meta-Agent
+
+class PlatformType(Enum):
+    """Supported platform integrations"""
+    # Communication
+    SLACK = "slack"
+    TEAMS = "teams"
+    GMAIL = "gmail"
+    WHATSAPP = "whatsapp"
+    OUTLOOK = "outlook"
+    ZOOM = "zoom"
+
+    # Task Management
+    ASANA = "asana"
+    NOTION = "notion"
+    TRELLO = "trello"
+    LINEAR = "linear"
+    JIRA = "jira"
+
+    # File Storage
+    GOOGLE_DRIVE = "google_drive"
+    ONEDRIVE = "onedrive"
+    DROPBOX = "dropbox"
+    BOX = "box"
+
+    # Finance
+    PLAID = "plaid"
+    QUICKBOOKS = "quickbooks"
+    XERO = "xero"
+    STRIPE = "stripe"
+
+    # CRM & Business
+    SALESFORCE = "salesforce"
+    HUBSPOT = "hubspot"
+
+    # Social Media
+    TWITTER = "twitter"
+    LINKEDIN = "linkedin"
+    INSTAGRAM = "instagram"
+    TIKTOK = "tiktok"
+
+    # Marketing
+    MAILCHIMP = "mailchimp"
+    CANVA = "canva"
+    FIGMA = "figma"
+
+    # HR
+    GREENHOUSE = "greenhouse"
+    BAMBOOHR = "bamboohr"
+
+    # E-commerce
+    SHOPIFY = "shopify"
+
+    # Other
+    ZAPIER = "zapier"
+    ZOHO = "zoho"
+    DOCUSIGN = "docusign"
+
+
+class ChatIntent(Enum):
+    """Chat intent classification"""
+    SEARCH_REQUEST = "search_request"
+    MESSAGE_SEND = "message_send"
+    TASK_MANAGEMENT = "task_management"
+    WORKFLOW_CREATION = "workflow_creation"
+    SCHEDULING = "scheduling"
+    DATA_ANALYSIS = "data_analysis"
+    AUTOMATION_TRIGGER = "automation_trigger"
+    INTEGRATION_SETUP = "integration_setup"
+    STATUS_CHECK = "status_check"
+    HELP_REQUEST = "help_request"
+    MULTI_STEP_PROCESS = "multi_step_process"
+    BUSINESS_HEALTH = "business_health"
+    CRM = "crm"
+    AGENT_REQUEST = "agent_request"  # Phase 30: Request that needs Atom Meta-Agent
+
+
+class ChatOrchestrator:
+    """
+    Main orchestrator that connects chat interface with all ATOM features
+    """
+
+    def __init__(self, tenant_id: str = "default"):
+        self.conversation_sessions = {}
+        self.feature_handlers = {}
+        self.platform_connectors = {}
+        self.ai_engines = {}
+        self.tenant_id = tenant_id
+        
+        # Initialize LLMService (Unified interface replaces direct clients)
+        self.llm_service = None
+        if LLM_SERVICE_AVAILABLE:
+            self.llm_service = LLMService(tenant_id=tenant_id)
+            logger.info(f"ChatOrchestrator initialized with LLMService for tenant: {tenant_id}")
+
+        # Initialize session manager for persistence
+        try:
+            from core.chat_session_manager import get_chat_session_manager
+            self.session_manager = get_chat_session_manager()
+        except ImportError:
+            logger.warning("Chat session manager not available, using in-memory sessions only")
+            self.session_manager = None
+
+        # Initialize feature handlers
+        self._initialize_feature_handlers()
+        self._initialize_platform_connectors()
+        self._initialize_ai_engines()
+        
+        # Load persisted sessions
+        self._load_persisted_sessions()
+
+    def get_user_sessions(self, user_id: str, limit: int = 20) -> Dict[str, Any]:
+        """
+        Get all sessions for a user, delegating to the session manager (DB/File).
+        Ported from upstream for session persistence.
+        """
+        if not self.session_manager:
+            # Fallback: return in-memory sessions for this user
+            return {
+                sid: sess for sid, sess in self.conversation_sessions.items()
+                if sess.get("user_id") == user_id
+            }
+        
+        # Fetch from manager (which handles DB/File abstraction)
+        sessions_list = self.session_manager.list_user_sessions(user_id, limit)
+        
+        # Convert list to dict format expected by frontend
+        sessions_dict = {}
+        for s in sessions_list:
+            sessions_dict[s["session_id"]] = {
+                "id": s["session_id"],
+                "user_id": s["user_id"],
+                "title": s.get("title"),
+                "created_at": s.get("created_at"),
+                "last_updated": s.get("last_active"), 
+                "history": s.get("history", []),
+                "metadata": s.get("metadata", {})
+            }
+            
+            # Opportunistically cache in memory if missing
+            if s["session_id"] not in self.conversation_sessions:
+                self.conversation_sessions[s["session_id"]] = sessions_dict[s["session_id"]]
+                
+        return sessions_dict
+
+    def _load_persisted_sessions(self):
+        """Load sessions from disk into memory (Legacy File Support)"""
+        if not self.session_manager:
+            return
+            
+        try:
+            # NOTE: This only loads from file. DB sessions are loaded lazily via get_user_sessions.
+            if hasattr(self.session_manager, '_load_sessions_file'):
+                persisted = self.session_manager._load_sessions_file()
+                for s in persisted:
+                    # Convert flat session structure to orchestrator structure
+                    self.conversation_sessions[s["session_id"]] = {
+                        "id": s["session_id"],
+                        "user_id": s["user_id"],
+                        "created_at": s.get("created_at"),
+                        "last_updated": s.get("last_active"), 
+                        "history": s.get("history", [])
+                    }
+                logger.info(f"Loaded {len(persisted)} persisted sessions from file.")
+        except Exception as e:
+            logger.error(f"Failed to load persisted sessions: {e}")
+
+    async def _emit_agent_step(self, step: int, thought: str, action: str, observation: str):
+        """Emit an agent step update to the frontend via WebSockets"""
+        try:
+            from core.websockets import get_connection_manager
+            manager = get_connection_manager()
+            # Broadcast to default workspace channel for now
+            await manager.broadcast_event("workspace:default", "agent_step_update", {
+                "step": {
+                    "step": step,
+                    "thought": thought,
+                    "action": action,
+                    "action_input": "",
+                    "observation": observation,
+                    "timestamp": datetime.now().isoformat()
+                },
+                "agent_id": "system_orchestrator"
+            })
+        except Exception as e:
+            logger.warning(f"Failed to emit agent step: {e}")
+
+    def _initialize_feature_handlers(self):
+        """Initialize handlers for all ATOM features"""
+        self.feature_handlers = {
+            FeatureType.SEARCH: self._handle_search_request,
+            FeatureType.COMMUNICATION: self._handle_communication_request,
+            FeatureType.TASKS: self._handle_task_request,
+            FeatureType.WORKFLOWS: self._handle_workflow_request,
+            FeatureType.SCHEDULING: self._handle_scheduling_request,
+            FeatureType.INTEGRATIONS: self._handle_integration_request,
+            FeatureType.AI_ANALYTICS: self._handle_ai_analytics_request,
+            FeatureType.AUTOMATION: self._handle_automation_request,
+            FeatureType.DOCUMENTS: self._handle_document_request,
+            FeatureType.FINANCE: self._handle_finance_request,
+            FeatureType.CRM: self._handle_crm_request,
+            FeatureType.SOCIAL_MEDIA: self._handle_social_media_request,
+            FeatureType.HR: self._handle_hr_request,
+            FeatureType.ECOMMERCE: self._handle_ecommerce_request,
+            FeatureType.BUSINESS_HEALTH: self._handle_business_health_request,
+            FeatureType.AGENT: self._handle_agent_request,  # Phase 30: Atom Meta-Agent
+        }
+
+    def _initialize_platform_connectors(self):
+        """Initialize platform connectors for all integrations"""
+        # This would connect to actual platform APIs
+        self.platform_connectors = {
+            platform: self._create_platform_connector(platform)
+            for platform in PlatformType
+        }
+
+    def _initialize_ai_engines(self):
+        """Initialize AI engines for NLP, data intelligence, and automation"""
+        try:
+            from ai.nlp_engine import NaturalLanguageEngine
+            from ai.data_intelligence import DataIntelligenceEngine
+            from ai.automation_engine import AutomationEngine
+
+            self.ai_engines = {
+                "nlp": NaturalLanguageEngine(tenant_id=self.tenant_id),
+                "data_intelligence": DataIntelligenceEngine(),
+                "automation": AutomationEngine(),
+            }
+        except ImportError as e:
+            logger.warning(f"AI engines not available: {e}")
+            self.ai_engines = {}
+
+    def _create_platform_connector(self, platform: PlatformType):
+        """Create a mock platform connector (would connect to real APIs in production)"""
+        return {
+            "connected": True,
+            "capabilities": ["search", "create", "update", "delete"],
+            "metadata": {"platform": platform.value}
+        }
+
+    async def process_chat_message(
+        self,
+        user_id: str,
+        message: str,
+        session_id: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Process a chat message and coordinate across all ATOM features
+        """
+        try:
+            # Create or get session
+            session_id = session_id or str(uuid.uuid4())
+            session = self._get_or_create_session(user_id, session_id)
+
+            # Build conversation history for context
+            history = session.get("history", [])[-6:]  # Last 3 turns
+
+            # 1. Try Qwen AI conversational response first (real AI reply)
+            ai_message = await self._get_qwen_response(message, history)
+
+            # 2. Analyze intent using AI NLP (for routing)
+            intent_analysis = await self._analyze_intent(message, session)
+
+            # 3. Route to appropriate feature handlers (for data lookups)
+            feature_responses = await self._route_to_features(
+                message, intent_analysis, session, context
+            )
+
+            # 4. If AI gave a real response, use it; otherwise use template
+            if ai_message:
+                main_message = ai_message
+            else:
+                main_message = self._generate_main_message(message, intent_analysis, feature_responses)
+
+            # Build combined data from feature responses
+            combined_data = {}
+            suggested_actions = []
+            for feature_type, response in feature_responses.items():
+                if response and "data" in response:
+                    combined_data[feature_type.value] = response["data"]
+                if response and "suggested_actions" in response:
+                    suggested_actions.extend(response.get("suggested_actions", []))
+
+            response = {
+                "success": True,
+                "message": main_message,
+                "session_id": session["id"],
+                "intent": intent_analysis["primary_intent"].value,
+                "confidence": intent_analysis["confidence"],
+                "data": combined_data,
+                "suggested_actions": suggested_actions[:5],
+                "requires_confirmation": False,
+                "next_steps": self._generate_next_steps(intent_analysis, feature_responses),
+                "timestamp": datetime.now().isoformat()
+            }
+
+            # Update session with new context
+            self._update_session(session, message, response, intent_analysis)
+
+            return response
+
+        except Exception as e:
+            logger.error(f"Error processing chat message: {e}")
+            return self._generate_error_response(str(e), session_id)
+
+    async def _get_qwen_response(self, message: str, history: list) -> Optional[str]:
+        """Get a real conversational AI response using unified LLMService."""
+        if not self.llm_service:
+            return None
+
+        try:
+            # Build messages from history
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are ATOM, an AI-powered business automation assistant. You help users:
+- Manage leads and CRM (Zoho, Salesforce, HubSpot)
+- Automate workflows and processes
+- Schedule meetings and interviews
+- Send and draft emails
+- Analyze business data and priorities
+- Coordinate tasks across Slack, Notion, Google Drive, Gmail
+
+When users ask to fetch live data (like CRM leads), acknowledge that the integration needs to be connected first and guide them on setup. Be helpful, specific, and actionable. Keep responses concise (2-4 sentences) unless detail is needed."""
+                }
+            ]
+
+            # Add conversation history
+            for h in history:
+                if h.get("message"):
+                    messages.append({"role": "user", "content": h["message"]})
+                resp_msg = h.get("response", {}).get("message", "")
+                if resp_msg:
+                    messages.append({"role": "assistant", "content": resp_msg})
+
+            messages.append({"role": "user", "content": message})
+
+            # Use LLMService for completion (delegates Qwen/OpenAI/Anthropic routing internally)
+            response_data = await self.llm_service.generate_completion(
+                messages=messages,
+                model="auto", # Use auto-resolution
+                tenant_id=self.tenant_id
+            )
+            
+            if response_data.get("success"):
+                return response_data.get("content", "").strip()
+            
+            return None
+        except Exception as e:
+            logger.warning(f"Unified conversational response failed: {e}")
+            return None
+
+
+    async def _analyze_intent(self, message: str, session: Dict) -> Dict[str, Any]:
+        """Analyze user intent using AI NLP engine"""
+        try:
+            if "nlp" in self.ai_engines:
+                nlp_result = await self.ai_engines["nlp"].parse_command(message)
+                return {
+                    "primary_intent": self._classify_intent(nlp_result),
+                    "confidence": nlp_result.confidence,
+                    "entities": nlp_result.entities,
+                    "platforms": nlp_result.platforms,
+                    "command_type": nlp_result.command_type,
+                    "raw_nlp": nlp_result
+                }
+        except Exception as e:
+            logger.warning(f"NLP analysis failed: {e}")
+
+        # Fallback intent classification
+        return self._fallback_intent_analysis(message)
+
+    def _classify_intent(self, nlp_result) -> ChatIntent:
+        """Classify intent from NLP results"""
+        from ai.nlp_engine import CommandType
+        command_type = nlp_result.command_type
+        
+        # Map command types to intents
+        intent_mapping = {
+            CommandType.SEARCH: ChatIntent.SEARCH_REQUEST,
+            CommandType.CREATE: ChatIntent.TASK_MANAGEMENT,
+            CommandType.UPDATE: ChatIntent.TASK_MANAGEMENT,
+            CommandType.SCHEDULE: ChatIntent.SCHEDULING,
+            CommandType.ANALYZE: ChatIntent.DATA_ANALYSIS,
+            CommandType.BUSINESS_HEALTH: ChatIntent.BUSINESS_HEALTH,
+            CommandType.TRIGGER: ChatIntent.AUTOMATION_TRIGGER,
+            CommandType.WORKFLOW_CREATION: ChatIntent.WORKFLOW_CREATION,
+        }
+
+        return intent_mapping.get(command_type, ChatIntent.SEARCH_REQUEST)
+
+    def _fallback_intent_analysis(self, message: str) -> Dict[str, Any]:
+        """Fallback intent analysis when NLP is unavailable"""
+        message_lower = message.lower()
+
+        # Simple keyword-based intent detection
+        if any(word in message_lower for word in ["find", "search", "look for", "where is"]):
+            intent = ChatIntent.SEARCH_REQUEST
+        elif any(word in message_lower for word in ["message", "email", "send", "notify"]):
+            intent = ChatIntent.MESSAGE_SEND
+        elif any(word in message_lower for word in ["task", "todo", "reminder", "due"]):
+            intent = ChatIntent.TASK_MANAGEMENT
+        elif any(word in message_lower for word in ["workflow", "automate", "automation"]):
+            intent = ChatIntent.WORKFLOW_CREATION
+        elif any(word in message_lower for word in ["schedule", "meeting", "calendar", "appointment"]):
+            intent = ChatIntent.SCHEDULING
+        # Business Health Detection
+        elif any(word in message_lower for word in ["priority", "priorities", "what should i do", "what to do today"]):
+            intent = ChatIntent.BUSINESS_HEALTH
+        elif any(word in message_lower for word in ["simulate", "simulation", "what if i", "impact of"]):
+            intent = ChatIntent.BUSINESS_HEALTH
+        # CRM & Sales Intelligence intents
+        elif any(word in message_lower for word in ["deal", "lead", "pipeline", "sales", "prospect", "forecast"]):
+            intent = ChatIntent.CRM
+        else:
+            intent = ChatIntent.SEARCH_REQUEST
+
+        return {
+            "primary_intent": intent,
+            "confidence": 0.6,
+            "entities": [],
+            "platforms": [],
+            "command_type": "search"
+        }
+
+    async def _route_to_features(
+        self,
+        message: str,
+        intent_analysis: Dict[str, Any],
+        session: Dict,
+        context: Optional[Dict]
+    ) -> Dict[FeatureType, Any]:
+        """Route message to appropriate feature handlers"""
+        feature_responses = {}
+        primary_intent = intent_analysis["primary_intent"]
+
+        # Map intents to features
+        intent_to_features = {
+            ChatIntent.SEARCH_REQUEST: [FeatureType.SEARCH, FeatureType.AI_ANALYTICS],
+            ChatIntent.MESSAGE_SEND: [FeatureType.COMMUNICATION],
+            ChatIntent.TASK_MANAGEMENT: [FeatureType.TASKS, FeatureType.AUTOMATION],
+            ChatIntent.WORKFLOW_CREATION: [FeatureType.WORKFLOWS, FeatureType.AUTOMATION],
+            ChatIntent.SCHEDULING: [FeatureType.SCHEDULING],
+            ChatIntent.DATA_ANALYSIS: [FeatureType.AI_ANALYTICS, FeatureType.SEARCH],
+            ChatIntent.AUTOMATION_TRIGGER: [FeatureType.AUTOMATION, FeatureType.WORKFLOWS],
+            ChatIntent.INTEGRATION_SETUP: [FeatureType.INTEGRATIONS],
+            ChatIntent.STATUS_CHECK: [FeatureType.SEARCH, FeatureType.AI_ANALYTICS],
+            ChatIntent.HELP_REQUEST: [FeatureType.SEARCH],
+            ChatIntent.BUSINESS_HEALTH: [FeatureType.BUSINESS_HEALTH],
+            ChatIntent.CRM: [FeatureType.CRM], # Added CRM intent mapping
+            ChatIntent.AGENT_REQUEST: [FeatureType.AGENT],  # Phase 30: Route to Atom
+            ChatIntent.MULTI_STEP_PROCESS: list(FeatureType),  # All features for complex requests
+        }
+
+        target_features = intent_to_features.get(primary_intent, [FeatureType.SEARCH])
+
+        # Execute feature handlers
+        feature_responses = {}
+        handled = False
+        
+        logger.info(f"Routing to features: {target_features}")
+        
+        for feature_type in target_features:
+            if feature_type in self.feature_handlers:
+                try:
+                    logger.info(f"Executing handler for {feature_type}")
+                    response = await self.feature_handlers[feature_type](
+                        message, intent_analysis, session, context
+                    )
+                    if response and response.get("success"):
+                        feature_responses[feature_type] = response
+                        handled = True
+                        logger.info(f"Handler {feature_type} succeeded")
+                    else:
+                        logger.info(f"Handler {feature_type} returned failure/empty")
+                except Exception as e:
+                    logger.error(f"Feature handler {feature_type} failed: {e}")
+                    feature_responses[feature_type] = {"error": str(e)}
+
+        logger.info(f"Feature handling complete. Handled: {handled}, Intent: {primary_intent}")
+
+        # Fallback to ComputerUseAgent if no specific feature handled it successfully
+        # OR if the intention was explicitly AGENT_REQUEST
+        if not handled or primary_intent == ChatIntent.AGENT_REQUEST:
+             try:
+                # Use the General Agent (ComputerUseAgent) for unhandled queries
+                logger.info(f"Fallback to ComputerUseAgent for: {message}")
+                
+                # Determine mode based on intent
+                mode = "thinker" # Default
+                if primary_intent in [ChatIntent.TASK_MANAGEMENT, ChatIntent.WORKFLOW_CREATION]:
+                    mode = "tasker"
+                
+                logger.info(f"Calling agent_service.execute_task with goal: {message}")
+                
+                # Execute agent task (short-lived)
+                task = await agent_service.execute_task(
+                    goal=message,
+                    mode=mode,
+                    workspace_id=session.get("workspace_id", "default")
+                )
+                logger.info(f"Agent task started: {task}")
+                
+                feature_responses[FeatureType.AGENT] = {
+                    "success": True,
+                    "data": {"task_id": task["id"], "status": task["status"]},
+                    "message": f"I'm working on that. Task ID: {task['id']}",
+                    "suggested_actions": ["Check Status"]
+                }
+             except Exception as e:
+                logger.error(f"Agent fallback failed: {e}")
+                
+        return feature_responses
+
+    def _generate_coordinated_response(
+        self,
+        message: str,
+        intent_analysis: Dict[str, Any],
+        feature_responses: Dict[FeatureType, Any],
+        session: Dict
+    ) -> Dict[str, Any]:
+        """Generate coordinated response from all feature responses"""
+        # Combine results from all features
+        combined_data = {}
+        suggested_actions = []
+        ui_updates = []
+
+        for feature_type, response in feature_responses.items():
+            if response and "data" in response:
+                combined_data[feature_type.value] = response["data"]
+
+            if response and "suggested_actions" in response:
+                suggested_actions.extend(response["suggested_actions"])
+
+            if response and "ui_updates" in response:
+                ui_updates.extend(response["ui_updates"])
+
+        # Generate main response message
+        main_message = self._generate_main_message(message, intent_analysis, feature_responses)
+
+        return {
+            "success": True,
+            "message": main_message,
+            "session_id": session["id"],
+            "intent": intent_analysis["primary_intent"].value,
+            "confidence": intent_analysis["confidence"],
+            "data": combined_data,
+            "suggested_actions": suggested_actions[:5],  # Limit to top 5
+            "ui_updates": ui_updates,
+            "requires_confirmation": any(
+                resp.get("requires_confirmation", False)
+                for resp in feature_responses.values()
+            ),
+            "next_steps": self._generate_next_steps(intent_analysis, feature_responses),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    def _generate_main_message(
+        self,
+        message: str,
+        intent_analysis: Dict[str, Any],
+        feature_responses: Dict[FeatureType, Any]
+    ) -> str:
+        """Generate main response message based on feature responses"""
+        
+        # Check if Agent handled the request (e.g. fallback or direct request)
+        if FeatureType.AGENT in feature_responses:
+            agent_resp = feature_responses[FeatureType.AGENT]
+            if agent_resp.get("success") and agent_resp.get("message"):
+                return agent_resp["message"]
+                
+        intent = intent_analysis["primary_intent"]
+
+        if intent == ChatIntent.SEARCH_REQUEST:
+            search_data = feature_responses.get(FeatureType.SEARCH, {})
+            if search_data.get("data"):
+                count = len(search_data["data"].get("results", []))
+                return f"I found {count} results for your search."
+            return "I've searched across your connected platforms."
+
+        elif intent == ChatIntent.MESSAGE_SEND:
+            comm_data = feature_responses.get(FeatureType.COMMUNICATION, {})
+            if comm_data.get("success"):
+                return "Message sent successfully."
+            return "I'll help you send that message."
+
+        elif intent == ChatIntent.TASK_MANAGEMENT:
+            task_data = feature_responses.get(FeatureType.TASKS, {})
+            if task_data.get("success"):
+                return task_data.get("data", {}).get("message", "I've processed your task request.")
+            return "I'll manage those tasks for you."
+
+        elif intent == ChatIntent.WORKFLOW_CREATION:
+            workflow_data = feature_responses.get(FeatureType.WORKFLOWS, {})
+            if workflow_data.get("data"):
+                return "Workflow created successfully. Ready to execute?"
+            return "I'll create that automation workflow for you."
+
+        elif intent == ChatIntent.SCHEDULING:
+            schedule_data = feature_responses.get(FeatureType.SCHEDULING, {})
+            if schedule_data.get("data"):
+                return "Schedule updated successfully."
+            return "I'll handle the scheduling for you."
+
+        elif intent == ChatIntent.CRM:
+            crm_data = feature_responses.get(FeatureType.CRM, {})
+            if crm_data.get("success"):
+                return crm_data.get("data", {}).get("answer", "I've processed your CRM request.")
+            return "I'll help you with your CRM request."
+
+        elif intent == ChatIntent.BUSINESS_HEALTH:
+            health_data = feature_responses.get(FeatureType.BUSINESS_HEALTH, {})
+            if health_data.get("success"):
+                return health_data.get("message", "I've analyzed your business health.")
+            return "I'll help you with your business health query."
+
+        return "I've processed your request across all connected platforms."
+
+    def _generate_next_steps(
+        self,
+        intent_analysis: Dict[str, Any],
+        feature_responses: Dict[FeatureType, Any]
+    ) -> List[str]:
+        """Generate suggested next steps"""
+        intent = intent_analysis["primary_intent"]
+        next_steps = []
+
+        if intent == ChatIntent.SEARCH_REQUEST:
+            next_steps.extend([
+                "Refine your search with more specific terms",
+                "Check the search results in the Search UI",
+                "Save important results for quick access"
+            ])
+
+        elif intent == ChatIntent.WORKFLOW_CREATION:
+            next_steps.extend([
+                "Review the workflow steps",
+                "Test the workflow execution",
+                "Schedule the workflow for automatic runs"
+            ])
+
+        elif intent == ChatIntent.TASK_MANAGEMENT:
+            next_steps.extend([
+                "Set up automatic task creation",
+                "Create task templates for recurring work",
+                "Coordinate tasks with your team"
+            ])
+        
+        elif intent == ChatIntent.CRM:
+            next_steps.extend([
+                "View sales pipeline",
+                "Create a new lead",
+                "Update a deal status"
+            ])
+
+        # Add general next steps
+        next_steps.extend([
+            "Ask me to connect more services",
+            "Explore automation opportunities",
+            "Check your dashboard for insights"
+        ])
+
+        return next_steps[:3]  # Limit to 3 next steps
+
+    # Feature handler implementations
+    async def _handle_search_request(
+        self,
+        message: str,
+        intent_analysis: Dict[str, Any],
+        session: Dict,
+        context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle search requests across all platforms"""
+        try:
+            # Use AI data intelligence for unified search
+            if "data_intelligence" in self.ai_engines:
+                search_results = self.ai_engines["data_intelligence"].search_unified_entities(
+                    message
+                )
+            else:
+                search_results = []
+
+            return {
+                "success": True,
+                "data": {
+                    "results": search_results,
+                    "query": message,
+                    "platforms_searched": intent_analysis.get("platforms", [])
+                },
+                "suggested_actions": [
+                    "Open Search UI for detailed results",
+                    "Save this search for later",
+                    "Set up alert for similar content"
+                ],
+                "ui_updates": [
+                    {"type": "search_results", "data": search_results}
+                ]
+            }
+        except Exception as e:
+            logger.error(f"Search handler failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def _handle_communication_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "Communication logic here"}}
+
+    async def _handle_task_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle task creation and management requests via unified endpoints."""
+        try:
+            from core.unified_task_endpoints import create_task, CreateTaskRequest, get_current_user
+            import asyncio
+            from datetime import datetime, timedelta
+            from unittest.mock import MagicMock
+            
+            # 1. Use NLP to extract title and description
+            title = message
+            description = ""
+            if "data_intelligence" in self.ai_engines and hasattr(self.ai_engines["data_intelligence"], "extract_task_details"):
+                # Hypothetical method if it exists, otherwise fallback
+                extracted = self.ai_engines["data_intelligence"].extract_task_details(message)
+                title = extracted.get("title", message)
+                description = extracted.get("description", "")
+            else:
+                import re
+                # Clean up natural language prefixes
+                clean_msg = re.sub(r'^(?:please\s+)?(?:create|make|add|schedule)\s+(?:a\s+)?(?:task|todo|reminder)(?:\s+to|\s+that|\s+for|:|-)?\s*', '', message, flags=re.IGNORECASE).strip()
+                
+                if not clean_msg:
+                    clean_msg = message.strip()
+                    
+                parts = clean_msg.split(":", 1)
+                if len(parts) > 1 and len(parts[0]) < 30:
+                    title = parts[0].strip()
+                    description = parts[1].strip()
+                else:
+                    title = clean_msg
+                    description = ""
+            
+            # Shorten title if it's too long
+            if len(title) > 50:
+                description = title
+                title = title[:47] + "..."
+            
+            # Capitalize
+            if title:
+                title = title[0].upper() + title[1:]
+                
+            # 2. Construct unified task request
+            task_req = CreateTaskRequest(
+                title=title or "New Task",
+                description=description,
+                dueDate=datetime.now() + timedelta(days=1), # Default to tomorrow
+                priority="medium",
+                platform="local", # Use local mock backend for chat orchestrator tests
+                status="todo"
+            )
+            
+            # Mock the FastAPI current_user dependency for internal calls
+            mock_user = MagicMock()
+            mock_user.id = session.get("user_id", "system")
+            
+            # 3. Call the unified API endpoint directly
+            result = await create_task(task_data=task_req, current_user=mock_user)
+            
+            if result.get("success"):
+                task_id = result.get("task").id if hasattr(result.get("task"), "id") else "unknown"
+                return {
+                    "success": True, 
+                    "data": {
+                        "task": task_req.dict(),
+                        "message": f"I've added '{task_req.title}' to your Tasks.",
+                        "task_id": task_id
+                    },
+                    "suggested_actions": ["View My Tasks", "Add a deadline", "Assign to team"]
+                }
+            else:
+                return {"success": False, "error": "Internal task creation failed."}
+                
+        except Exception as e:
+            logger.error(f"Task handler failed: {e}")
+            return {"success": False, "error": str(e), "data": {"message": f"Failed to create task: {str(e)}"}}
+
+    async def _handle_workflow_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle workflow requests (List, Run)"""
+        message_lower = message.lower()
+        
+        # 1. LIST WORKFLOWS
+        if "list" in message_lower or "show" in message_lower:
+            workflows = load_workflows()
+            if not workflows:
+                return {"success": True, "message": "No workflows found."}
+            
+            workflow_list = "\n".join([f"• {wf['name']}" for wf in workflows[:10]])
+            return {
+                "success": True,
+                "message": f"Available Workflows:\n{workflow_list}",
+                "data": {"results": workflows},
+                "suggested_actions": [f"Run {wf['name']}" for wf in workflows[:3]]
+            }
+
+        # 2. RUN WORKFLOW
+        if "run" in message_lower or "execute" in message_lower:
+            workflows = load_workflows()
+            # Extract workflow name (simple heuristic)
+            target = message_lower.replace("run", "").replace("execute", "").replace("workflow", "").strip()
+            
+            workflow = next((w for w in workflows if target in w.get('name', '').lower() or target == w.get('workflow_id') or target == w.get('id')), None)
+            
+            if workflow:
+                # Execute it
+                try:
+                    engine = AutomationEngine()
+                    execution_id = str(uuid.uuid4())
+                    # Fire and forget or await? Await for now.
+                    await engine.execute_workflow_definition(workflow, {}, execution_id=execution_id)
+                    return {
+                        "success": True, 
+                        "message": f"✅ Workflow '{workflow['name']}' started! (ID: {execution_id})"
+                    }
+                except Exception as e:
+                    return {"success": False, "message": f"Failed to run workflow: {e}"}
+            else:
+                return {
+                    "success": False, 
+                    "message": f"Workflow '{target}' not found. Try 'list workflows' to see available options."
+                }
+
+        return {"success": True, "message": "I can help you list or run workflows. Just ask!"}
+
+    async def _handle_scheduling_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle scheduling requests"""
+        # Simple extraction for now
+        message_lower = message.lower()
+        if "schedule" in message_lower:
+            # Try to parse "schedule [workflow] [time]"
+            # This requires robust NLP which we are porting partially
+            return {
+                "success": True, 
+                "message": "I can help schedule workflows. Please specify the workflow and time, e.g., 'Schedule Daily Report for every Monday at 9am'.",
+                "suggested_actions": ["List Workflows"]
+            }
+        
+        return {"success": True, "data": {"message": "Scheduling logic is being enabled."}}
+
+    async def _handle_integration_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "Integration logic here"}}
+
+    async def _handle_ai_analytics_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "AI Analytics logic here"}}
+
+    async def _handle_automation_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle requests to trigger automation agents"""
+        message_lower = message.lower()
+        
+        # Identify which agent to run based on keywords
+        target_agent_id = None
+        
+        if "competitor" in message_lower or "price" in message_lower:
+            target_agent_id = "competitive_intel"
+        elif "inventory" in message_lower or "stock" in message_lower:
+            target_agent_id = "inventory_reconcile"
+        elif "payroll" in message_lower:
+            target_agent_id = "payroll_guardian"
+            
+        if not target_agent_id:
+            return {
+                "success": False, 
+                "message": "I understood you want to run an automation, but I'm not sure which one. Try 'Run inventory check' or 'Check competitor prices'."
+            }
+            
+        if target_agent_id not in AGENTS:
+             return {
+                "success": False, 
+                "message": f"Agent configuration for '{target_agent_id}' not found."
+            }
+
+        # Trigger the agent using unified execution
+        try:
+             # In a real app we might pass specific parameters extracted from NLP
+            run_params = {"trigger": "chat_user", "session_id": session.get("id"), "request": message}
+            
+            # Use execute_agent_task from api.agent_routes
+            # Note: execute_agent_task is async
+            await execute_agent_task(target_agent_id, run_params)
+            
+            agent_name = AGENTS[target_agent_id]["name"]
+            return {
+                "success": True,
+                "data": {
+                    "agent_id": target_agent_id,
+                    "status": "started"
+                },
+                "message": f"🚀 I've started the **{agent_name}** for you. You'll receive a notification when it completes.",
+                "suggested_actions": ["Check Agent Status", "View Live Logs"]
+            }
+        except Exception as e:
+            logger.error(f"Failed to trigger agent {target_agent_id}: {e}")
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"I tried to start the agent but encountered an error: {str(e)}"
+            }
+
+    async def _handle_document_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "Document logic here"}}
+
+    async def _handle_finance_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle financial and accounting queries"""
+        if not get_automation_settings().is_accounting_enabled():
+            return {
+                "success": False,
+                "message": "AI Accounting Automations are currently disabled in settings.",
+                "suggested_actions": ["Enable Accounting in Settings"]
+            }
+        try:
+            # Generate a DB session
+            db = SessionLocal()
+            try:
+                # In a real app, workspace_id comes from context or session
+                workspace_id = context.get("workspace_id") if context else "default"
+                assistant = AccountingAssistant(db)
+                result = await assistant.process_query(workspace_id, message)
+                
+                # Check for specific AP/AR follow-up actions
+                if "intent" in result:
+                    if result["intent"] == "check_overdue":
+                        agent = CollectionAgent(db)
+                        reminders = await agent.check_overdue_invoices(workspace_id)
+                        result["answer"] = f"I've identified {len(reminders)} overdue invoices and triggered reminders."
+                        result["reminders"] = reminders
+                    elif result["intent"] == "get_aging":
+                        agent = CollectionAgent(db)
+                        result["aging_report"] = agent.generate_aging_report(workspace_id)
+                        result["answer"] = "Here is your current AR aging report summary."
+                    elif result["intent"] == "check_close_readiness":
+                        agent = CloseChecklistAgent(db)
+                        period = result.get("params", {}).get("period", datetime.utcnow().strftime("%Y-%m"))
+                        result["close_check"] = await agent.run_close_check(workspace_id, period)
+                        result["answer"] = f"Here is the close readiness report for {period}."
+                    elif result["intent"] == "get_tax_estimate":
+                        service = TaxService(db)
+                        result["tax_estimate"] = service.estimate_tax_liability(workspace_id)
+                        result["answer"] = "I've calculated your estimated tax liability based on current sales."
+                    elif result["intent"] == "get_cash_forecast":
+                        service = FPAService(db)
+                        result["forecast"] = service.get_13_week_forecast(workspace_id)
+                        result["answer"] = "Here is your 13-week cash flow forecast."
+                    elif result["intent"] == "run_scenario":
+                        service = FPAService(db)
+                        # Assume params contains scenario definitions
+                        scenarios = result.get("params", {}).get("scenarios", [])
+                        result["scenario_results"] = service.run_scenario(workspace_id, scenarios)
+                        result["answer"] = "I've modeled the requested scenario and updated the forecast."
+                    elif result["intent"] == "get_intercompany_report":
+                        manager = IntercompanyManager(db)
+                        result["intercompany_report"] = manager.generate_elimination_report(workspace_id)
+                        result["answer"] = "Here is the intercompany activity and elimination report."
+                    
+                    # Append Regulatory Disclaimer to all financial answers
+                    if "answer" in result:
+                        result["answer"] += REGULATORY_DISCLAIMER
+
+                return {
+                    "success": True,
+                    "data": result,
+                    "message": result.get("answer", "I've processed your financial request."),
+                    "suggested_actions": ["Run P&L Report", "Check AR Aging", "View Unpaid Bills"]
+                }
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"Finance handler failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def _handle_crm_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle sales and CRM queries via SalesAssistant"""
+        if not get_automation_settings().is_sales_enabled():
+            return {
+                "success": False,
+                "message": "AI Sales Automations are currently disabled in settings.",
+                "suggested_actions": ["Enable Sales in Settings"]
+            }
+        
+        try:
+            db = SessionLocal()
+            try:
+                from sales.assistant import SalesAssistant
+                workspace_id = context.get("workspace_id") if context else "default"
+                assistant = SalesAssistant(db)
+                answer = await assistant.answer_sales_query(workspace_id, message)
+                
+                return {
+                    "success": True,
+                    "data": {"answer": answer},
+                    "message": answer[:100] + "...",
+                    "suggested_actions": ["View Pipeline", "Check Top Leads", "List My Tasks"]
+                }
+            finally:
+                db.close()
+        except Exception as e:
+            logger.error(f"CRM handler failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def _handle_business_health_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """Handle business health queries (priorities and simulations)"""
+        from core.business_health_service import business_health_service
+        
+        message_lower = message.lower()
+        workspace_id = context.get("workspace_id") if context else "default"
+        
+        try:
+            if any(word in message_lower for word in ["simulate", "simulation", "impact", "what if"]):
+                # Run Simulation
+                # Simple extraction for demo purposes, in production use AI extraction
+                decision_type = "GENERAL"
+                if "hire" in message_lower or "hiring" in message_lower:
+                    decision_type = "HIRING"
+                elif "spend" in message_lower or "spent" in message_lower or "buy" in message_lower:
+                    decision_type = "CAPEX"
+                
+                result = await business_health_service.simulate_decision(workspace_id, decision_type, {"query": message})
+                answer = result.get("prediction", "I've analyzed the potential impact of this decision.")
+                if "roi" in result:
+                    answer += f"\n\n**Predicted ROI:** {result['roi']}"
+                if "breakeven" in result:
+                    answer += f"\n**Breakeven:** {result['breakeven']}"
+                
+                return {
+                    "success": True,
+                    "data": result,
+                    "message": answer,
+                    "suggested_actions": ["Run another simulation", "View cash flow"]
+                }
+            else:
+                # Get Priorities
+                result = await business_health_service.get_daily_priorities(workspace_id)
+                priorities = result.get("priorities", [])
+                advice = result.get("owner_advice", "")
+                
+                answer = f"**Daily Strategy Insight:**\n{advice}\n\n"
+                if priorities:
+                    answer += "**Top Priorities:**\n"
+                    for p in priorities:
+                        answer += f"- [{p['priority']}] **{p['title']}**: {p['description']}\n"
+                else:
+                    answer += "Your business vitals look great! No urgent actions identified."
+                
+                return {
+                    "success": True,
+                    "data": result,
+                    "message": answer,
+                    "suggested_actions": ["Review Lead Pipeline", "Check Failed Tasks"]
+                }
+        except Exception as e:
+            logger.error(f"Business Health handler failed: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def _handle_social_media_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "Social Media logic here"}}
+
+    async def _handle_hr_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "HR logic here"}}
+
+    async def _handle_ecommerce_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        return {"success": True, "data": {"message": "Ecommerce logic here"}}
+
+    def _get_or_create_session(self, user_id: str, session_id: str) -> Dict[str, Any]:
+        if session_id not in self.conversation_sessions:
+            self.conversation_sessions[session_id] = {
+                "id": session_id,
+                "user_id": user_id,
+                "created_at": datetime.now().isoformat(),
+                "history": []
+            }
+        return self.conversation_sessions[session_id]
+
+    def _update_session(self, session: Dict, message: str, response: Dict, intent: Dict):
+        session["history"].append({
+            "message": message,
+            "response": response,
+            "intent": intent,
+            "timestamp": datetime.now().isoformat()
+        })
+
+    def _generate_error_response(self, error: str, session_id: str) -> Dict[str, Any]:
+        return {
+            "success": False,
+            "error": error,
+            "session_id": session_id,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    # ==================== PHASE 30: ATOM META-AGENT HANDLER ====================
+    
+    async def _handle_agent_request(
+        self, message: str, intent_analysis: Dict, session: Dict, context: Optional[Dict]
+    ) -> Dict[str, Any]:
+        """
+        Route request to Atom Meta-Agent for complex/agent-based processing.
+        Atom will analyze the request, spawn specialty agents if needed, and coordinate response.
+        """
+        try:
+            from core.atom_meta_agent import get_atom_agent, AgentTriggerMode
+            
+            # Get user from session if available
+            user_id = session.get("user_id", "default_user")
+            
+            # Get or create Atom instance
+            atom = get_atom_agent()
+            
+            # Execute through Atom
+            result = await atom.execute(
+                request=message,
+                context={
+                    "intent_analysis": intent_analysis,
+                    "session_id": session.get("id"),
+                    "user_id": user_id,
+                    **(context or {})
+                },
+                trigger_mode=AgentTriggerMode.MANUAL
+            )
+            
+            return {
+                "status": "success",
+                "message": result.get("final_output"),
+                "actions_taken": result.get("actions_executed", []),
+                "spawned_agent": result.get("spawned_agent"),
+                "feature": "agent"
+            }
+            
+        except Exception as e:
+            logger.error(f"Agent request handler failed: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "feature": "agent"
+            }
+
+# Global Chat Orchestrator Instance
+chat_orchestrator = ChatOrchestrator()

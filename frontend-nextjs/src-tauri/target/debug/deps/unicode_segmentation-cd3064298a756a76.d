@@ -1,0 +1,9 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\unicode_segmentation-cd3064298a756a76.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\grapheme.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\sentence.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\word.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\tables.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\libunicode_segmentation-cd3064298a756a76.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\grapheme.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\sentence.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\word.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\tables.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\lib.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\grapheme.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\sentence.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\word.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\unicode-segmentation-1.12.0\src\tables.rs:

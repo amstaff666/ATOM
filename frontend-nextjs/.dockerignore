@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.DS_Store
+*.log
+.env.local
+
+# Tauri build artifacts (HUGE)
+src-tauri
+src-tauri/target
+out
+.turbo
+coverage
+test-results

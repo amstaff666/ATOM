@@ -1,0 +1,11 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\inout-90fce45c7c995631.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\errors.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout_buf.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\reserved.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libinout-90fce45c7c995631.rlib: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\errors.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout_buf.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\reserved.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libinout-90fce45c7c995631.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\errors.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout_buf.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\reserved.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\lib.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\errors.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\inout_buf.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\inout-0.1.4\src\reserved.rs:

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ATOM",
+  "version": "0.1.0-alpha.4",
+  "identifier": "com.atom.app",
+  "build": {
+    "beforeDevCommand": "",
+    "devUrl": "http://localhost:4491",
+    "beforeBuildCommand": "",
+    "frontendDist": "../launcher-dist"
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "category": "DeveloperTool",
+    "shortDescription": "ATOM Desktop App",
+    "longDescription": "ATOM - Advanced Task Orchestration & Management",
+    "icon": [
+      "icons/atom-ai-2.ico"
+    ]
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "ATOM",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "maximized": true,
+        "minWidth": 800,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' blob: data: filesystem: ws: wss: http://localhost:* ; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:"
+    }
+  }
+}

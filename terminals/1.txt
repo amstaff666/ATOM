@@ -1,0 +1,25 @@
+---
+pid: 101952
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "cd \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\" && python scripts/atom_fix_typescript.py 2>&1"
+started_at: 2026-06-17T15:13:53.928Z
+running_for_ms: 15100003 
+---
+atom_fix_typescript: 17 patch(es)
+  • removed connected prop: components\__tests__\AsanaIntegration.test.tsx
+  • removed connected prop: components\__tests__\BoxIntegration.test.tsx
+  • removed connected prop: components\__tests__\GitHubIntegration.test.tsx
+  • removed connected prop: components\__tests__\GoogleWorkspaceIntegration.test.tsx
+  • removed connected prop: components\__tests__\JiraIntegration.test.tsx
+  • removed connected prop: components\__tests__\Microsoft365Integration.test.tsx
+  • removed connected prop: components\__tests__\NotionIntegration.test.tsx
+  • removed connected prop: components\__tests__\OutlookIntegration.test.tsx
+  • removed connected prop: components\__tests__\QuickBooksIntegration.test.tsx
+  • removed connected prop: components\__tests__\SlackIntegration.test.tsx
+  • removed connected prop: components\__tests__\TrelloIntegration.test.tsx
+  • removed connected prop: components\__tests__\ZendeskIntegration.test.tsx
+  • removed connected prop: components\__tests__\ZoomIntegration.test.tsx
+  • removed connected prop: components\integrations\__tests__\EnhancedWhatsAppBusinessIntegration.test.tsx
+  • removed connected prop: components\integrations\monday\__tests__\MondayIntegration.test.tsx
+  • removed connected prop: components\integrations\hubspot\__tests__\HubSpotPredictiveAnalytics.test.tsx
+  • removed connected prop: components\integrations\hubspot\__tests__\HubSpotWorkflowAutomation.test.tsx

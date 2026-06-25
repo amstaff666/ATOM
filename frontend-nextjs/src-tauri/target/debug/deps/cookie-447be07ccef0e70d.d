@@ -1,0 +1,12 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\cookie-447be07ccef0e70d.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\builder.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\parse.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\jar.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\delta.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\same_site.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\expiration.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\prefix.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\debug\deps\libcookie-447be07ccef0e70d.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\builder.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\parse.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\jar.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\delta.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\same_site.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\expiration.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\prefix.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\lib.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\builder.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\parse.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\jar.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\delta.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\same_site.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\expiration.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cookie-0.18.1\src\prefix.rs:

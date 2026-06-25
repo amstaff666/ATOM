@@ -1,0 +1,9 @@
+{
+  "name": "hf_whoami",
+  "description": "Hugging Face tools are being used by authenticated user 'techprotrade'",
+  "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+  }
+}

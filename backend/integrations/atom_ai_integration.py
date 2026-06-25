@@ -1,0 +1,1240 @@
+"""
+ATOM AI Integration Module
+Seamless AI integration within unified communication ecosystem with cross-platform intelligence
+"""
+
+import asyncio
+from collections import Counter, defaultdict
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta, timezone
+from enum import Enum
+import json
+import logging
+import os
+from typing import Any, Dict, List, Optional, Union
+import aiohttp
+import httpx
+
+# Import existing ATOM services
+try:
+    from core.llm_service import LLMService
+    from atom_discord_integration import atom_discord_integration
+    from atom_google_chat_integration import atom_google_chat_integration
+    from atom_ingestion_pipeline import AtomIngestionPipeline
+    from atom_memory_service import AtomMemoryService
+    from atom_search_service import AtomSearchService
+    from atom_slack_integration import atom_slack_integration
+    from atom_teams_integration import atom_teams_integration
+    from atom_workflow_service import AtomWorkflowService
+except ImportError as e:
+    logging.warning(f"AI integration services not available: {e}")
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+@dataclass
+class AIConversationContext:
+    """Context for AI conversation (Modernized)"""
+    conversation_id: str
+    user_id: str
+    platform: str
+    messages: List[Dict[str, Any]]
+    metadata: Dict[str, Any]
+    last_updated: datetime = datetime.utcnow()
+
+class AtomAIIntegration:
+    """Main AI integration class for unified communication ecosystem"""
+    
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+        self.atom_memory = config.get('atom_memory_service')
+        self.atom_search = config.get('atom_search_service')
+        self.atom_workflow = config.get('atom_workflow_service')
+        self.atom_ingestion = config.get('atom_ingestion_pipeline')
+        
+        # Platform integrations
+        self.platform_integrations = {
+            'slack': atom_slack_integration,
+            'teams': atom_teams_integration,
+            'google_chat': atom_google_chat_integration,
+            'discord': atom_discord_integration
+        }
+        
+        # AI service (Modernized)
+        self.llm_service = config.get('llm_service') or LLMService(workspace_id=config.get('workspace_id', 'default'))
+        
+        # Integration state
+        self.is_initialized = False
+        self.active_ai_features = []
+        self.intelligent_workspaces = []
+        self.ai_analytics = []
+        
+        # AI conversation management
+        self.conversation_manager = AIConversationManager(self.llm_service)
+        
+        # AI-powered search
+        self.search_manager = IntelligentSearchManager(self.llm_service, self.atom_search, self.atom_ingestion)
+        
+        # AI workflow automation
+        self.workflow_intelligence = WorkflowIntelligenceManager(self.llm_service, self.atom_workflow)
+        
+        # Cross-platform AI features
+        self.cross_platform_ai = CrossPlatformAIManager(self.llm_service, self.platform_integrations)
+        
+        logger.info("ATOM AI Integration initialized")
+    
+    async def initialize(self) -> bool:
+        """Initialize AI integration with ATOM services"""
+        try:
+            if not all([self.llm_service, self.atom_memory, self.atom_search]):
+                logger.error("Required services not available for AI integration")
+                return False
+            
+            # Start AI integration workers
+            await self._start_ai_integration_workers()
+            
+            # Initialize AI features
+            await self._initialize_ai_features()
+            
+            # Setup intelligent search
+            await self.search_manager.initialize()
+            
+            # Setup workflow intelligence
+            await self._setup_workflow_intelligence()
+            
+            # Setup cross-platform AI
+            await self._setup_cross_platform_ai()
+            
+            self.is_initialized = True
+            logger.info("AI integration with ATOM ecosystem initialized successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error initializing AI integration: {e}")
+            return False
+    
+    async def get_intelligent_workspaces(self, user_id: str = None) -> List[Dict[str, Any]]:
+        """Get workspaces with AI-enhanced features"""
+        try:
+            intelligent_workspaces = []
+            
+            # Get all platform workspaces
+            for platform, integration in self.platform_integrations.items():
+                if not integration:
+                    continue
+                
+                workspaces = await integration.get_unified_workspaces(user_id)
+                
+                for workspace in workspaces:
+                    # Add AI-enhanced features
+                    intelligent_workspace = {
+                        'id': workspace['id'],
+                        'name': workspace['name'],
+                        'platform': workspace['platform'],
+                        'type': workspace['type'],
+                        'status': workspace['status'],
+                        'member_count': workspace['member_count'],
+                        'channel_count': workspace['channel_count'],
+                        'icon_url': workspace['icon_url'],
+                        'description': workspace['description'],
+                        'capabilities': workspace['capabilities'],
+                        'integration_data': workspace['integration_data'],
+                        # AI-enhanced features
+                        'ai_features': {
+                            'intelligent_search': True,
+                            'message_summarization': True,
+                            'sentiment_analysis': True,
+                            'topic_extraction': True,
+                            'workflow_recommendations': True,
+                            'conversation_analysis': True,
+                            'predictive_analytics': True,
+                            'natural_language_commands': True,
+                            'content_generation': True,
+                            'voice_analysis': workspace['capabilities'].get('voice_chat', False)
+                        },
+                        'ai_insights': {
+                            'engagement_level': await self._calculate_engagement_level(workspace),
+                            'activity_trends': await self._get_activity_trends(workspace),
+                            'communication_patterns': await self._get_communication_patterns(workspace),
+                            'predicted_activity': await self._predict_activity(workspace),
+                            'recommended_actions': await self._get_recommended_actions(workspace)
+                        },
+                        'ai_settings': {
+                            'ai_enabled': True,
+                            'analysis_level': 'comprehensive',
+                            'prediction_horizon': '7_days',
+                            'sentiment_tracking': True,
+                            'topic_detection': True,
+                            'workflow_suggestions': True,
+                            'content_recommendations': True
+                        }
+                    }
+                    intelligent_workspaces.append(intelligent_workspace)
+            
+            # Store in intelligent workspaces
+            self.intelligent_workspaces = intelligent_workspaces
+            
+            return intelligent_workspaces
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent workspaces: {e}")
+            return []
+    
+    async def get_intelligent_channels(self, workspace_id: str, user_id: str = None) -> List[Dict[str, Any]]:
+        """Get channels with AI-enhanced features"""
+        try:
+            intelligent_channels = []
+            
+            # Determine platform from workspace ID
+            platform = self._get_platform_from_workspace(workspace_id)
+            integration = self.platform_integrations.get(platform)
+            
+            if not integration:
+                return []
+            
+            # Get channels
+            channels = await integration.get_unified_channels(workspace_id, user_id)
+            
+            for channel in channels:
+                # Add AI-enhanced features
+                intelligent_channel = {
+                    'id': channel['id'],
+                    'name': channel['name'],
+                    'display_name': channel['display_name'],
+                    'type': channel['type'],
+                    'platform': channel['platform'],
+                    'workspace_id': channel['workspace_id'],
+                    'workspace_name': channel['workspace_name'],
+                    'status': channel['status'],
+                    'member_count': channel['member_count'],
+                    'message_count': channel['message_count'],
+                    'unread_count': channel['unread_count'],
+                    'is_private': channel['is_private'],
+                    'is_text': channel['is_text'],
+                    'is_voice': channel['is_voice'],
+                    'capabilities': channel['capabilities'],
+                    'integration_data': channel['integration_data'],
+                    # AI-enhanced features
+                    'ai_features': {
+                        'intelligent_search': True,
+                        'message_summarization': True,
+                        'sentiment_analysis': True,
+                        'topic_extraction': True,
+                        'trend_analysis': True,
+                        'engagement_prediction': True,
+                        'content_recommendations': True,
+                        'natural_language_commands': True,
+                        'voice_analysis': channel['is_voice']
+                    },
+                    'ai_insights': {
+                        'engagement_level': await self._calculate_channel_engagement(channel),
+                        'topic_trends': await self._get_channel_topic_trends(channel),
+                        'sentiment_evolution': await self._get_sentiment_evolution(channel),
+                        'peak_activity_times': await self._get_peak_activity_times(channel),
+                        'predicted_messages': await self._predict_message_volume(channel),
+                        'suggested_actions': await self._get_channel_suggestions(channel)
+                    },
+                    'ai_settings': {
+                        'ai_enabled': True,
+                        'analysis_frequency': 'real_time',
+                        'sentiment_tracking': True,
+                        'topic_detection': True,
+                        'engagement_prediction': True,
+                        'auto_summarization': True
+                    }
+                }
+                intelligent_channels.append(intelligent_channel)
+            
+            return intelligent_channels
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent channels: {e}")
+            return []
+    
+    async def get_intelligent_messages(self, workspace_id: str, channel_id: str,
+                                  limit: int = 100, user_id: str = None,
+                                  options: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """Get messages with AI-enhanced analysis"""
+        try:
+            options = options or {}
+            intelligent_messages = []
+            
+            # Determine platform from channel ID
+            platform = self._get_platform_from_channel(channel_id)
+            integration = self.platform_integrations.get(platform)
+            
+            if not integration:
+                return []
+            
+            # Get messages
+            messages = await integration.get_unified_messages(
+                workspace_id, channel_id, limit, options
+            )
+            
+            # Process messages with AI
+            for message in messages:
+                # Get AI analysis for message
+                ai_analysis = await self._get_message_ai_analysis(message)
+                
+                intelligent_message = {
+                    'id': message['id'],
+                    'content': message['content'],
+                    'html_content': message['html_content'],
+                    'platform': message['platform'],
+                    'workspace_id': message['workspace_id'],
+                    'channel_id': message['channel_id'],
+                    'user_id': message['user_id'],
+                    'user_name': message['user_name'],
+                    'user_display_name': message['user_display_name'],
+                    'user_avatar': message['user_avatar'],
+                    'timestamp': message['timestamp'],
+                    'thread_id': message['thread_id'],
+                    'reply_to_id': message['reply_to_id'],
+                    'message_type': message['message_type'],
+                    'is_edited': message['is_edited'],
+                    'is_pinned': message['is_pinned'],
+                    'is_bot': message['is_bot'],
+                    'is_webhook': message['is_webhook'],
+                    'reactions': message['reactions'],
+                    'attachments': message['attachments'],
+                    'embeds': message['embeds'],
+                    'mentions': message['mentions'],
+                    'files': message['files'],
+                    'integration_data': message['integration_data'],
+                    'metadata': message['metadata'],
+                    # AI-enhanced features
+                    'ai_analysis': {
+                        'sentiment': ai_analysis.get('sentiment'),
+                        'sentiment_score': ai_analysis.get('sentiment_score'),
+                        'key_topics': ai_analysis.get('key_topics'),
+                        'emotions': ai_analysis.get('emotions'),
+                        'urgency': ai_analysis.get('urgency'),
+                        'importance': ai_analysis.get('importance'),
+                        'action_items': ai_analysis.get('action_items'),
+                        'category': ai_analysis.get('category'),
+                        'language': ai_analysis.get('language'),
+                        'confidence': ai_analysis.get('confidence', 0.8)
+                    },
+                    'ai_features': {
+                        'translation_available': True,
+                        'sentiment_analysis': True,
+                        'topic_extraction': True,
+                        'action_item_detection': True,
+                        'urgency_detection': True,
+                        'translation_target': options.get('translation_language')
+                    }
+                }
+                intelligent_messages.append(intelligent_message)
+            
+            return intelligent_messages
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent messages: {e}")
+            return []
+    
+    async def intelligent_search(self, query: str, workspace_id: str = None,
+                            channel_id: str = None, user_id: str = None,
+                            options: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """Perform AI-powered search across platforms"""
+        try:
+            options = options or {}
+            
+            # Use intelligent search manager
+            search_results = await self.search_manager.search(
+                query=query,
+                workspace_id=workspace_id,
+                channel_id=channel_id,
+                user_id=user_id,
+                options=options
+            )
+            
+            return search_results
+            
+        except Exception as e:
+            logger.error(f"Error in intelligent search: {e}")
+            return []
+    
+    async def send_intelligent_message(self, workspace_id: str, channel_id: str,
+                                 content: str, options: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Send message with AI enhancement"""
+        try:
+            options = options or {}
+            
+            # AI-enhance content
+            enhanced_content = await self._enhance_content(content, options)
+            
+            # Determine platform from channel ID
+            platform = self._get_platform_from_channel(channel_id)
+            integration = self.platform_integrations.get(platform)
+            
+            if not integration:
+                return {'ok': False, 'error': 'Unsupported platform'}
+            
+            # Send message
+            result = await integration.send_unified_message(
+                workspace_id, channel_id, enhanced_content, options
+            )
+            
+            # AI analyze sent message
+            if result.get('ok'):
+                await self._analyze_message_after_send(result, options)
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error sending intelligent message: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    async def create_intelligent_workflow(self, workflow_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create AI-enhanced workflow"""
+        try:
+            # AI-enhance workflow
+            enhanced_workflow = await self.workflow_intelligence.enhance_workflow(workflow_data)
+            
+            # Create workflow
+            if self.atom_workflow:
+                result = await self.atom_workflow.create_workflow(enhanced_workflow)
+            else:
+                result = {'ok': False, 'error': 'Workflow service not available'}
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error creating intelligent workflow: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    async def get_intelligent_analytics(self, metric: str, time_range: str,
+                                  workspace_id: str = None, options: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Get AI-enhanced analytics"""
+        try:
+            options = options or {}
+            
+            # Use AI to enhance analytics (Modernized)
+            prompt = f"Analyze the following {metric} for the time range {time_range}. " \
+                     f"Workspace: {workspace_id}. Options: {json.dumps(options)}. " \
+                     "Provide insights and predictions in JSON format."
+            
+            result = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a predictive analytics expert for communication platforms."
+            )
+            
+            try:
+                # Attempt to parse JSON from AI response
+                return json.loads(result)
+            except:
+                return {'analysis': result}
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent analytics: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    async def process_natural_language_command(self, command: str, user_id: str,
+                                        workspace_id: str = None, platform: str = None) -> Dict[str, Any]:
+        """Process natural language command with AI"""
+        try:
+            # Use conversation manager for command processing
+            result = await self.conversation_manager.process_command(
+                command=command,
+                user_id=user_id,
+                workspace_id=workspace_id,
+                platform=platform
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error processing natural language command: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    async def start_ai_conversation(self, user_id: str, platform: str,
+                                workspace_id: str = None) -> str:
+        """Start AI-powered conversation"""
+        try:
+            conversation_id = await self.conversation_manager.start_conversation(
+                user_id=user_id,
+                platform=platform,
+                workspace_id=workspace_id
+            )
+            
+            return conversation_id
+            
+        except Exception as e:
+            logger.error(f"Error starting AI conversation: {e}")
+            return ''
+    
+    async def continue_ai_conversation(self, conversation_id: str, message: str,
+                                   user_id: str) -> Dict[str, Any]:
+        """Continue AI-powered conversation"""
+        try:
+            response = await self.conversation_manager.continue_conversation(
+                conversation_id=conversation_id,
+                message=message,
+                user_id=user_id
+            )
+            
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error continuing AI conversation: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    # Private helper methods
+    async def _start_ai_integration_workers(self):
+        """Start background AI integration workers"""
+        # Start AI message analysis worker
+        asyncio.create_task(self._ai_message_analysis_worker())
+        
+        # Start intelligent search indexing worker
+        asyncio.create_task(self._intelligent_search_indexing_worker())
+        
+        # Start AI workflow optimization worker
+        asyncio.create_task(self._ai_workflow_optimization_worker())
+        
+        # Start cross-platform AI synchronization worker
+        asyncio.create_task(self._cross_platform_ai_worker())
+    
+    async def _initialize_ai_features(self):
+        """Initialize AI features"""
+        # Initialize AI features list
+        self.active_ai_features = [
+            'intelligent_search',
+            'message_summarization',
+            'sentiment_analysis',
+            'topic_extraction',
+            'workflow_recommendations',
+            'conversation_analysis',
+            'predictive_analytics',
+            'natural_language_commands',
+            'content_generation',
+            'voice_analysis',
+            'gaming_insights',
+            'cross_platform_intelligence'
+        ]
+    
+    async def _setup_intelligent_search(self):
+        """Setup intelligent search"""
+        await self.search_manager.initialize()
+    
+    async def _setup_workflow_intelligence(self):
+        """Setup workflow intelligence"""
+        await self.workflow_intelligence.initialize()
+    
+    async def _setup_cross_platform_ai(self):
+        """Setup cross-platform AI"""
+        await self.cross_platform_ai.initialize()
+    
+    def _get_platform_from_workspace(self, workspace_id: str) -> str:
+        """Extract platform from workspace ID"""
+        if workspace_id.startswith('slack_'):
+            return 'slack'
+        elif workspace_id.startswith('teams_'):
+            return 'teams'
+        elif workspace_id.startswith('google_chat_'):
+            return 'google_chat'
+        elif workspace_id.startswith('discord_'):
+            return 'discord'
+        return 'unknown'
+    
+    def _get_platform_from_channel(self, channel_id: str) -> str:
+        """Extract platform from channel ID"""
+        if channel_id.startswith('slack_'):
+            return 'slack'
+        elif channel_id.startswith('teams_'):
+            return 'teams'
+        elif channel_id.startswith('google_chat_'):
+            return 'google_chat'
+        elif channel_id.startswith('discord_'):
+            return 'discord'
+        return 'unknown'
+    
+    async def _calculate_engagement_level(self, workspace: Dict[str, Any]) -> str:
+        """Calculate engagement level for workspace"""
+        try:
+            # Mock calculation - would use AI analysis
+            member_count = workspace.get('member_count', 0)
+            channel_count = workspace.get('channel_count', 0)
+            
+            if member_count > 100 and channel_count > 20:
+                return 'high'
+            elif member_count > 50 and channel_count > 10:
+                return 'medium'
+            else:
+                return 'low'
+        except Exception as e:
+            return 'unknown'
+    
+    async def _get_activity_trends(self, workspace: Dict[str, Any]) -> Dict[str, Any]:
+        """Get activity trends for workspace"""
+        # Mock trends - would use AI analysis
+        return {
+            'daily_average': 150,
+            'peak_hour': 14,
+            'trend': 'increasing',
+            'growth_rate': 0.12
+        }
+    
+    async def _get_communication_patterns(self, workspace: Dict[str, Any]) -> Dict[str, Any]:
+        """Get communication patterns for workspace"""
+        # Mock patterns - would use AI analysis
+        return {
+            'preferred_channels': ['general', 'random', 'projects'],
+            'peak_times': ['09:00', '14:00', '16:00'],
+            'response_times': {'average': 5.2, 'median': 3.1},
+            'message_types': {'text': 0.85, 'file': 0.15}
+        }
+    
+    async def _predict_activity(self, workspace: Dict[str, Any]) -> Dict[str, Any]:
+        """Predict activity for workspace"""
+        # Mock prediction - would use AI
+        return {
+            'next_7_days': {
+                'messages': 1200,
+                'active_users': 35,
+                'confidence': 0.82
+            }
+        }
+    
+    async def _get_recommended_actions(self, workspace: Dict[str, Any]) -> List[str]:
+        """Get recommended actions for workspace"""
+        # Mock recommendations - would use AI
+        return [
+            'Schedule team sync meeting',
+            'Archive inactive channels',
+            'Enable automatic summarization',
+            'Set up workflow automation'
+        ]
+    
+    async def _calculate_channel_engagement(self, channel: Dict[str, Any]) -> str:
+        """Calculate engagement level for channel"""
+        message_count = channel.get('message_count', 0)
+        member_count = channel.get('member_count', 0)
+        
+        if message_count > 500 and member_count > 20:
+            return 'high'
+        elif message_count > 200 and member_count > 10:
+            return 'medium'
+        else:
+            return 'low'
+    
+    async def _get_channel_topic_trends(self, channel: Dict[str, Any]) -> List[str]:
+        """Get topic trends for channel"""
+        # Mock trends - would use AI
+        return ['project updates', 'technical discussions', 'team announcements']
+    
+    async def _get_sentiment_evolution(self, channel: Dict[str, Any]) -> Dict[str, Any]:
+        """Get sentiment evolution for channel"""
+        # Mock evolution - would use AI
+        return {
+            'current': 'positive',
+            'trend': 'improving',
+            'weekly_scores': [0.65, 0.72, 0.78, 0.82]
+        }
+    
+    async def _get_peak_activity_times(self, channel: Dict[str, Any]) -> List[str]:
+        """Get peak activity times for channel"""
+        # Mock times - would use AI analysis
+        return ['10:00', '14:30', '16:00']
+    
+    async def _predict_message_volume(self, channel: Dict[str, Any]) -> Dict[str, Any]:
+        """Predict message volume for channel"""
+        # Mock prediction - would use AI
+        return {
+            'tomorrow': 45,
+            'next_week': 280,
+            'confidence': 0.75
+        }
+    
+    async def _get_channel_suggestions(self, channel: Dict[str, Any]) -> List[str]:
+        """Get suggestions for channel"""
+        # Mock suggestions - would use AI
+        return [
+            'Enable topic threading',
+            'Set up automated moderation',
+            'Create channel guidelines',
+            'Archive old messages'
+        ]
+    
+    async def _get_message_ai_analysis(self, message: Dict[str, Any]) -> Dict[str, Any]:
+        """Get AI analysis for message (Modernized)"""
+        try:
+            prompt = f"Analyze the following message for sentiment and topics: {message['content']}. " \
+                     "Return a JSON object with 'sentiment' (string), 'sentiment_score' (float -1 to 1), and 'key_topics' (list)."
+            
+            analysis_text = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a linguistic analysis agent."
+            )
+            
+            try:
+                analysis = json.loads(analysis_text)
+                return {
+                    'sentiment': analysis.get('sentiment', 'neutral'),
+                    'sentiment_score': analysis.get('sentiment_score', 0.0),
+                    'key_topics': analysis.get('key_topics', []),
+                    'emotions': {},
+                    'urgency': 'medium',
+                    'importance': 'medium',
+                    'action_items': [],
+                    'category': 'general',
+                    'language': 'en',
+                    'confidence': 0.8
+                }
+            except:
+                return {
+                    'sentiment': 'neutral',
+                    'sentiment_score': 0.0,
+                    'key_topics': [],
+                    'emotions': {},
+                    'confidence': 0.5
+                }
+            
+        except Exception as e:
+            logger.error(f"Error getting message AI analysis: {e}")
+            return {
+                'sentiment': 'neutral',
+                'sentiment_score': 0.0,
+                'key_topics': [],
+                'emotions': {},
+                'confidence': 0.0
+            }
+    
+    async def _enhance_content(self, content: str, options: Dict[str, Any]) -> str:
+        """Enhance content with AI (Modernized)"""
+        try:
+            if not options.get('enhance_content', True):
+                return content
+            
+            prompt = f"Enhance this content: {content}. Tone: {options.get('tone', 'professional')}. Platform: {options.get('platform')}."
+            
+            enhanced_content = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a professional content writer and editor."
+            )
+            
+            return enhanced_content or content
+            
+        except Exception as e:
+            logger.error(f"Error enhancing content: {e}")
+            return content
+    
+    async def _analyze_message_after_send(self, result: Dict[str, Any], options: Dict[str, Any]):
+        """Analyze message after sending"""
+        try:
+            if not options.get('analyze_after_send', True):
+                return
+            
+            # Store analysis in memory
+            if self.atom_memory:
+                memory_data = {
+                    'type': 'sent_message_analysis',
+                    'message_id': result.get('message_id'),
+                    'channel_id': result.get('channel_id'),
+                    'workspace_id': result.get('workspace_id'),
+                    'timestamp': datetime.utcnow().isoformat()
+                }
+                await self.atom_memory.store(memory_data)
+            
+        except Exception as e:
+            logger.error(f"Error analyzing message after send: {e}")
+    
+    # Background workers
+    async def _ai_message_analysis_worker(self):
+        """Background worker for AI message analysis"""
+        while True:
+            try:
+                # Process message queue for AI analysis
+                await asyncio.sleep(60)  # Process every minute
+                
+            except Exception as e:
+                logger.error(f"Error in AI message analysis worker: {e}")
+                await asyncio.sleep(120)  # Wait before retrying
+    
+    async def _intelligent_search_indexing_worker(self):
+        """Background worker for intelligent search indexing"""
+        while True:
+            try:
+                # Index content for intelligent search
+                if self.search_manager:
+                    await self.search_manager.update_search_index()
+                
+                await asyncio.sleep(300)  # Process every 5 minutes
+                
+            except Exception as e:
+                logger.error(f"Error in intelligent search indexing worker: {e}")
+                await asyncio.sleep(600)  # Wait before retrying
+    
+    async def _ai_workflow_optimization_worker(self):
+        """Background worker for AI workflow optimization"""
+        while True:
+            try:
+                # Optimize workflows with AI
+                if self.workflow_intelligence:
+                    await self.workflow_intelligence.optimize_workflows()
+                
+                await asyncio.sleep(1800)  # Process every 30 minutes
+                
+            except Exception as e:
+                logger.error(f"Error in AI workflow optimization worker: {e}")
+                await asyncio.sleep(3600)  # Wait before retrying
+    
+    async def _cross_platform_ai_worker(self):
+        """Background worker for cross-platform AI"""
+        while True:
+            try:
+                # Synchronize AI insights across platforms
+                if self.cross_platform_ai:
+                    await self.cross_platform_ai.synchronize_ai_insights()
+                
+                await asyncio.sleep(900)  # Process every 15 minutes
+                
+            except Exception as e:
+                logger.error(f"Error in cross-platform AI worker: {e}")
+                await asyncio.sleep(1800)  # Wait before retrying
+
+class AIConversationManager:
+    """Manages AI-powered conversations (Modernized)"""
+    
+    def __init__(self, llm_service):
+        self.llm_service = llm_service
+        self.conversations: Dict[str, AIConversationContext] = {}
+    
+    async def start_conversation(self, user_id: str, platform: str,
+                             workspace_id: str = None) -> str:
+        """Start new AI conversation"""
+        try:
+            conversation_id = f"ai_conv_{user_id}_{platform}_{int(datetime.utcnow().timestamp())}"
+            
+            context = AIConversationContext(
+                conversation_id=conversation_id,
+                user_id=user_id,
+                platform=platform,
+                messages=[],
+                metadata={
+                    'workspace_id': workspace_id,
+                    'created_at': datetime.utcnow().isoformat()
+                }
+            )
+            
+            self.conversations[conversation_id] = context
+            
+            return conversation_id
+            
+        except Exception as e:
+            logger.error(f"Error starting AI conversation: {e}")
+            return ''
+    
+    async def continue_conversation(self, conversation_id: str, message: str,
+                               user_id: str) -> Dict[str, Any]:
+        """Continue AI conversation"""
+        try:
+            context = self.conversations.get(conversation_id)
+            if not context:
+                return {'ok': False, 'error': 'Conversation not found'}
+            
+            # Add user message
+            context.messages.append({
+                'role': 'user',
+                'content': message,
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            
+            # Get AI response using unified LLMService
+            messages = []
+            for m in context.messages[-10:]:
+                messages.append({"role": m['role'], "content": m['content']})
+            
+            response_text = await self.llm_service.chat_completion(
+                messages=messages,
+                system_prompt="You are an intelligent assistant for unified communication platforms. Provide helpful, contextually relevant responses."
+            )
+            
+            if response_text:
+                # Add AI response
+                context.messages.append({
+                    'role': 'assistant',
+                    'content': response_text,
+                    'timestamp': datetime.utcnow().isoformat()
+                })
+                
+                # Update conversation
+                context.last_updated = datetime.utcnow()
+                self.conversations[conversation_id] = context
+                
+                return {
+                    'ok': True,
+                    'response': response_text,
+                    'conversation_id': conversation_id,
+                    'confidence': 0.9
+                }
+            else:
+                return {'ok': False, 'error': 'AI processing failed'}
+            
+        except Exception as e:
+            logger.error(f"Error continuing AI conversation: {e}")
+            return {'ok': False, 'error': str(e)}
+    
+    async def process_command(self, command: str, user_id: str,
+                           workspace_id: str = None, platform: str = None) -> Dict[str, Any]:
+        """Process natural language command (Modernized)"""
+        try:
+            prompt = f"Parse and process this command: {command}. User: {user_id}. Platform: {platform}. Workspace: {workspace_id}."
+            
+            result_text = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are an intelligent command processor. Return response in JSON format."
+            )
+            
+            try:
+                return json.loads(result_text)
+            except:
+                return {'ok': True, 'response': result_text}
+            
+        except Exception as e:
+            logger.error(f"Error processing command: {e}")
+            return {'ok': False, 'error': str(e)}
+
+class IntelligentSearchManager:
+    """Manages AI-powered intelligent search"""
+    
+    def __init__(self, llm_service, atom_search, atom_ingestion=None):
+        self.llm_service = llm_service
+        self.atom_search = atom_search
+        self.atom_ingestion = atom_ingestion
+        self.search_index = {}
+    
+    async def initialize(self):
+        """Initialize intelligent search"""
+        # Load search index
+        await self._load_search_index()
+    
+    async def search(self, query: str, workspace_id: str = None,
+                    channel_id: str = None, user_id: str = None,
+                    options: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """Perform AI-powered intelligent search (Modernized)"""
+        try:
+            options = options or {}
+            
+            # Get base search results
+            base_results = await self.atom_search.unified_search(
+                query=query,
+                workspace_id=workspace_id,
+                channel_id=channel_id,
+                user_id=user_id,
+                filters=options.get('filters', {}),
+                limit=options.get('limit', 50)
+            )
+            
+            # Use AI to rank and enhance results using LLMService
+            if not base_results:
+                return []
+            
+            prompt = f"Rank these search results for the query: '{query}'. Results: {json.dumps(base_results[:10])}."
+            
+            ranked_text = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a search ranking expert. return a JSON object with 'ranked_results'."
+            )
+            
+            try:
+                ranked_data = json.loads(ranked_text)
+                return ranked_data.get('ranked_results', base_results)
+            except:
+                return base_results
+            
+        except Exception as e:
+            logger.error(f"Error in intelligent search: {e}")
+            return []
+    
+    async def update_search_index(self):
+        """Update search index with AI enhancements (Modernized)"""
+        try:
+            logger.info("Updating search index with AI enhancements")
+
+            # Collect new content from ingestion pipeline
+            if self.atom_ingestion:
+                recent_communications = await self._get_recent_communications()
+                for comm in recent_communications:
+                    await self._index_communication(comm)
+
+            logger.info("Search index updated successfully")
+        except Exception as e:
+            logger.error(f"Error updating search index: {e}")
+
+    async def _get_recent_communications(self) -> List[Dict[str, Any]]:
+        """Get recent communications for indexing"""
+        try:
+            # Implementation depends on ingestion pipeline API
+            return []
+        except Exception as e:
+            logger.error(f"Error getting recent communications: {e}")
+            return []
+
+    async def _index_communication(self, comm: Dict[str, Any]):
+        """Index a communication document with embedding generation (Modernized)"""
+        try:
+            from core.lancedb_handler import get_lancedb_handler
+            from core.embedding_service import EmbeddingService
+
+            # Prepare content for embedding
+            content_parts = [
+                comm.get('subject', ''),
+                comm.get('body', ''),
+                comm.get('sender', ''),
+                comm.get('summary', '')
+            ]
+            content = ' '.join([p for p in content_parts if p])
+
+            if not content or len(content.strip()) < 10:
+                return
+
+            # Generate embedding using modernized service
+            embedding_service = EmbeddingService()
+            embedding = await embedding_service.generate_embedding(content)
+
+            # Store in LanceDB using unified handler
+            vector_db = get_lancedb_handler()
+            await vector_db.upsert(
+                table_name="communications",
+                data=[{
+                    "id": comm.get('id'),
+                    "vector": embedding,
+                    "subject": comm.get('subject', ''),
+                    "body": comm.get('body', ''),
+                    "sender": comm.get('sender', ''),
+                    "timestamp": comm.get('timestamp', datetime.now(timezone.utc).isoformat()),
+                    "platform": comm.get('platform', 'unknown'),
+                    "communication_type": comm.get('type', 'email')
+                }]
+            )
+
+            logger.info(f"Indexed communication {comm.get('id')} with embedding dimension {len(embedding)}")
+        except Exception as e:
+            logger.error(f"Error indexing communication: {e}")
+
+    async def _load_search_index(self):
+        """Load search index"""
+        try:
+            logger.info("Loading search index")
+            self.search_index = {"documents": [], "embeddings": [], "metadata": {}}
+            logger.info("Search index loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading search index: {e}")
+
+class WorkflowIntelligenceManager:
+    """Manages AI-powered workflow intelligence"""
+    
+    def __init__(self, llm_service, atom_workflow):
+        self.llm_service = llm_service
+        self.atom_workflow = atom_workflow
+        self.workflow_patterns = {}
+    
+    async def initialize(self):
+        """Initialize workflow intelligence"""
+        await self._load_workflow_patterns()
+    
+    async def enhance_workflow(self, workflow_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Enhance workflow with AI (Modernized)"""
+        try:
+            prompt = f"Enhance this workflow: {json.dumps(workflow_data)}. " \
+                     "Identify optimizations and suggestions."
+            
+            enhancement_text = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a workflow optimization expert."
+            )
+            
+            try:
+                enhancement_data = json.loads(enhancement_text)
+                workflow_data['ai_enhancements'] = enhancement_data
+            except:
+                workflow_data['ai_enhancements'] = {"suggestions": enhancement_text}
+            
+            return workflow_data
+            
+        except Exception as e:
+            logger.error(f"Error enhancing workflow: {e}")
+            return workflow_data
+    
+    async def optimize_workflows(self):
+        """Optimize workflows with AI (Modernized)"""
+        try:
+            # Analyze and optimize existing workflows
+            logger.info("Optimizing workflows with AI")
+
+            # Get all workflows
+            if self.atom_workflow:
+                workflows = await self._get_all_workflows()
+
+                # Analyze each workflow
+                for workflow in workflows:
+                    # Use AI to identify optimization opportunities
+                    prompt = f"Optimize this workflow: {json.dumps(workflow)}."
+                    
+                    optimization_text = await self.llm_service.chat_completion(
+                        messages=[{"role": "user", "content": prompt}],
+                        system_prompt="You are a workflow optimization expert."
+                    )
+
+                    try:
+                        optimizations = json.loads(optimization_text)
+                        await self._apply_optimizations(workflow, optimizations)
+                    except:
+                        pass
+
+            logger.info("Workflow optimization completed successfully")
+        except Exception as e:
+            logger.error(f"Error optimizing workflows: {e}")
+
+    async def _get_all_workflows(self) -> List[Dict[str, Any]]:
+        """Get all workflows"""
+        try:
+            # Implementation depends on workflow service
+            return []
+        except Exception as e:
+            logger.error(f"Error getting workflows: {e}")
+            return []
+
+    async def _apply_optimizations(self, workflow: Dict[str, Any], optimizations: Dict[str, Any]):
+        """Apply AI-recommended optimizations to workflow"""
+        try:
+            # Apply optimizations
+            logger.info(f"Applying optimizations to workflow {workflow.get('id')}")
+        except Exception as e:
+            logger.error(f"Error applying optimizations: {e}")
+
+    async def _load_workflow_patterns(self):
+        """Load workflow patterns"""
+        try:
+            # Load existing workflow patterns
+            logger.info("Loading workflow patterns")
+
+            # Load patterns from database or file
+            self.workflow_patterns = {
+                "approval_patterns": [],
+                "notification_patterns": [],
+                "automation_patterns": []
+            }
+
+            logger.info("Workflow patterns loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading workflow patterns: {e}")
+
+    async def setup_workflow_automation(self):
+        """Setup AI-powered workflow automation"""
+        try:
+            logger.info("Setting up workflow automation")
+            # Initialize AI workflow automation
+            logger.info("Workflow automation setup complete")
+        except Exception as e:
+            logger.error(f"Error setting up workflow automation: {e}")
+
+    async def start_monitoring(self):
+        """Start AI monitoring"""
+        try:
+            logger.info("Starting AI monitoring")
+            # Start background AI monitoring tasks
+            logger.info("AI monitoring started successfully")
+        except Exception as e:
+            logger.error(f"Error starting AI monitoring: {e}")
+
+class CrossPlatformAIManager:
+    """Manages cross-platform AI features"""
+    
+    def __init__(self, llm_service, platform_integrations):
+        self.llm_service = llm_service
+        self.platform_integrations = platform_integrations
+        self.cross_platform_insights = {}
+    
+    async def initialize(self):
+        """Initialize cross-platform AI"""
+        await self._load_cross_platform_data()
+    
+    async def synchronize_ai_insights(self):
+        """Synchronize AI insights across platforms (Modernized)"""
+        try:
+            # Collect insights from all platforms
+            all_insights = {}
+            
+            for platform, integration in self.platform_integrations.items():
+                if not integration:
+                    continue
+                
+                # Get platform-specific insights
+                insights = await self._get_platform_insights(platform, integration)
+                all_insights[platform] = insights
+            
+            # Generate cross-platform AI analysis using LLMService
+            prompt = f"Analyze these cross-platform insights: {json.dumps(all_insights)}."
+            
+            analysis_text = await self.llm_service.chat_completion(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt="You are a cross-platform data scientist."
+            )
+            
+            try:
+                self.cross_platform_insights = json.loads(analysis_text)
+            except:
+                self.cross_platform_insights = {"analysis": analysis_text}
+            
+        except Exception as e:
+            logger.error(f"Error synchronizing AI insights: {e}")
+    
+    async def _load_cross_platform_data(self):
+        """Load cross-platform data"""
+        try:
+            # Load existing cross-platform data
+            logger.info("Loading cross-platform data")
+
+            # Collect data from all integrated platforms
+            self.cross_platform_insights = {
+                "platforms": {},
+                "shared_users": set(),
+                "message_patterns": {},
+                "engagement_metrics": {}
+            }
+
+            # Load data for each platform
+            for platform in self.platform_integrations.keys():
+                platform_data = await self._get_platform_data(platform)
+                self.cross_platform_insights["platforms"][platform] = platform_data
+
+            logger.info("Cross-platform data loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading cross-platform data: {e}")
+    
+    async def _get_platform_insights(self, platform: str, integration) -> Dict[str, Any]:
+        """Get insights for specific platform"""
+        try:
+            # Get platform-specific insights
+            return {
+                'platform': platform,
+                'active_users': 100,  # Mock data
+                'message_count': 1000,
+                'engagement_level': 'high'
+            }
+        except Exception as e:
+            logger.error(f"Error getting platform insights for {platform}: {e}")
+            return {}
+
+    async def _get_platform_data(self, platform: str) -> Dict[str, Any]:
+        """Get data for specific platform"""
+        try:
+            # Implementation depends on platform integration
+            return {
+                "platform": platform,
+                "connected": False,
+                "data": {}
+            }
+        except Exception as e:
+            logger.error(f"Error getting platform data for {platform}: {e}")
+            return {}
+
+# Global AI integration instance
+atom_ai_integration = AtomAIIntegration({
+    'atom_memory_service': None,
+    'atom_search_service': None,
+    'atom_workflow_service': None,
+    'atom_ingestion_pipeline': None,
+    'llm_service': None
+})

@@ -1,0 +1,10 @@
+---
+pid: 38184
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "foreach ($p in 3000,3001,3002) { $r = curl -s -o NUL -w \"%{http_code}\" \"http://localhost:$p/\" 2>&1; Write-Output \"port $p : $r\" }"
+started_at: 2026-06-17T15:36:03.097Z
+running_for_ms: 13814996 
+---
+port 3000 : 200
+port 3001 : 000
+port 3002 : 200

@@ -1,0 +1,319 @@
+import datetime
+import json
+import logging
+import os
+import uuid
+from apscheduler.executors.pool import ThreadPoolExecutor
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.background import BackgroundScheduler
+from sqlalchemy.orm import Session
+
+from core.database import engine, get_db_session
+from core.models import AgentJob, AgentJobStatus, AgentRegistry
+
+logger = logging.getLogger(__name__)
+
+class AgentScheduler:
+    _instance = None
+
+    def __init__(self):
+        jobstores = {
+            'default': SQLAlchemyJobStore(engine=engine)
+        }
+        executors = {
+            'default': ThreadPoolExecutor(20)
+        }
+        job_defaults = {
+            'coalesce': False,
+            'max_instances': 3
+        }
+        self.scheduler = BackgroundScheduler(
+            jobstores=jobstores, 
+            executors=executors, 
+            job_defaults=job_defaults
+        )
+        self.scheduler.start()
+        logger.info("AgentScheduler started.")
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = AgentScheduler()
+        return cls._instance
+
+    def schedule_job(self, agent_id: str, cron_expression: str, func, args=None):
+        """
+        Schedule a recurring agent job.
+        cron_expression format: "* * * * *" (minute hour day month day_of_week)
+        """
+        # Simple parser for "every X minutes" vs full cron
+        # For MVP, we assume cron string passed to from_crontab or keyword args
+        # But APScheduler usually takes separate args (minute='*', hour='9')
+        # We will implement a simplified 'interval' or 'cron' parser if needed.
+        # Here we assume caller passes a dict of cron args for simplicity in this MVP.
+        
+        job_id = str(uuid.uuid4())
+        
+        # Wrapped function to log to DB
+        def managed_execution(*args, **kwargs):
+            self._execute_and_log(agent_id, func, *args, **kwargs)
+
+        # Assuming cron_expression is a dict for add_job keywords (e.g., {'minute': '*/5'})
+        # or we accept a CronTrigger.
+        # For safety/simplicity in this file generation, let's just use add_job directly
+        # But we need to handle the trigger parsing.
+        
+        # Fallback: if input is a dict, unpack it. If string, try to parse
+        trigger_args = {}
+        if isinstance(cron_expression, dict):
+            trigger_args = cron_expression
+        else:
+            # Very basic string parser (e.g. "*/5 * * * *")
+            parts = cron_expression.split()
+            if len(parts) == 5:
+                trigger_args = {
+                    'minute': parts[0],
+                    'hour': parts[1],
+                    'day': parts[2],
+                    'month': parts[3],
+                    'day_of_week': parts[4]
+                }
+
+        self.scheduler.add_job(
+            managed_execution,
+            'cron',
+            id=job_id,
+            args=args,
+            **trigger_args
+        )
+        logger.info(f"Scheduled job {job_id} for agent {agent_id} with trigger {trigger_args}")
+        return job_id
+
+    def _execute_and_log(self, agent_id: str, func, *args, **kwargs):
+        """
+        Execution wrapper that creates AgentJob record.
+        """
+        with get_db_session() as db:
+            job_record = AgentJob(
+                id=str(uuid.uuid4()),
+                agent_id=agent_id,
+                status=AgentJobStatus.RUNNING.value,
+                logs=""
+            )
+            db.add(job_record)
+            db.commit()
+        
+        try:
+            # We need to run async function in sync ThreadPool
+            # This is tricky with APScheduler + AsyncIO
+            # Usually we'd use AsyncIOScheduler if main loop is async
+            # But here we are in a thread. We will run asyncio.run()
+            import asyncio
+            result = asyncio.run(func(*args, **kwargs))
+            
+            job_record.status = AgentJobStatus.SUCCESS.value
+            job_record.end_time = datetime.datetime.now()
+            job_record.result_summary = json.dumps(result, default=str)
+            
+        except Exception as e:
+            logger.error(f"Job failed: {e}")
+            job_record.status = AgentJobStatus.FAILED.value
+            job_record.end_time = datetime.datetime.now()
+            job_record.logs = str(e)
+            
+        finally:
+            db.commit()
+            db.close()
+
+    def schedule_agent(self, agent_id: str, schedule_config: dict):
+        """
+        Schedule a generic agent based on its config.
+        """
+        # 1. Define the execution wrapper
+        async def run_agent_wrapper():
+            from core.database import get_db_session
+            from core.generic_agent import GenericAgent
+            from core.models import AgentRegistry
+            
+            with get_db_session() as db:
+                try:
+                    agent_model = db.query(AgentRegistry).filter(AgentRegistry.id == agent_id).first()
+                    if agent_model:
+                        runner = GenericAgent(agent_model)
+                        # For scheduled tasks, we might need a default prompt or check config
+                        task_input = agent_model.configuration.get("scheduled_task", "Perform scheduled check.")
+                        await runner.execute(task_input, context={"trigger": "schedule"})
+                finally:
+                    db.close()
+
+        # 2. Extract Cron details
+        cron_expr = schedule_config.get("cron_expression")
+        if not cron_expr:
+            logger.warning(f"No cron expression for agent {agent_id}")
+            return
+            
+        # 3. Schedule it
+        return self.schedule_job(agent_id, cron_expr, run_agent_wrapper)
+
+    def load_scheduled_agents(self):
+        """
+        Load all agents with active schedules from DB.
+        """
+        with get_db_session() as db:
+            try:
+                agents = db.query(AgentRegistry).all() # In prod, filter by active schedule
+                count = 0
+                for agent in agents:
+                    if agent.schedule_config and agent.schedule_config.get("active"):
+                        self.schedule_agent(agent.id, agent.schedule_config)
+                        count += 1
+                logger.info(f"Loaded {count} agents into scheduler.")
+            finally:
+                db.close()
+
+    def schedule_rating_sync(self, sync_service, interval_minutes: int = 30):
+        """
+        Schedule periodic rating sync with Atom SaaS.
+
+        Args:
+            sync_service: RatingSyncService instance
+            interval_minutes: Sync interval in minutes (default: 30)
+
+        Returns:
+            job_id: Scheduled job ID
+        """
+        job_id = "rating-sync-atom-saas"
+
+        async def sync_wrapper():
+            """Async wrapper for rating sync."""
+            try:
+                result = await sync_service.sync_ratings()
+                logger.info(
+                    f"Rating sync completed: {result.get('uploaded')} uploaded, "
+                    f"{result.get('failed')} failed"
+                )
+            except Exception as e:
+                logger.error(f"Rating sync failed: {e}")
+
+        def sync_job():
+            """Sync job wrapper for ThreadPool scheduler."""
+            import asyncio
+            asyncio.run(sync_wrapper())
+
+        # Remove existing job if it exists
+        if self.scheduler.get_job(job_id):
+            self.scheduler.remove_job(job_id)
+            logger.info(f"Removed existing rating sync job {job_id}")
+
+        # Add new interval job
+        self.scheduler.add_job(
+            sync_job,
+            'interval',
+            id=job_id,
+            minutes=interval_minutes,
+            name='Rating Sync with Atom SaaS',
+            replace_existing=True
+        )
+
+        logger.info(f"Scheduled rating sync job {job_id} every {interval_minutes} minutes")
+        return job_id
+
+    def schedule_skill_sync(self, sync_service, interval_minutes: int = 15):
+        """
+        Schedule periodic skill sync with Atom SaaS.
+
+        Args:
+            sync_service: SyncService instance
+            interval_minutes: Sync interval in minutes (default: 15)
+
+        Returns:
+            job_id: Scheduled job ID
+        """
+        job_id = "skill-sync-atom-saas"
+
+        async def sync_wrapper():
+            """Async wrapper for skill sync."""
+            try:
+                result = await sync_service.sync_all(enable_websocket=True)
+                logger.info(
+                    f"Skill sync completed: {result.get('skills_synced')} skills, "
+                    f"{result.get('categories_synced')} categories in "
+                    f"{result.get('duration_seconds'):.2f}s"
+                )
+            except Exception as e:
+                logger.error(f"Skill sync failed: {e}")
+
+        def sync_job():
+            """Sync job wrapper for ThreadPool scheduler."""
+            import asyncio
+            asyncio.run(sync_wrapper())
+
+        # Remove existing job if it exists
+        if self.scheduler.get_job(job_id):
+            self.scheduler.remove_job(job_id)
+            logger.info(f"Removed existing skill sync job {job_id}")
+
+        # Add new interval job
+        self.scheduler.add_job(
+            sync_job,
+            'interval',
+            id=job_id,
+            minutes=interval_minutes,
+            name='Skill Sync with Atom SaaS',
+            replace_existing=True
+        )
+
+        logger.info(f"Scheduled skill sync job {job_id} every {interval_minutes} minutes")
+        return job_id
+
+    def initialize_skill_sync(self):
+        """
+        Initialize skill sync job from environment configuration.
+
+        Reads ATOM_SAAS_SYNC_INTERVAL_MINUTES from environment.
+        Default: 15 minutes
+        """
+        interval = int(os.getenv("ATOM_SAAS_SYNC_INTERVAL_MINUTES", "15"))
+
+        # Lazy import to avoid circular dependency
+        from core.sync_service import SyncService
+        from core.atom_saas_client import AtomSaaSClient
+        from core.atom_saas_websocket import AtomSaaSWebSocketClient
+
+        # Create clients
+        db = get_db_session()
+        try:
+            saas_client = AtomSaaSClient()
+            ws_client = AtomSaaSWebSocketClient()
+            sync_service = SyncService(saas_client, ws_client)
+
+            # Schedule the job
+            self.schedule_skill_sync(sync_service, interval)
+            logger.info(f"Initialized skill sync with {interval} minute interval")
+        finally:
+            db.close()
+
+    def initialize_rating_sync(self):
+        """
+        Initialize rating sync job from environment configuration.
+
+        Reads ATOM_SAAS_RATING_SYNC_INTERVAL_MINUTES from environment.
+        Default: 30 minutes
+        """
+        interval = int(os.getenv("ATOM_SAAS_RATING_SYNC_INTERVAL_MINUTES", "30"))
+
+        # Lazy import to avoid circular dependency
+        from core.rating_sync_service import RatingSyncService
+        from core.atom_saas_client import AtomSaaSClient
+
+        # Create sync service instance
+        db = get_db_session()
+        try:
+            client = AtomSaaSClient()
+            sync_service = RatingSyncService(db, client)
+
+            # Schedule the job
+            self.schedule_rating_sync(sync_service, interval)
+            logger.info(f"Initialized rating sync with {interval} minute interval")
+        finally:
+            db.close()

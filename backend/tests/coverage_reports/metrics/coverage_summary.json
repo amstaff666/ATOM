@@ -1,0 +1,1803 @@
+{
+  "generated_at": "2026-03-11T14:41:58.742514Z",
+  "overall": {
+    "percent_covered": 7.92,
+    "covered_lines": 5751,
+    "total_lines": 72622,
+    "coverage_gap": 66871
+  },
+  "modules": {
+    "api": {
+      "percent_covered": 0.0,
+      "covered_lines": 0,
+      "total_lines": 15239,
+      "coverage_gap": 15239,
+      "file_count": 141
+    },
+    "core": {
+      "percent_covered": 10.27,
+      "covered_lines": 5676,
+      "total_lines": 55267,
+      "coverage_gap": 49591,
+      "file_count": 374
+    },
+    "tools": {
+      "percent_covered": 3.54,
+      "covered_lines": 75,
+      "total_lines": 2116,
+      "coverage_gap": 2041,
+      "file_count": 17
+    }
+  },
+  "files_by_size": {
+    "Tier 1": {
+      "file_count": 8,
+      "total_lines": 9105,
+      "covered_lines": 4271,
+      "avg_coverage_pct": 46.91
+    },
+    "Tier 2": {
+      "file_count": 24,
+      "total_lines": 8736,
+      "covered_lines": 346,
+      "avg_coverage_pct": 3.96
+    },
+    "Tier 3": {
+      "file_count": 60,
+      "total_lines": 14517,
+      "covered_lines": 352,
+      "avg_coverage_pct": 2.42
+    },
+    "Tier 4": {
+      "file_count": 194,
+      "total_lines": 27418,
+      "covered_lines": 460,
+      "avg_coverage_pct": 1.68
+    },
+    "Tier 5": {
+      "file_count": 246,
+      "total_lines": 12846,
+      "covered_lines": 322,
+      "avg_coverage_pct": 2.51
+    }
+  },
+  "high_priority_files": [
+    {
+      "file": "core/workflow_engine.py",
+      "lines": 1163,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 1163,
+      "potential_gain": 582,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/atom_agent_endpoints.py",
+      "lines": 787,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 787,
+      "potential_gain": 394,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/llm/byok_handler.py",
+      "lines": 654,
+      "coverage_pct": 6.73,
+      "uncovered_lines": 610,
+      "potential_gain": 305,
+      "priority_score": 0.933
+    },
+    {
+      "file": "core/lancedb_handler.py",
+      "lines": 709,
+      "coverage_pct": 14.1,
+      "uncovered_lines": 609,
+      "potential_gain": 304,
+      "priority_score": 0.859
+    },
+    {
+      "file": "core/workflow_analytics_engine.py",
+      "lines": 561,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 561,
+      "potential_gain": 280,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_debugger.py",
+      "lines": 527,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 527,
+      "potential_gain": 264,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/advanced_workflow_system.py",
+      "lines": 495,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 495,
+      "potential_gain": 248,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/episode_segmentation_service.py",
+      "lines": 573,
+      "coverage_pct": 17.28,
+      "uncovered_lines": 474,
+      "potential_gain": 237,
+      "priority_score": 0.827
+    },
+    {
+      "file": "core/auto_document_ingestion.py",
+      "lines": 468,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 468,
+      "potential_gain": 234,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_versioning_system.py",
+      "lines": 442,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 442,
+      "potential_gain": 221,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/atom_meta_agent.py",
+      "lines": 422,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 422,
+      "potential_gain": 211,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/agent_social_layer.py",
+      "lines": 376,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 376,
+      "potential_gain": 188,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/admin_routes.py",
+      "lines": 374,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 374,
+      "potential_gain": 187,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/package_routes.py",
+      "lines": 373,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 373,
+      "potential_gain": 186,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/skill_registry_service.py",
+      "lines": 366,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 366,
+      "potential_gain": 183,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_template_system.py",
+      "lines": 350,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 350,
+      "potential_gain": 175,
+      "priority_score": 1.0
+    },
+    {
+      "file": "tools/canvas_tool.py",
+      "lines": 422,
+      "coverage_pct": 17.77,
+      "uncovered_lines": 347,
+      "potential_gain": 174,
+      "priority_score": 0.822
+    },
+    {
+      "file": "core/proposal_service.py",
+      "lines": 342,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 342,
+      "potential_gain": 171,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/config.py",
+      "lines": 336,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 336,
+      "potential_gain": 168,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_marketplace.py",
+      "lines": 332,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 332,
+      "potential_gain": 166,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/atom_saas_websocket.py",
+      "lines": 328,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 328,
+      "potential_gain": 164,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/integration_data_mapper.py",
+      "lines": 325,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 325,
+      "potential_gain": 162,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/embedding_service.py",
+      "lines": 321,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 321,
+      "potential_gain": 160,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/agent_world_model.py",
+      "lines": 317,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 317,
+      "potential_gain": 158,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/byok_endpoints.py",
+      "lines": 488,
+      "coverage_pct": 35.45,
+      "uncovered_lines": 315,
+      "potential_gain": 158,
+      "priority_score": 0.645
+    },
+    {
+      "file": "core/workflow_analytics_endpoints.py",
+      "lines": 314,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 314,
+      "potential_gain": 157,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/formula_extractor.py",
+      "lines": 313,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 313,
+      "potential_gain": 156,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/hybrid_data_ingestion.py",
+      "lines": 311,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 311,
+      "potential_gain": 156,
+      "priority_score": 1.0
+    },
+    {
+      "file": "tools/device_tool.py",
+      "lines": 308,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 308,
+      "potential_gain": 154,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_ui_endpoints.py",
+      "lines": 304,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 304,
+      "potential_gain": 152,
+      "priority_score": 1.0
+    },
+    {
+      "file": "tools/browser_tool.py",
+      "lines": 299,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 299,
+      "potential_gain": 150,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/debug_routes.py",
+      "lines": 296,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 296,
+      "potential_gain": 148,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/ai_accounting_engine.py",
+      "lines": 295,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 295,
+      "potential_gain": 148,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/enterprise_auth_service.py",
+      "lines": 293,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 293,
+      "potential_gain": 146,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/collaboration_service.py",
+      "lines": 291,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 291,
+      "potential_gain": 146,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/agent_integration_gateway.py",
+      "lines": 290,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 290,
+      "potential_gain": 145,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/bulk_operations_processor.py",
+      "lines": 288,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 288,
+      "potential_gain": 144,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/workflow_parameter_validator.py",
+      "lines": 286,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 286,
+      "potential_gain": 143,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/agent_routes.py",
+      "lines": 283,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 283,
+      "potential_gain": 142,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/enhanced_execution_state_manager.py",
+      "lines": 281,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 281,
+      "potential_gain": 140,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/productivity/notion_service.py",
+      "lines": 277,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 277,
+      "potential_gain": 138,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/graphrag_engine.py",
+      "lines": 275,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 275,
+      "potential_gain": 138,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/debug_storage.py",
+      "lines": 271,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 271,
+      "potential_gain": 136,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/unified_message_processor.py",
+      "lines": 267,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 267,
+      "potential_gain": 134,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/advanced_workflow_endpoints.py",
+      "lines": 265,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 265,
+      "potential_gain": 132,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/user_templates_endpoints.py",
+      "lines": 261,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 261,
+      "potential_gain": 130,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/validation_service.py",
+      "lines": 258,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 258,
+      "potential_gain": 129,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/cross_platform_correlation.py",
+      "lines": 255,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 255,
+      "potential_gain": 128,
+      "priority_score": 1.0
+    },
+    {
+      "file": "core/integration_dashboard.py",
+      "lines": 252,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 252,
+      "potential_gain": 126,
+      "priority_score": 1.0
+    },
+    {
+      "file": "api/social_media_routes.py",
+      "lines": 248,
+      "coverage_pct": 0.0,
+      "uncovered_lines": 248,
+      "potential_gain": 124,
+      "priority_score": 1.0
+    }
+  ],
+  "zero_coverage_files": [
+    {
+      "file": "core/workflow_engine.py",
+      "lines": 1163,
+      "estimated_gain_lines": 582
+    },
+    {
+      "file": "core/atom_agent_endpoints.py",
+      "lines": 787,
+      "estimated_gain_lines": 394
+    },
+    {
+      "file": "core/workflow_analytics_engine.py",
+      "lines": 561,
+      "estimated_gain_lines": 280
+    },
+    {
+      "file": "core/workflow_debugger.py",
+      "lines": 527,
+      "estimated_gain_lines": 264
+    },
+    {
+      "file": "core/advanced_workflow_system.py",
+      "lines": 495,
+      "estimated_gain_lines": 248
+    },
+    {
+      "file": "core/auto_document_ingestion.py",
+      "lines": 468,
+      "estimated_gain_lines": 234
+    },
+    {
+      "file": "core/workflow_versioning_system.py",
+      "lines": 442,
+      "estimated_gain_lines": 221
+    },
+    {
+      "file": "core/atom_meta_agent.py",
+      "lines": 422,
+      "estimated_gain_lines": 211
+    },
+    {
+      "file": "core/agent_social_layer.py",
+      "lines": 376,
+      "estimated_gain_lines": 188
+    },
+    {
+      "file": "api/admin_routes.py",
+      "lines": 374,
+      "estimated_gain_lines": 187
+    },
+    {
+      "file": "api/package_routes.py",
+      "lines": 373,
+      "estimated_gain_lines": 186
+    },
+    {
+      "file": "core/skill_registry_service.py",
+      "lines": 366,
+      "estimated_gain_lines": 183
+    },
+    {
+      "file": "core/workflow_template_system.py",
+      "lines": 350,
+      "estimated_gain_lines": 175
+    },
+    {
+      "file": "core/proposal_service.py",
+      "lines": 342,
+      "estimated_gain_lines": 171
+    },
+    {
+      "file": "core/config.py",
+      "lines": 336,
+      "estimated_gain_lines": 168
+    },
+    {
+      "file": "core/workflow_marketplace.py",
+      "lines": 332,
+      "estimated_gain_lines": 166
+    },
+    {
+      "file": "core/atom_saas_websocket.py",
+      "lines": 328,
+      "estimated_gain_lines": 164
+    },
+    {
+      "file": "core/integration_data_mapper.py",
+      "lines": 325,
+      "estimated_gain_lines": 162
+    },
+    {
+      "file": "core/embedding_service.py",
+      "lines": 321,
+      "estimated_gain_lines": 160
+    },
+    {
+      "file": "core/agent_world_model.py",
+      "lines": 317,
+      "estimated_gain_lines": 158
+    },
+    {
+      "file": "core/workflow_analytics_endpoints.py",
+      "lines": 314,
+      "estimated_gain_lines": 157
+    },
+    {
+      "file": "core/formula_extractor.py",
+      "lines": 313,
+      "estimated_gain_lines": 156
+    },
+    {
+      "file": "core/hybrid_data_ingestion.py",
+      "lines": 311,
+      "estimated_gain_lines": 156
+    },
+    {
+      "file": "tools/device_tool.py",
+      "lines": 308,
+      "estimated_gain_lines": 154
+    },
+    {
+      "file": "core/workflow_ui_endpoints.py",
+      "lines": 304,
+      "estimated_gain_lines": 152
+    },
+    {
+      "file": "tools/browser_tool.py",
+      "lines": 299,
+      "estimated_gain_lines": 150
+    },
+    {
+      "file": "api/debug_routes.py",
+      "lines": 296,
+      "estimated_gain_lines": 148
+    },
+    {
+      "file": "core/ai_accounting_engine.py",
+      "lines": 295,
+      "estimated_gain_lines": 148
+    },
+    {
+      "file": "core/enterprise_auth_service.py",
+      "lines": 293,
+      "estimated_gain_lines": 146
+    },
+    {
+      "file": "core/collaboration_service.py",
+      "lines": 291,
+      "estimated_gain_lines": 146
+    },
+    {
+      "file": "core/agent_integration_gateway.py",
+      "lines": 290,
+      "estimated_gain_lines": 145
+    },
+    {
+      "file": "core/bulk_operations_processor.py",
+      "lines": 288,
+      "estimated_gain_lines": 144
+    },
+    {
+      "file": "core/workflow_parameter_validator.py",
+      "lines": 286,
+      "estimated_gain_lines": 143
+    },
+    {
+      "file": "api/agent_routes.py",
+      "lines": 283,
+      "estimated_gain_lines": 142
+    },
+    {
+      "file": "core/enhanced_execution_state_manager.py",
+      "lines": 281,
+      "estimated_gain_lines": 140
+    },
+    {
+      "file": "core/productivity/notion_service.py",
+      "lines": 277,
+      "estimated_gain_lines": 138
+    },
+    {
+      "file": "core/graphrag_engine.py",
+      "lines": 275,
+      "estimated_gain_lines": 138
+    },
+    {
+      "file": "core/debug_storage.py",
+      "lines": 271,
+      "estimated_gain_lines": 136
+    },
+    {
+      "file": "core/unified_message_processor.py",
+      "lines": 267,
+      "estimated_gain_lines": 134
+    },
+    {
+      "file": "core/advanced_workflow_endpoints.py",
+      "lines": 265,
+      "estimated_gain_lines": 132
+    },
+    {
+      "file": "api/user_templates_endpoints.py",
+      "lines": 261,
+      "estimated_gain_lines": 130
+    },
+    {
+      "file": "core/validation_service.py",
+      "lines": 258,
+      "estimated_gain_lines": 129
+    },
+    {
+      "file": "core/cross_platform_correlation.py",
+      "lines": 255,
+      "estimated_gain_lines": 128
+    },
+    {
+      "file": "core/integration_dashboard.py",
+      "lines": 252,
+      "estimated_gain_lines": 126
+    },
+    {
+      "file": "api/social_media_routes.py",
+      "lines": 248,
+      "estimated_gain_lines": 124
+    },
+    {
+      "file": "core/workflow_endpoints.py",
+      "lines": 245,
+      "estimated_gain_lines": 122
+    },
+    {
+      "file": "api/workflow_collaboration.py",
+      "lines": 244,
+      "estimated_gain_lines": 122
+    },
+    {
+      "file": "core/workflow_template_endpoints.py",
+      "lines": 243,
+      "estimated_gain_lines": 122
+    },
+    {
+      "file": "core/generic_agent.py",
+      "lines": 242,
+      "estimated_gain_lines": 121
+    },
+    {
+      "file": "api/integration_health_stubs.py",
+      "lines": 241,
+      "estimated_gain_lines": 120
+    },
+    {
+      "file": "core/agent_graduation_service.py",
+      "lines": 240,
+      "estimated_gain_lines": 120
+    },
+    {
+      "file": "core/ai_workflow_optimizer.py",
+      "lines": 240,
+      "estimated_gain_lines": 120
+    },
+    {
+      "file": "api/browser_routes.py",
+      "lines": 235,
+      "estimated_gain_lines": 118
+    },
+    {
+      "file": "core/chat_session_manager.py",
+      "lines": 231,
+      "estimated_gain_lines": 116
+    },
+    {
+      "file": "core/sync_service.py",
+      "lines": 230,
+      "estimated_gain_lines": 115
+    },
+    {
+      "file": "core/skill_adapter.py",
+      "lines": 229,
+      "estimated_gain_lines": 114
+    },
+    {
+      "file": "api/workflow_versioning_endpoints.py",
+      "lines": 228,
+      "estimated_gain_lines": 114
+    },
+    {
+      "file": "core/health_monitoring_service.py",
+      "lines": 228,
+      "estimated_gain_lines": 114
+    },
+    {
+      "file": "core/graduation_exam.py",
+      "lines": 227,
+      "estimated_gain_lines": 114
+    },
+    {
+      "file": "core/auto_invoicer.py",
+      "lines": 224,
+      "estimated_gain_lines": 112
+    },
+    {
+      "file": "core/custom_components_service.py",
+      "lines": 224,
+      "estimated_gain_lines": 112
+    },
+    {
+      "file": "api/menubar_routes.py",
+      "lines": 220,
+      "estimated_gain_lines": 110
+    },
+    {
+      "file": "core/financial_ops_engine.py",
+      "lines": 220,
+      "estimated_gain_lines": 110
+    },
+    {
+      "file": "core/feedback_service.py",
+      "lines": 219,
+      "estimated_gain_lines": 110
+    },
+    {
+      "file": "core/message_analytics_engine.py",
+      "lines": 219,
+      "estimated_gain_lines": 110
+    },
+    {
+      "file": "core/webhook_handlers.py",
+      "lines": 219,
+      "estimated_gain_lines": 110
+    },
+    {
+      "file": "core/supervision_service.py",
+      "lines": 218,
+      "estimated_gain_lines": 109
+    },
+    {
+      "file": "api/device_capabilities.py",
+      "lines": 214,
+      "estimated_gain_lines": 107
+    },
+    {
+      "file": "api/learning_plan_routes.py",
+      "lines": 212,
+      "estimated_gain_lines": 106
+    },
+    {
+      "file": "api/media_routes.py",
+      "lines": 212,
+      "estimated_gain_lines": 106
+    },
+    {
+      "file": "core/supervisor_learning_service.py",
+      "lines": 212,
+      "estimated_gain_lines": 106
+    },
+    {
+      "file": "core/predictive_insights.py",
+      "lines": 211,
+      "estimated_gain_lines": 106
+    },
+    {
+      "file": "api/agent_governance_routes.py",
+      "lines": 209,
+      "estimated_gain_lines": 104
+    },
+    {
+      "file": "api/competitor_analysis_routes.py",
+      "lines": 209,
+      "estimated_gain_lines": 104
+    },
+    {
+      "file": "api/maturity_routes.py",
+      "lines": 208,
+      "estimated_gain_lines": 104
+    },
+    {
+      "file": "core/enterprise_user_management.py",
+      "lines": 208,
+      "estimated_gain_lines": 104
+    },
+    {
+      "file": "core/recording_review_service.py",
+      "lines": 207,
+      "estimated_gain_lines": 104
+    },
+    {
+      "file": "api/workflow_debugging.py",
+      "lines": 204,
+      "estimated_gain_lines": 102
+    },
+    {
+      "file": "core/unified_task_endpoints.py",
+      "lines": 204,
+      "estimated_gain_lines": 102
+    },
+    {
+      "file": "api/mobile_agent_routes.py",
+      "lines": 202,
+      "estimated_gain_lines": 101
+    },
+    {
+      "file": "api/mobile_workflows.py",
+      "lines": 200,
+      "estimated_gain_lines": 100
+    },
+    {
+      "file": "core/enterprise_security.py",
+      "lines": 200,
+      "estimated_gain_lines": 100
+    },
+    {
+      "file": "core/creative/ffmpeg_service.py",
+      "lines": 197,
+      "estimated_gain_lines": 98
+    },
+    {
+      "file": "api/device_websocket.py",
+      "lines": 196,
+      "estimated_gain_lines": 98
+    },
+    {
+      "file": "core/media/spotify_service.py",
+      "lines": 196,
+      "estimated_gain_lines": 98
+    },
+    {
+      "file": "tools/media_tool.py",
+      "lines": 196,
+      "estimated_gain_lines": 98
+    },
+    {
+      "file": "api/google_chat_enhanced_routes.py",
+      "lines": 194,
+      "estimated_gain_lines": 97
+    },
+    {
+      "file": "core/canvas_collaboration_service.py",
+      "lines": 194,
+      "estimated_gain_lines": 97
+    },
+    {
+      "file": "core/database_manager.py",
+      "lines": 194,
+      "estimated_gain_lines": 97
+    },
+    {
+      "file": "core/agent_evolution_loop.py",
+      "lines": 191,
+      "estimated_gain_lines": 96
+    },
+    {
+      "file": "api/smarthome_routes.py",
+      "lines": 188,
+      "estimated_gain_lines": 94
+    },
+    {
+      "file": "core/debug_ai_assistant.py",
+      "lines": 188,
+      "estimated_gain_lines": 94
+    },
+    {
+      "file": "core/deeplinks.py",
+      "lines": 188,
+      "estimated_gain_lines": 94
+    },
+    {
+      "file": "core/error_guidance_engine.py",
+      "lines": 188,
+      "estimated_gain_lines": 94
+    },
+    {
+      "file": "core/condition_monitoring_service.py",
+      "lines": 186,
+      "estimated_gain_lines": 93
+    },
+    {
+      "file": "api/document_ingestion_routes.py",
+      "lines": 185,
+      "estimated_gain_lines": 92
+    },
+    {
+      "file": "api/enterprise_auth_endpoints.py",
+      "lines": 183,
+      "estimated_gain_lines": 92
+    },
+    {
+      "file": "core/business_agents.py",
+      "lines": 182,
+      "estimated_gain_lines": 91
+    },
+    {
+      "file": "core/industry_workflow_endpoints.py",
+      "lines": 181,
+      "estimated_gain_lines": 90
+    },
+    {
+      "file": "core/conflict_resolution_service.py",
+      "lines": 180,
+      "estimated_gain_lines": 90
+    },
+    {
+      "file": "core/group_reflection_service.py",
+      "lines": 178,
+      "estimated_gain_lines": 89
+    },
+    {
+      "file": "core/apar_engine.py",
+      "lines": 177,
+      "estimated_gain_lines": 88
+    },
+    {
+      "file": "api/oauth_routes.py",
+      "lines": 174,
+      "estimated_gain_lines": 87
+    },
+    {
+      "file": "api/financial_routes.py",
+      "lines": 173,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "core/connection_service.py",
+      "lines": 173,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "core/event_sourced_architecture.py",
+      "lines": 173,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "api/mobile_canvas_routes.py",
+      "lines": 172,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "core/cron_parser.py",
+      "lines": 172,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "api/agent_guidance_routes.py",
+      "lines": 171,
+      "estimated_gain_lines": 86
+    },
+    {
+      "file": "api/integration_dashboard_routes.py",
+      "lines": 170,
+      "estimated_gain_lines": 85
+    },
+    {
+      "file": "core/social_post_generator.py",
+      "lines": 170,
+      "estimated_gain_lines": 85
+    },
+    {
+      "file": "core/canvas_docs_service.py",
+      "lines": 169,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/integration_enhancement_endpoints.py",
+      "lines": 169,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/npm_package_installer.py",
+      "lines": 169,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/byok_cost_optimizer.py",
+      "lines": 168,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/debug_insight_engine.py",
+      "lines": 168,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "tools/smarthome_tool.py",
+      "lines": 168,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/docling_processor.py",
+      "lines": 167,
+      "estimated_gain_lines": 84
+    },
+    {
+      "file": "core/local_ocr_service.py",
+      "lines": 166,
+      "estimated_gain_lines": 83
+    },
+    {
+      "file": "core/offline_sync_service.py",
+      "lines": 165,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "core/api_routes.py",
+      "lines": 164,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "core/expression_parser.py",
+      "lines": 164,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "core/reconciliation_engine.py",
+      "lines": 164,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "api/cognitive_tier_routes.py",
+      "lines": 163,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "core/debug_query.py",
+      "lines": 163,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "tools/productivity_tool.py",
+      "lines": 163,
+      "estimated_gain_lines": 82
+    },
+    {
+      "file": "api/project_health_routes.py",
+      "lines": 162,
+      "estimated_gain_lines": 81
+    },
+    {
+      "file": "api/episode_routes.py",
+      "lines": 161,
+      "estimated_gain_lines": 80
+    },
+    {
+      "file": "core/scheduled_messaging_service.py",
+      "lines": 159,
+      "estimated_gain_lines": 80
+    },
+    {
+      "file": "api/analytics_dashboard_endpoints.py",
+      "lines": 158,
+      "estimated_gain_lines": 79
+    },
+    {
+      "file": "api/creative_routes.py",
+      "lines": 157,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "api/sync_admin_routes.py",
+      "lines": 157,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/canvas_recording_service.py",
+      "lines": 157,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/constitutional_validator.py",
+      "lines": 157,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "api/dashboard_data_routes.py",
+      "lines": 156,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "api/productivity_routes.py",
+      "lines": 156,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/email_utils.py",
+      "lines": 156,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/smarthome/hue_service.py",
+      "lines": 156,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/debug_alerting.py",
+      "lines": 155,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/debug_prediction.py",
+      "lines": 155,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/jwt_verifier.py",
+      "lines": 155,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/reasoning_chain.py",
+      "lines": 155,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "core/workflow_template_manager.py",
+      "lines": 155,
+      "estimated_gain_lines": 78
+    },
+    {
+      "file": "api/auth_routes.py",
+      "lines": 154,
+      "estimated_gain_lines": 77
+    },
+    {
+      "file": "core/financial_audit_service.py",
+      "lines": 154,
+      "estimated_gain_lines": 77
+    },
+    {
+      "file": "core/media/sonos_service.py",
+      "lines": 153,
+      "estimated_gain_lines": 76
+    },
+    {
+      "file": "core/budget_enforcement_service.py",
+      "lines": 151,
+      "estimated_gain_lines": 76
+    },
+    {
+      "file": "core/agent_utils.py",
+      "lines": 150,
+      "estimated_gain_lines": 75
+    },
+    {
+      "file": "core/proactive_messaging_service.py",
+      "lines": 150,
+      "estimated_gain_lines": 75
+    },
+    {
+      "file": "tools/registry.py",
+      "lines": 150,
+      "estimated_gain_lines": 75
+    },
+    {
+      "file": "api/admin/business_facts_routes.py",
+      "lines": 149,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/debug_collector.py",
+      "lines": 149,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/push_notification_service.py",
+      "lines": 149,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/ab_testing_service.py",
+      "lines": 148,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/logging_config.py",
+      "lines": 148,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/formula_memory.py",
+      "lines": 147,
+      "estimated_gain_lines": 74
+    },
+    {
+      "file": "core/npm_dependency_scanner.py",
+      "lines": 146,
+      "estimated_gain_lines": 73
+    },
+    {
+      "file": "core/communication_service.py",
+      "lines": 145,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/debug_monitor.py",
+      "lines": 145,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/ai_trigger_coordinator.py",
+      "lines": 144,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/scheduler.py",
+      "lines": 144,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/skill_parser.py",
+      "lines": 144,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "api/document_routes.py",
+      "lines": 143,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/debug_insights/performance.py",
+      "lines": 143,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/feedback_advanced_analytics.py",
+      "lines": 143,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/pm_engine.py",
+      "lines": 143,
+      "estimated_gain_lines": 72
+    },
+    {
+      "file": "core/auth_helpers.py",
+      "lines": 142,
+      "estimated_gain_lines": 71
+    },
+    {
+      "file": "core/business_intelligence.py",
+      "lines": 142,
+      "estimated_gain_lines": 71
+    },
+    {
+      "file": "core/meta_agent_training_orchestrator.py",
+      "lines": 142,
+      "estimated_gain_lines": 71
+    },
+    {
+      "file": "core/oauth_user_context.py",
+      "lines": 142,
+      "estimated_gain_lines": 71
+    },
+    {
+      "file": "api/feedback_batch.py",
+      "lines": 141,
+      "estimated_gain_lines": 70
+    },
+    {
+      "file": "core/debug_cache.py",
+      "lines": 141,
+      "estimated_gain_lines": 70
+    },
+    {
+      "file": "core/debug_self_healing.py",
+      "lines": 141,
+      "estimated_gain_lines": 70
+    },
+    {
+      "file": "core/rating_sync_service.py",
+      "lines": 140,
+      "estimated_gain_lines": 70
+    },
+    {
+      "file": "core/llm/cognitive_tier_service.py",
+      "lines": 139,
+      "estimated_gain_lines": 70
+    },
+    {
+      "file": "api/feedback_enhanced.py",
+      "lines": 138,
+      "estimated_gain_lines": 69
+    },
+    {
+      "file": "core/base_routes.py",
+      "lines": 138,
+      "estimated_gain_lines": 69
+    },
+    {
+      "file": "core/ai_workflow_optimization_endpoints.py",
+      "lines": 137,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/byok_competitive_endpoints.py",
+      "lines": 137,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/error_middleware.py",
+      "lines": 137,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/im_governance_service.py",
+      "lines": 137,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/local_llm_secrets_detector.py",
+      "lines": 137,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/agent_communication.py",
+      "lines": 136,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/resource_guards.py",
+      "lines": 136,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/governance_config.py",
+      "lines": 135,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/supervisor_performance_service.py",
+      "lines": 135,
+      "estimated_gain_lines": 68
+    },
+    {
+      "file": "core/agent_execution_service.py",
+      "lines": 134,
+      "estimated_gain_lines": 67
+    },
+    {
+      "file": "core/condition_checkers.py",
+      "lines": 134,
+      "estimated_gain_lines": 67
+    },
+    {
+      "file": "core/error_handler_decorator.py",
+      "lines": 132,
+      "estimated_gain_lines": 66
+    },
+    {
+      "file": "core/skill_composition_engine.py",
+      "lines": 132,
+      "estimated_gain_lines": 66
+    },
+    {
+      "file": "api/workflow_template_routes.py",
+      "lines": 131,
+      "estimated_gain_lines": 66
+    },
+    {
+      "file": "core/agent_request_manager.py",
+      "lines": 130,
+      "estimated_gain_lines": 65
+    },
+    {
+      "file": "core/analytics_engine.py",
+      "lines": 130,
+      "estimated_gain_lines": 65
+    },
+    {
+      "file": "core/governance_helper.py",
+      "lines": 130,
+      "estimated_gain_lines": 65
+    },
+    {
+      "file": "api/email_verification_routes.py",
+      "lines": 129,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/canvas_orchestration_service.py",
+      "lines": 129,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/task_queue.py",
+      "lines": 129,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/view_coordinator.py",
+      "lines": 129,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/agent_promotion_service.py",
+      "lines": 128,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "api/agent_status_endpoints.py",
+      "lines": 127,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/governance_decorator.py",
+      "lines": 127,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/package_feature_service.py",
+      "lines": 127,
+      "estimated_gain_lines": 64
+    },
+    {
+      "file": "core/package_installer.py",
+      "lines": 126,
+      "estimated_gain_lines": 63
+    },
+    {
+      "file": "core/smarthome/home_assistant_service.py",
+      "lines": 126,
+      "estimated_gain_lines": 63
+    },
+    {
+      "file": "api/line_routes.py",
+      "lines": 125,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/privsec/audit_logger.py",
+      "lines": 125,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "api/task_monitoring_routes.py",
+      "lines": 124,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/pii_redactor.py",
+      "lines": 124,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "api/skill_routes.py",
+      "lines": 123,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/auth_endpoints.py",
+      "lines": 123,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/competitive_advantage_dashboard.py",
+      "lines": 123,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/debug_streaming.py",
+      "lines": 123,
+      "estimated_gain_lines": 62
+    },
+    {
+      "file": "core/communication_intelligence.py",
+      "lines": 122,
+      "estimated_gain_lines": 61
+    },
+    {
+      "file": "core/mcp_service.py",
+      "lines": 122,
+      "estimated_gain_lines": 61
+    },
+    {
+      "file": "core/background_agent_runner.py",
+      "lines": 121,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "core/workforce_analytics.py",
+      "lines": 121,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "api/canvas_collaboration.py",
+      "lines": 120,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "core/chronological_integrity.py",
+      "lines": 120,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "tools/agent_guidance_canvas_tool.py",
+      "lines": 120,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "api/custom_components.py",
+      "lines": 119,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "core/analytics_endpoints.py",
+      "lines": 119,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "core/autonomous_supervisor_service.py",
+      "lines": 119,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "core/package_governance_service.py",
+      "lines": 119,
+      "estimated_gain_lines": 60
+    },
+    {
+      "file": "api/ai_accounting_routes.py",
+      "lines": 117,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "api/canvas_type_routes.py",
+      "lines": 117,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "core/debug_insights/error_causality.py",
+      "lines": 117,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "core/privsec/token_encryption.py",
+      "lines": 117,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "core/skill_dynamic_loader.py",
+      "lines": 117,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "api/workflow_debugging_advanced.py",
+      "lines": 116,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "core/local_agent_service.py",
+      "lines": 116,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "core/agent_task_registry.py",
+      "lines": 115,
+      "estimated_gain_lines": 58
+    },
+    {
+      "file": "api/analytics_dashboard_routes.py",
+      "lines": 114,
+      "estimated_gain_lines": 57
+    },
+    {
+      "file": "api/health_routes.py",
+      "lines": 114,
+      "estimated_gain_lines": 57
+    },
+    {
+      "file": "core/atom_saas_client.py",
+      "lines": 114,
+      "estimated_gain_lines": 57
+    },
+    {
+      "file": "core/health_monitor.py",
+      "lines": 113,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "core/active_intervention_service.py",
+      "lines": 112,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "core/financial_audit_orchestrator.py",
+      "lines": 112,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "api/canvas_recording_routes.py",
+      "lines": 111,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "core/governance_wrapper.py",
+      "lines": 111,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "core/secrets_redactor.py",
+      "lines": 111,
+      "estimated_gain_lines": 56
+    },
+    {
+      "file": "api/monitoring_routes.py",
+      "lines": 109,
+      "estimated_gain_lines": 54
+    },
+    {
+      "file": "core/package_dependency_scanner.py",
+      "lines": 109,
+      "estimated_gain_lines": 54
+    },
+    {
+      "file": "api/deeplinks.py",
+      "lines": 108,
+      "estimated_gain_lines": 54
+    },
+    {
+      "file": "core/feedback_analytics.py",
+      "lines": 107,
+      "estimated_gain_lines": 54
+    },
+    {
+      "file": "core/token_refresher.py",
+      "lines": 107,
+      "estimated_gain_lines": 54
+    },
+    {
+      "file": "api/messenger_routes.py",
+      "lines": 106,
+      "estimated_gain_lines": 53
+    },
+    {
+      "file": "core/agent_learning_enhanced.py",
+      "lines": 106,
+      "estimated_gain_lines": 53
+    },
+    {
+      "file": "core/canvas_email_service.py",
+      "lines": 106,
+      "estimated_gain_lines": 53
+    },
+    {
+      "file": "core/monitoring.py",
+      "lines": 106,
+      "estimated_gain_lines": 53
+    },
+    {
+      "file": "core/websocket_manager.py",
+      "lines": 106,
+      "estimated_gain_lines": 53
+    },
+    {
+      "file": "api/reconciliation_routes.py",
+      "lines": 105,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/host_shell_service.py",
+      "lines": 105,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/circuit_breaker.py",
+      "lines": 104,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/skill_sandbox.py",
+      "lines": 104,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/audit_service.py",
+      "lines": 103,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/pm_swarm.py",
+      "lines": 103,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "core/uptime_tracker.py",
+      "lines": 103,
+      "estimated_gain_lines": 52
+    },
+    {
+      "file": "api/channel_routes.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "api/user_activity_routes.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "core/api_governance.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "core/database_helper.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "core/skill_marketplace_service.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "core/user_context_manager.py",
+      "lines": 102,
+      "estimated_gain_lines": 51
+    },
+    {
+      "file": "api/apar_routes.py",
+      "lines": 101,
+      "estimated_gain_lines": 50
+    },
+    {
+      "file": "core/chat_process_manager.py",
+      "lines": 101,
+      "estimated_gain_lines": 50
+    },
+    {
+      "file": "core/condition_evaluator.py",
+      "lines": 100,
+      "estimated_gain_lines": 50
+    },
+    {
+      "file": "core/hybrid_retrieval_service.py",
+      "lines": 100,
+      "estimated_gain_lines": 50
+    }
+  ]
+}

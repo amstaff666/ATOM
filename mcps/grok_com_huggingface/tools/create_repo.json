@@ -1,0 +1,45 @@
+{
+  "name": "create_repo",
+  "description": "Create a Hugging Face model, dataset, space, or bucket repository.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Fully-qualified repository name in 'namespace/repo-name' format."
+      },
+      "repo_type": {
+        "type": "string",
+        "enum": [
+          "model",
+          "dataset",
+          "space",
+          "bucket"
+        ],
+        "default": "bucket",
+        "description": "Repository type. Defaults to bucket."
+      },
+      "private": {
+        "type": "boolean",
+        "description": "Whether to create the repository as private."
+      },
+      "sdk": {
+        "type": "string",
+        "enum": [
+          "streamlit",
+          "gradio",
+          "docker",
+          "static"
+        ],
+        "default": "static",
+        "description": "SDK type - only required for repo_type='space'."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

@@ -1,0 +1,92 @@
+---
+pid: 20604
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "Set-Location \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\"; $env:PYTHONPATH=\"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\"; python -m uvicorn main_api_app:app --host 127.0.0.1 --port 4492"
+started_at: 2026-06-17T16:26:14.671Z
+running_for_ms: 10815008 
+---
+Failed to decrypt API key anthropic_default_production: 
+Failed to decrypt API key openai_default_shared_production: 
+Failed to decrypt API key deepseek_default_shared_production: 
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\llm\byok_handler.py:258: SAWarning: relationship 'Machine.session' will copy column machines.id to column guacamole_sessions.machine_id, which conflicts with relationship(s): 'Machine.guacamole_sessions' (copies machines.id to guacamole_sessions.machine_id). If this is not the intention, consider if these relationships should be linked with back_populates, or if viewonly=True should be applied to one or more if they are read-only. For the less common case that foreign key constraints are partially overlapping, the orm.foreign() annotation can be used to isolate the columns that should be written towards.   To silence this warning, add the parameter 'overlaps="guacamole_sessions"' to the 'Machine.session' relationship. (Background on this warning at: https://sqlalche.me/e/20/qzyx) (This warning originated from the `configure_mappers()` process, which was invoked automatically in response to a user-initiated operation.)
+  ).all()
+LanceDB not initialized, chat history disabled
+Workflow automation integration unavailable
+Failed to decrypt API key anthropic_default_production: 
+Failed to decrypt API key openai_default_production: 
+Failed to decrypt API key deepseek_default_production: 
+WARNING: IntegrationLoader could not be imported (likely numpy/lancedb issue)WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+
+WARNING:ATOM_SERVER:Failed to load community skill routes: No module named 'frontmatter'
+{"level": "WARNING", "message": "Failed to register media tools: cannot import name 'tool_registry' from 'tools.registry' (I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\\backend\\tools\\registry.py)", "timestamp": "2026-06-17T16:26:22.791995", "logger": "tools.media_tool", "module": "structured_logger", "function": "_log", "line": 118}
+WARNING:core.media.sonos_service:SoCo library not installed - Sonos functions will fail
+WARNING:tools.media_tool:Failed to register media tools: cannot import name 'tool_registry' from 'tools.registry' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\tools\registry.py)
+WARNING:ATOM_SERVER:Failed to load media routes: No module named 'api.authentication'
+WARNING:ATOM_SERVER:Failed to load media routes: No module named 'api.authentication'
+WARNING:ATOM_SERVER:Failed to load Episodic Memory routes: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Failed to load Canvas routes: No module named 'frontmatter'
+WARNING:core.app_secrets:Failed to initialize encryption: cannot import name 'PBKDF2' from 'cryptography.hazmat.primitives.kdf.pbkdf2' (C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\cryptography\hazmat\primitives\kdf\pbkdf2.py)
+WARNING:ATOM_SERVER:Failed to load Task Monitoring routes: No module named 'redis'
+ERROR:core.byok_endpoints:Failed to decrypt API key anthropic_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key openai_ai_employee_shared_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key deepseek_ai_employee_shared_production: 
+WARNING:ATOM_SERVER:Communication webhooks not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Demo routes not found: No module named 'api.demo_routes'
+WARNING:ATOM_SERVER:AI endpoints not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Workflow DNA Analytics not available: cannot import name 'WorkflowExecutionLog' from 'analytics.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\analytics\models.py)
+WARNING:integrations.workflow_automation_routes:Enhanced workflow automation components not available: No module named 'backend.python_api_service'
+WARNING:ATOM_SERVER:Auth endpoints or 2FA routes not found, skipping.
+WARNING:core.agent_communication:Redis not available, using in-memory pub/sub only
+WARNING:core.pii_redactor:Presidio not available. Install with: pip install presidio-analyzer presidio-anonymizer spacy. Falling back to regex-only redaction.
+WARNING:ATOM_SERVER:Channel routes not found: cannot import name 'Channel' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Competitor analysis routes not found: cannot import name 'CompetitorAnalysis' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Learning plan routes not found: cannot import name 'LearningPlan' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Chat routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Risk routes not found: cannot import name 'customer_protection' from 'core.risk_prevention' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\risk_prevention.py)
+WARNING:ATOM_SERVER:Messaging routes not found: cannot import name 'ProactiveMessageStatus' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:root:Discord integration services not available: No module named 'atom_ingestion_pipeline'
+WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+WARNING:ATOM_SERVER:Scheduled messaging routes not found: No module named 'frontmatter'
+WARNING:root:Core LanceDB and Communication handlers not found (No module named 'frontmatter'). Using local fallbacks for development.
+WARNING:ATOM_SERVER:Condition monitoring routes not found: No module named 'frontmatter'
+WARNING:root:Google Chat integration services not available: No module named 'atom_ingestion_pipeline'
+WARNING:integrations.adapters.signal_adapter:Signal adapter not configured or httpx not available
+WARNING:integrations.adapters.messenger_adapter:Facebook Messenger adapter not configured or httpx not available
+WARNING:integrations.adapters.line_adapter:LINE adapter not configured or httpx not available
+WARNING:ATOM_SERVER:Canvas routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Production health check routes not found: No module named 'prometheus_client'
+WARNING:ATOM_SERVER:Browser automation routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Device capabilities routes not found: No module named 'frontmatter'
+WARNING:ATOM_SERVER:Edition routes not found: cannot import name 'get_db' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Agent coordination routes not found: No module named 'core.auth_routes'
+WARNING:ATOM_SERVER:Custom components routes not found: cannot import name 'ComponentVersion' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:ATOM_SERVER:Auto-installation routes not found: No module named 'docker'
+WARNING:ATOM_SERVER:User workflow templates routes not found: cannot import name 'TemplateVersion' from 'core.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\core\models.py)
+WARNING:core.token_storage:Initializing DEPRECATED TokenStorage. Please migrate to ConnectionService.
+WhatsApp Business: DEMO MODE - Use real API credentials for productionWARNING:ATOM_SERVER:Live Command Center APIs not found: cannot import name 'microsoft365_service' from 'integrations.microsoft365_service' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\integrations\microsoft365_service.py)
+WARNING:ATOM_SERVER:Workflow DNA plugin not found: cannot import name 'WorkflowExecutionLog' from 'analytics.models' (I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend\analytics\models.py)
+
+WARNING:integrations.whatsapp_configuration_setup:Missing required WhatsApp configuration, using demo mode
+ERROR:integrations.whatsapp_configuration_setup:Error creating WhatsApp configuration: [Errno 2] No such file or directory: '/tmp/whatsapp_demo_config.json'
+WARNING:integrations.whatsapp_business_integration:Database connection failed in demo mode: connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+Is the server running on that host and accepting TCP/IP connections?
+
+ERROR:integrations.whatsapp_service_manager:Error registering WhatsApp service: [Errno 2] No such file or directory: '/tmp/whatsapp_business_registration.json'
+WARNING:root:Enterprise services not available: No module named 'ai_enhanced_service'. Using stubs/None.
+ERROR:core.byok_endpoints:Failed to decrypt API key anthropic_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key openai_default_production: 
+ERROR:core.byok_endpoints:Failed to decrypt API key deepseek_default_production: 
+WARNING:ATOM_SERVER:Demo routes not found: No module named 'api.demo_routes'
+WARNING:ATOM_SERVER:Email Verification routes not found: email-validator is not installed, run `pip install 'pydantic[email]'`
+WARNING:ATOM_SERVER:Tenant routes not found: No module named 'api.tenant_routes'
+WARNING:ATOM_SERVER:Admin routes not found: email-validator is not installed, run `pip install 'pydantic[email]'`
+INFO:     Started server process [23812]
+INFO:     Waiting for application startup.
+WARNING:core.lazy_integration_registry:✗ oauth not available: No module named 'oauth_routes'
+WARNING:core.lazy_integration_registry:✗ openai not available: No module named 'integrations.openai_routes'
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:4492 (Press CTRL+C to quit)
+WARNING:core.auth:⚠️ Using local development auth fallback user
+INFO:     127.0.0.1:20612 - "POST /api/documents/upload HTTP/1.1" 200 OK

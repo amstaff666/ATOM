@@ -1,0 +1,30 @@
+{
+  "name": "gr1_clip_interrogator_2_generate_image_prompt",
+  "description": "Generate a Stable Diffusion 2.0 prompt description from an input image. Use this tool when you need to interrogate an image with CLIP Interrogator 2.1 and produce a text prompt. If a user passes a file as an input, use the upload_file_to_gradio tool, if present, to upload the file to the gradio app and create a Gradio File Input. Then use the returned path as the input to the tool. Returns: str: Generated prompt description, or an upload prompt when no image is provided. (from fffiloni/CLIP-Interrogator-2)",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "input_image": {
+        "type": "string",
+        "description": "PIL image to describe."
+      },
+      "interrogation_mode": {
+        "type": "string",
+        "enum": [
+          "best",
+          "classic",
+          "fast"
+        ],
+        "description": "Interrogation mode to use: best, classic, or fast.",
+        "default": "best"
+      },
+      "best_mode_max_flavors": {
+        "type": "number",
+        "description": "Maximum number of flavors used only when interrogation_mode is best.",
+        "default": 4
+      }
+    },
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

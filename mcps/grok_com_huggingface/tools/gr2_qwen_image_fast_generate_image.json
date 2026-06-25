@@ -1,0 +1,48 @@
+{
+  "name": "gr2_qwen_image_fast_generate_image",
+  "description": "Generates an image based on a text prompt using the Qwen-Image-Lightning model. Returns: tuple[Image.Image, int]: A tuple containing the generated PIL Image and, the integer seed used for the generation. (from mcp-tools/Qwen-Image-Fast)",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "Detailed Prompt that clearly describe your desired image, including subject characteristics, visual style, composition, and spatial relationships. If you want specific text to appear in the image, put it in \"quotation marks\" and specify where it should be placed (e.g.,top-left corner) and its style. Choose a specific visual style that matches your intent (e.g., realistic photography, watercolor, anime), and keep your prompt under 200 words for best results."
+      },
+      "seed": {
+        "type": "number",
+        "description": "The seed for the random number generator for reproducibility."
+      },
+      "randomize_seed": {
+        "type": "boolean",
+        "description": "If True, a random seed is used.",
+        "default": true
+      },
+      "aspect_ratio": {
+        "type": "string",
+        "enum": [
+          "1:1",
+          "16:9",
+          "9:16",
+          "4:3",
+          "3:4",
+          "3:2",
+          "2:3"
+        ],
+        "description": "The desired aspect ratio of the output image.",
+        "default": "16:9"
+      },
+      "guidance_scale": {
+        "type": "number",
+        "description": "Corresponds to `true_cfg_scale`. A higher value",
+        "default": 1
+      },
+      "num_inference_steps": {
+        "type": "number",
+        "description": "The number of denoising steps.",
+        "default": 8
+      }
+    },
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

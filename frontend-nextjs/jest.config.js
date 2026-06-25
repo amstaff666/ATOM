@@ -1,0 +1,168 @@
+module.exports = {
+  testEnvironment: "jsdom",
+  setupFiles: ["<rootDir>/tests/polyfills.ts"],
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
+  transform: {
+    "^.+\\.(ts|tsx)$": ["ts-jest", {
+      tsconfig: {
+        jsx: "react",
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      },
+    }],
+    "^.+\\.(js|jsx)$": "babel-jest",
+  },
+  preset: "ts-jest",
+  testMatch: [
+    // Shared property tests (Phase 147: Cross-Platform Property Testing)
+    "<rootDir>/shared/property-tests/**/*.ts",
+    // Standard test files
+    "<rootDir>/tests/**/*.test.(ts|tsx|js)",
+    "<rootDir>/components/**/__tests__/**/*.test.(ts|tsx|js)",
+    "<rootDir>/components/**/__tests__/**/*.a11y.test.(ts|tsx)",
+    "<rootDir>/lib/**/__tests__/**/*.test.(ts|tsx|js)",
+    "<rootDir>/hooks/**/__tests__/**/*.test.(ts|tsx|js)"
+  ],
+  collectCoverageFrom: [
+    "components/**/*.{ts,tsx}",
+    "pages/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "hooks/**/*.{ts,tsx}",
+    "!**/*.d.ts",
+    "!**/node_modules/**",
+    "!**/.next/**",
+    "!**/__tests__/**",
+    "!**/*.test.{ts,tsx,js}",
+  ],
+  coverageDirectory: "coverage",
+  coverageReporters: ["json", "json-summary", "text", "lcov"],
+  // Progressive coverage thresholds (Phase 153)
+  // Phase 1 (70%): Baseline enforcement
+  // Phase 2 (75%): Interim target
+  // Phase 3 (80%): Final target
+  // New code: Always 80% regardless of phase
+  // Set COVERAGE_PHASE environment variable to control phase
+  get coverageThreshold() {
+    const phase = process.env.COVERAGE_PHASE || 'phase_1';
+
+    const thresholds = {
+      phase_1: {
+        branches: 70,
+        functions: 70,
+        lines: 70,
+        statements: 70,
+      },
+      phase_2: {
+        branches: 75,
+        functions: 75,
+        lines: 75,
+        statements: 75,
+      },
+      phase_3: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
+    };
+
+    return {
+      global: thresholds[phase],
+      // New code always requires 80% regardless of phase
+      './src/**/*.{ts,tsx}': {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
+      // Utilities - critical infrastructure, highly testable
+      './lib/**/*.{ts,tsx}': {
+        branches: 85,
+        functions: 90,
+        lines: 90,
+        statements: 90,
+      },
+      // Custom hooks - testable with renderHook pattern
+      './hooks/**/*.{ts,tsx}': {
+        branches: 80,
+        functions: 85,
+        lines: 85,
+        statements: 85,
+      },
+      // Canvas components - maintain existing good coverage (73% baseline)
+      './components/canvas/**/*.{ts,tsx}': {
+        branches: 80,
+        functions: 85,
+        lines: 85,
+        statements: 85,
+      },
+      // UI components - standard component testing
+      './components/ui/**/*.{ts,tsx}': {
+        branches: 75,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
+      // Integration components - graduated rollout complete (70% -> 80%)
+      './components/integrations/**/*.{ts,tsx}': {
+        branches: 70,
+        functions: 75,
+        lines: 80,  // Raised from 70%
+        statements: 75,
+      },
+      // Next.js pages
+      './pages/**/*.{ts,tsx}': {
+        branches: 75,
+        functions: 75,
+        lines: 80,
+        statements: 75,
+      },
+    };
+  },
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(chakra-ui|@chakra-ui|@emotion|@mui|@tauri-apps|got|msw|@mswjs|@mswjs/interceptors|axios))"
+  ],
+
+  // Performance optimizations (Phase 134-11)
+  maxWorkers: '50%', // Use half of available CPU cores for parallel execution
+  cache: true, // Enable Jest cache (default: true, ensure not disabled)
+  clearMocks: true, // Clear mocks automatically between tests
+  resetMocks: true, // Reset mocks automatically between tests
+  restoreMocks: true, // Restore mocks automatically between tests
+
+  // Reduce test overhead
+  testTimeout: 10000, // Default timeout (10s)
+  bail: false, // Don't stop on first failure (default)
+
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1",
+    "^@pages/(.*)$": "<rootDir>/pages/$1",
+    "^@layouts/(.*)$": "<rootDir>/layouts/$1",
+    "^@components/(.*)$": "<rootDir>/components/$1",
+    "^@lib/(.*)$": "<rootDir>/lib/$1",
+    "^@hooks/(.*)$": "<rootDir>/hooks/$1",
+    "^@atom/test-utils(.*)$": "<rootDir>/shared/test-utils$1",
+    "^@atom/property-tests(.*)$": "<rootDir>/shared/property-tests$1",
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+  },
+
+  // Property test results output (Phase 147-03)
+  // Use --json flag for property tests: npm test -- shared-invariants --ci --json --outputFile=coverage/jest-frontend-property-results.json
+  reporters: ['default'],
+
+  // Retry Configuration for Flaky Test Detection (Phase 151-02)
+  // Used by scripts/jest-retry-wrapper.js for multi-run verification
+  // See: .planning/phases/151-quality-infrastructure-reliability/151-RESEARCH.md
+  // NOTE: jest-circus retry options commented out - not currently supported
+  // testRunner: 'jest-circus',
+  // retryTimeoutMs: 30000,
+  // maxRetries: 3,
+
+  // Export retry config for wrapper script (unused)
+  // module.exports.retryConfig = {
+  //   timeoutMs: 30000,
+  //   maxAttempts: 3,
+  //   delayMs: 1000,
+  // };
+};

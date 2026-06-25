@@ -1,0 +1,126 @@
+# Intelligence & Memory Documentation
+
+AI capabilities, knowledge management, and cognitive systems.
+
+## Core Intelligence
+
+### LLM & Cognition
+- **[BYOK V6 Migration Guide](BYOK_V6_MIGRATION_GUIDE.md)** - LLM service migration (if exists)
+- **[Cognitive Tier System](COGNITIVE_TIER_SYSTEM.md)** - 5-tier intelligent LLM routing (if exists in root, otherwise reference)
+
+### World Model & Knowledge
+- **[AI World Model](intelligence/world-model-guide.md)** - Knowledge representation
+- **[GraphRAG and Entity Types](intelligence/graphrag.md)** - Graph-based intelligence
+- **[GraphRAG Ported](GRAPHRAG_PORTED.md)** - GraphRAG implementation
+
+### Business Facts & Citations
+- **[JIT Fact Provision System](intelligence/jit-facts.md)** - Just-in-time fact retrieval
+- **[Citation System Guide](intelligence/jit-facts.md)** - Citation management
+- **[JIT Verification Quickstart](JIT_VERIFICATION_QUICKSTART.md)** - Quick setup
+- **[JIT Verification Agent Compliance](JIT_VERIFICATION_AGENT_COMPLIANCE.md)** - Compliance checks
+- **[JIT Verification Cache](JIT_VERIFICATION_CACHE.md)** - Caching layer
+
+## Memory & Learning
+
+### Episodic Memory
+- **[Episodic Memory Implementation](episodic-memory.md)** - Memory system overview
+- **[Episodic Memory Quick Start](episodic-quickstart.md)** - Getting started
+- **[Canvas & Feedback Episodic Memory](../canvas/feedback-memory.md)** - Canvas-linked memory
+
+### Self-Evolution ✨ NEW
+- **[Self-Evolution & Reflection Pool](self-evolution.md)** - Agents learn from mistakes, generate skills, optimize capabilities
+  - Reflection Pool (critique-based mistakes storage)
+  - Memento-Skills (generate new skills from failures)
+  - AlphaEvolver (optimize existing skills)
+  - Integration with episodic memory and graduation
+
+### Agent Learning
+- **[Agent Graduation Guide](../agents/graduation.md)** - Agent promotion system
+- **[Student Agent Training](STUDENT_AGENT_TRAINING_IMPLEMENTATION.md)** - Training workflow
+
+## Canvas Intelligence
+
+### Canvas Summaries
+- **[LLM Canvas Summaries](../canvas/llm-summaries.md)** - AI-generated summaries
+- **[Canvas Agent Learning Integration](CANVAS_AGENT_LEARNING_INTEGRATION.md)** - Learning from canvas
+
+### Canvas State
+- **[Canvas AI Accessibility](../canvas/ai-accessibility.md)** - AI-readable canvas state
+- **[Canvas State API](CANVAS_STATE_API.md)** - State API
+- **[Canvas Quick Reference](CANVAS_QUICK_REFERENCE.md)** - Quick reference
+- **[Canvas Recording Implementation](canvas/recording.md)** - Recording system
+- **[Specialized Canvas Types](SPECIALIZED_CANVAS_TYPES_IMPLEMENTATION_COMPLETE.md)** - Custom components (archived)
+- **[Recording Review Integration](canvas/recording.md)** - Review workflow
+
+## Error Handling & Debugging
+
+### AI Debug System
+- **[AI Debug Quick Start](AI_DEBUG_QUICK_START.md)** - Debug setup
+- **[AI Debug System](AI_DEBUG_SYSTEM.md)** - Debug architecture
+
+### Error Handling
+- **[Error Handling Guidelines](ERROR_HANDLING_GUIDELINES.md)** - Error patterns
+- **[Error Handling Standard](ERROR_HANDLING_STANDARD.md)** - Standards
+
+## Supervision & Multi-Level Learning
+
+### Supervision
+- **[Supervision Implementation](../agents/supervision-implementation.md)** - Supervision levels and real-time monitoring
+
+## Key Concepts
+
+### Memory Architecture
+```
+User Request → World Model → Episodic Memory → Knowledge Graph → LLM Response
+```
+
+### Knowledge Types
+- **Episodic Memory**: Past experiences and outcomes
+- **Business Facts**: Verified truths with citations
+- **Knowledge Graph**: Entities and relationships
+- **Formulas**: Business logic and calculations
+
+### Intelligence Flow
+1. **Input**: User request or data event
+2. **Retrieval**: Memory + Knowledge + Facts
+3. **Reasoning**: LLM with retrieved context
+4. **Learning**: Store experience for future
+5. **Graduation**: Update agent maturity
+
+## Quick Links
+
+### By Feature
+- **Memory**: [Episodic Memory](intelligence/episodic-memory.md)
+- **Knowledge**: [World Model](intelligence/world-model-guide.md)
+- **Graph**: [GraphRAG](intelligence/graphrag.md)
+- **Facts**: [JIT Fact Provision](intelligence/jit-facts.md)
+
+### By Use Case
+- **Learning from Interactions**: [Memory Integration Guide](MEMORY_INTEGRATION_GUIDE.md)
+- **Self-Evolution & Mistakes**: [Self-Evolution & Reflection Pool](self-evolution.md) ✨ NEW
+- **Storing Business Knowledge**: [Citation System Guide](intelligence/jit-facts.md)
+- **AI Summaries**: [LLM Canvas Summaries](../canvas/llm-summaries.md)
+- **Error Recovery**: [Error Handling Guidelines](ERROR_HANDLING_GUIDELINES.md)
+
+## Performance
+
+| System | Latency | Notes |
+|--------|---------|-------|
+| Episodic Recall | ~10-100ms | Temporal vs Semantic |
+| Knowledge Graph | ~50-80ms | Local search |
+| Reflection Pool | ~50-100ms | Vector similarity search |
+| JIT Fact Verification | <500ms | With citation check |
+| Canvas Summary | ~2-3s | LLM generation |
+| Memento-Skill Generation | ~30-60s | LLM code generation |
+| AlphaEvolver Optimization | ~2-5min | Per generation |
+
+## See Also
+
+- **[Agent System](../agents/)** - Agent governance and learning
+- **[Auto-Dev User Guide](../GUIDES/AUTO_DEV_USER_GUIDE.md)** - Self-evolving agent capabilities
+- **[Canvas Documentation](../canvas/)** - Canvas presentations
+- **[API Documentation](../API/)** - Intelligence API endpoints
+
+---
+
+*Last Updated: April 12, 2026*

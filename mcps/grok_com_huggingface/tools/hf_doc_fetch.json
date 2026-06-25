@@ -1,0 +1,24 @@
+{
+  "name": "hf_doc_fetch",
+  "description": "Fetch a document from the Hugging Face or Gradio documentation library. For large documents, use offset to get subsequent chunks.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "doc_url": {
+        "type": "string",
+        "maxLength": 200,
+        "description": "Documentation URL (Hugging Face or Gradio)"
+      },
+      "offset": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Token offset for large documents (use the offset from truncation message)"
+      }
+    },
+    "required": [
+      "doc_url"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

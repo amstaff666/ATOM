@@ -1,0 +1,5 @@
+# Screenshots and videos
+*.png
+*.webm
+*.mp4
+!.gitkeep

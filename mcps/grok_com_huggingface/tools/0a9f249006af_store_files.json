@@ -1,0 +1,12 @@
+{
+  "name": "0a9f249006af_store_files",
+  "description": "FastMCP app backend action discovered from file_manager.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "files": {}
+    },
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "name": "hub_repo_details",
+  "description": "Get details for one or more Hugging Face repos (model, dataset, or space). Auto-detects type unless specified. For datasets, use operations: overview, dataset_structure, dataset_preview. Use dataset_structure first to discover configs, splits, sizes, and schema. Use dataset_preview only when config and split are known, unless the dataset has a single config/split. README file may be requested from the external repository.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "repo_ids": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minItems": 1,
+        "maxItems": 10,
+        "description": "Repo IDs for (models|dataset/space) - usually in author/name format (e.g. openai/gpt-oss-120b)"
+      },
+      "repo_type": {
+        "type": "string",
+        "enum": [
+          "model",
+          "dataset",
+          "space"
+        ],
+        "description": "Specify lookup type; otherwise auto-detects"
+      },
+      "include_readme": {
+        "type": "boolean",
+        "default": false,
+        "description": "Include README from the repo"
+      },
+      "operations": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "overview",
+            "dataset_structure",
+            "dataset_preview"
+          ]
+        },
+        "description": "Details to return. Defaults to [\"overview\"]. For datasets, prefer [\"overview\", \"dataset_structure\"] first; then call [\"dataset_preview\"] with config and split."
+      },
+      "config": {
+        "type": "string",
+        "description": "Dataset Viewer config. Required for dataset_preview when the dataset has multiple config/split options. Discover via dataset_structure."
+      },
+      "split": {
+        "type": "string",
+        "description": "Dataset Viewer split. Required for dataset_preview when the dataset has multiple config/split options. Discover via dataset_structure."
+      },
+      "offset": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Row offset for dataset_preview. Defaults to 0."
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Row count for dataset_preview. Defaults to 5 and is clamped to 1-100."
+      }
+    },
+    "required": [
+      "repo_ids"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

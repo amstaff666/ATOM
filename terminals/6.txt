@@ -1,0 +1,35 @@
+---
+pid: 8608
+cwd: "I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom"
+command: "Stop-Process -Id 84260 -Force -ErrorAction SilentlyContinue; Start-Sleep -Seconds 2; Set-Location \"I:\\Devdrive\\NORDEAPDFOS\\pdf-ai-orchestrator\\atom\"; python scripts/start_backend.py"
+started_at: 2026-06-17T16:14:32.779Z
+running_for_ms: 11504999 
+---
+🌟 ATOM Platform Backend Starting...
+🔧 Running Atom self-heal...
+
+🔍 Checking Python Version...
+✅ Python version: 3.14.4
+
+🔍 Checking Required Packages...
+✅ Required packages installed
+
+🔍 Checking Environment...
+✅ Environment variables configured
+
+🔍 Checking Directories...
+✅ Directories created
+
+🔍 Checking Backend File...
+✅ Backend file found
+
+🔧 ATOM Platform Backend
+========================================
+📍 Current Directory: I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom
+🐍 Python Path: C:\Users\info\AppData\Local\Python\pythoncore-3.14-64\python.exe
+
+🚀 Starting ATOM Backend...
+📍 Changed to directory: I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\backend
+❌ Failed to import backend: No module named 'main_api_app'
+
+❌ Backend startup failed.

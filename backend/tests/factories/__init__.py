@@ -1,0 +1,57 @@
+"""
+Test data factories for Atom platform.
+
+Uses factory_boy for dynamic, isolated test data generation.
+All factories inherit from BaseFactory which manages SQLAlchemy sessions.
+
+IMPORTANT: All factory calls in test environment MUST include _session parameter:
+    AgentFactory.create(_session=db_session, ...)
+
+See: backend/tests/factories/README.md for complete documentation.
+"""
+
+from tests.factories.base import BaseFactory
+from tests.factories.agent_factory import (
+    AgentFactory,
+    StudentAgentFactory,
+    InternAgentFactory,
+    SupervisedAgentFactory,
+    AutonomousAgentFactory,
+)
+from tests.factories.user_factory import UserFactory, AdminUserFactory, MemberUserFactory
+from tests.factories.episode_factory import EpisodeFactory, EpisodeSegmentFactory
+from tests.factories.execution_factory import AgentExecutionFactory
+from tests.factories.canvas_factory import CanvasAuditFactory
+from tests.factories.chat_session_factory import ChatSessionFactory
+from tests.factories.workspace_factory import WorkspaceFactory, TeamFactory
+# NOTE: WorkflowStepExecution import broken - commented out for Phase 168
+# from tests.factories.workflow_factory import WorkflowExecutionFactory, WorkflowStepExecutionFactory
+from tests.factories.workflow_factory import WorkflowExecutionFactory
+from tests.factories.feedback_factory import AgentFeedbackFactory
+from tests.factories.training_factory import BlockedTriggerContextFactory, AgentProposalFactory
+from tests.factories.operation_tracker_factory import AgentOperationTrackerFactory
+
+__all__ = [
+    'BaseFactory',
+    'AgentFactory',
+    'StudentAgentFactory',
+    'InternAgentFactory',
+    'SupervisedAgentFactory',
+    'AutonomousAgentFactory',
+    'UserFactory',
+    'AdminUserFactory',
+    'MemberUserFactory',
+    'EpisodeFactory',
+    'EpisodeSegmentFactory',
+    'AgentExecutionFactory',
+    'CanvasAuditFactory',
+    'ChatSessionFactory',
+    'WorkspaceFactory',
+    'TeamFactory',
+    'WorkflowExecutionFactory',
+    # 'WorkflowStepExecutionFactory',  # NOTE: Broken import
+    'AgentFeedbackFactory',
+    'BlockedTriggerContextFactory',
+    'AgentProposalFactory',
+    'AgentOperationTrackerFactory',
+]

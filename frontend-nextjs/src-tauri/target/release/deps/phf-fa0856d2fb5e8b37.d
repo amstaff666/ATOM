@@ -1,0 +1,11 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\phf-fa0856d2fb5e8b37.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_set.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\set.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libphf-fa0856d2fb5e8b37.rlib: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_set.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\set.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libphf-fa0856d2fb5e8b37.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\lib.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_map.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_set.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\set.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\lib.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\map.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_map.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\ordered_set.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\phf-0.10.1\src\set.rs:

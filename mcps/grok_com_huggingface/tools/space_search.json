@@ -1,0 +1,30 @@
+{
+  "name": "space_search",
+  "description": "Find Hugging Face Spaces using semantic search. IMPORTANT Only MCP Servers can be used with the dynamic_space toolInclude links to the Space when presenting the results.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "description": "Semantic Search Query"
+      },
+      "limit": {
+        "type": "number",
+        "default": 10,
+        "description": "Number of results to return"
+      },
+      "mcp": {
+        "type": "boolean",
+        "default": false,
+        "description": "Only return MCP Server enabled Spaces"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

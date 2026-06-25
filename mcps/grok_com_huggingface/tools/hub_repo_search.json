@@ -1,0 +1,62 @@
+{
+  "name": "hub_repo_search",
+  "description": "Search Hugging Face repositories with a shared query interface. You can target models, datasets, spaces, or aggregate across multiple repo types in one call. Use space_search for semantic-first discovery of Spaces. Include links to repositories in your response.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search term. Leave blank and specify sort + limit to browse trending or recent repositories."
+      },
+      "repo_types": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "model",
+            "dataset",
+            "space"
+          ]
+        },
+        "minItems": 1,
+        "maxItems": 3,
+        "default": [
+          "model",
+          "dataset"
+        ],
+        "description": "Repository types to search. Defaults to [\"model\", \"dataset\"]. space uses keyword search via /api/spaces."
+      },
+      "author": {
+        "type": "string",
+        "description": "Organization or user namespace to filter by (e.g. 'google', 'meta-llama', 'huggingface')."
+      },
+      "filters": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Optional hub filter tags. Applied to each selected repo type (e.g. [\"text-generation\"], [\"language:en\"], [\"mcp-server\"])."
+      },
+      "sort": {
+        "type": "string",
+        "enum": [
+          "trendingScore",
+          "downloads",
+          "likes",
+          "createdAt",
+          "lastModified"
+        ],
+        "description": "Sort order (descending): trendingScore, downloads, likes, createdAt, lastModified"
+      },
+      "limit": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 100,
+        "default": 20,
+        "description": "Maximum number of results to return per selected repo type"
+      }
+    },
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

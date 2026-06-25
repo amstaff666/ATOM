@@ -1,0 +1,17 @@
+{
+  "name": "read_file",
+  "description": "Read an uploaded Hugging Face Bucket file by name and return its contents plus an HTTPS URL usable as a Gradio File Input.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

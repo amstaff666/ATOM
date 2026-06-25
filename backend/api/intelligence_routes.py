@@ -1,0 +1,222 @@
+import logging
+from typing import Any, Dict, List, Optional
+from ai.data_intelligence import DataIntelligenceEngine, PlatformType
+from fastapi import Depends
+
+from core.base_routes import BaseAPIRouter
+
+logger = logging.getLogger(__name__)
+
+router = BaseAPIRouter(prefix="/api/intelligence", tags=["Intelligence"])
+engine = DataIntelligenceEngine()
+
+@router.get("/insights")
+async def get_insights():
+    """
+    Fetch cross-platform smart insights and anomalies.
+    """
+    try:
+        # Check environment to disable mock logic in production
+        import os
+        ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+        
+        # Only allow auto-seeding in development if explicitly desired,
+        # otherwise return empty results if no data is present.
+        if engine.entity_registry:
+            pass # Data exists, proceed to detect anomalies
+        elif ENVIRONMENT == "development" and not engine.entity_registry:
+            logger.info("Initializing Intelligence Engine with mock data for /insights (DEVELOPMENT ONLY)")
+            platforms_to_seed = [
+                PlatformType.ASANA,
+                PlatformType.SALESFORCE,
+                PlatformType.HUBSPOT,
+            ]
+            for platform in platforms_to_seed:
+                data = await engine._get_platform_data(platform)
+                await engine.ingest_platform_data(platform, data)
+
+        anomalies = await engine.detect_anomalies()
+
+        # Sort critical first
+        severity_map = {"critical": 0, "warning": 1, "info": 2}
+        anomalies.sort(key=lambda x: severity_map.get(x.severity, 3))
+
+        return router.success_response(
+            data={
+                "count": len(anomalies),
+                "insights": anomalies
+            },
+            message=f"Retrieved {len(anomalies)} insights"
+        )
+    except Exception as e:
+        logger.error(f"Error fetching insights: {e}")
+        raise router.internal_error(str(e))
+
+@router.get("/entities")
+async def get_entities(type: Optional[str] = None, platform: Optional[str] = None):
+    """
+    Fetch unified entities from the intelligence engine.
+    """
+    try:
+        results = []
+        for entity in engine.entity_registry.values():
+            if type and entity.entity_type.value != type:
+                continue
+            if platform and platform not in [p.value for p in entity.source_platforms]:
+                continue
+
+            # Map UnifiedEntity to a JSON-serializable format
+            results.append({
+                "id": entity.entity_id,
+                "name": entity.canonical_name,
+                "type": entity.entity_type.value,
+                "platforms": [p.value for p in entity.source_platforms],
+                "status": entity.attributes.get("status"),
+                "value": entity.attributes.get("amount") or entity.attributes.get("value"),
+                "modified_at": entity.updated_at.isoformat()
+            })
+
+        return router.success_response(
+            data={"entities": results},
+            message=f"Retrieved {len(results)} entities"
+        )
+    except Exception as e:
+        logger.error(f"Error fetching entities: {e}")
+        raise router.internal_error(str(e))
+
+@router.post("/refresh")
+async def refresh_intelligence():
+    """
+    Manually trigger a cross-platform data ingestion and analysis.
+    Syncs data from all connected integrations into their respective dashboards.
+    """
+    try:
+        # All platforms to sync - organized by sidebar category
+        platforms_to_sync = [
+            # === SALES & CRM (feeds Sales dashboard) ===
+            PlatformType.SALESFORCE,
+            PlatformType.HUBSPOT,
+            PlatformType.ZOHO_CRM,
+            
+            # === COMMUNICATION (feeds Communication hub) ===
+            PlatformType.SLACK,
+            PlatformType.TEAMS,
+            PlatformType.DISCORD,
+            PlatformType.GOOGLE_CHAT,
+            PlatformType.TELEGRAM,
+            PlatformType.WHATSAPP,
+            PlatformType.ZOOM,
+            PlatformType.ZOHO_MAIL,
+            
+            # === PROJECT MANAGEMENT (feeds Projects dashboard) ===
+            PlatformType.ASANA,
+            PlatformType.JIRA,
+            PlatformType.LINEAR,
+            PlatformType.TRELLO,
+            PlatformType.MONDAY,
+            PlatformType.ZOHO_PROJECTS,
+            
+            # === KNOWLEDGE & STORAGE (feeds Knowledge dashboard) ===
+            PlatformType.GOOGLE_DRIVE,
+            PlatformType.DROPBOX,
+            PlatformType.ONEDRIVE,
+            PlatformType.BOX,
+            PlatformType.NOTION,
+            PlatformType.ZOHO_WORKDRIVE,
+            
+            # === SUPPORT (feeds Support dashboard) ===
+            PlatformType.ZENDESK,
+            PlatformType.FRESHDESK,
+            PlatformType.INTERCOM,
+            
+            # === DEVELOPMENT (feeds Dev Studio) ===
+            PlatformType.GITHUB,
+            PlatformType.GITLAB,
+            PlatformType.FIGMA,
+            
+            # === FINANCE (feeds Finance dashboard) ===
+            PlatformType.STRIPE,
+            PlatformType.QUICKBOOKS,
+            PlatformType.XERO,
+            PlatformType.ZOHO_BOOKS,
+            PlatformType.ZOHO_INVENTORY,
+            
+            # === MARKETING (feeds Marketing dashboard) ===
+            PlatformType.MAILCHIMP,
+            PlatformType.HUBSPOT_MARKETING,
+            
+            # === ANALYTICS (feeds Analytics dashboard) ===
+            PlatformType.TABLEAU,
+            PlatformType.GOOGLE_ANALYTICS,
+            
+            # === E-COMMERCE ===
+            PlatformType.SHOPIFY,
+        ]
+
+        
+        synced_count = 0
+        for platform in platforms_to_sync:
+            try:
+                data = await engine._get_platform_data(platform)
+                if data:
+                    await engine.ingest_platform_data(platform, data)
+                    synced_count += 1
+            except Exception as e:
+                logger.warning(f"Failed to sync {platform.value}: {e}")
+                continue
+
+        return router.success_response(
+            data={
+                "platforms_synced": synced_count,
+                "total_entities": len(engine.entity_registry)
+            },
+            message=f"Intelligence data refreshed across all categories"
+        )
+    except Exception as e:
+        logger.error(f"Error refreshing intelligence: {e}")
+        raise router.internal_error(str(e))
+
+@router.post("/execute")
+async def execute_insight_action(request: Dict[str, Any]):
+    """
+    Execute an actionable recommendation from an insight.
+    """
+    try:
+        action_type = request.get("action_type")
+        payload = request.get("action_payload", {})
+        user_id = request.get("user_id", "default_user")
+
+        if action_type == "workflow":
+            from advanced_workflow_orchestrator import get_orchestrator
+            orchestrator = get_orchestrator()
+            workflow_id = payload.get("workflow_id")
+            inputs = payload.get("inputs", {})
+
+            logger.info(f"Executing workflow action: {workflow_id}")
+            result = await orchestrator.execute_workflow(workflow_id, inputs)
+            return router.success_response(
+                data={"result": result},
+                message="Workflow executed successfully"
+            )
+
+        elif action_type == "tool":
+            from integrations.mcp_service import mcp_service
+            tool_name = payload.get("tool_name")
+            arguments = payload.get("arguments", {})
+
+            logger.info(f"Executing tool action: {tool_name}")
+            result = await mcp_service.execute_tool(
+                "local-tools",
+                tool_name,
+                arguments,
+                {"user_id": user_id}
+            )
+            return router.success_response(
+                data={"result": result},
+                message="Tool executed successfully"
+            )
+
+        raise router.validation_error("action_type", f"Unsupported action type: {action_type}")
+    except Exception as e:
+        logger.error(f"Error executing insight action: {e}")
+        raise router.internal_error(str(e))

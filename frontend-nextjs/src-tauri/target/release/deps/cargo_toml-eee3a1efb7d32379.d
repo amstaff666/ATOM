@@ -1,0 +1,10 @@
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\cargo_toml-eee3a1efb7d32379.d: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\cargo_toml.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\afs.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\error.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\inheritable.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libcargo_toml-eee3a1efb7d32379.rlib: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\cargo_toml.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\afs.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\error.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\inheritable.rs
+
+I:\Devdrive\NORDEAPDFOS\pdf-ai-orchestrator\atom\frontend-nextjs\src-tauri\target\release\deps\libcargo_toml-eee3a1efb7d32379.rmeta: C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\cargo_toml.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\afs.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\error.rs C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\inheritable.rs
+
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\cargo_toml.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\afs.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\error.rs:
+C:\Users\info\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\cargo_toml-0.22.3\src\inheritable.rs:

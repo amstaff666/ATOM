@@ -1,0 +1,30 @@
+{
+  "name": "paper_search",
+  "description": "Find Machine Learning research papers on the Hugging Face hub. Include 'Link to paper' When presenting the results. Consider whether tabulating results matches user intent.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 200,
+        "description": "Semantic Search query"
+      },
+      "results_limit": {
+        "type": "number",
+        "default": 12,
+        "description": "Number of results to return"
+      },
+      "concise_only": {
+        "type": "boolean",
+        "default": false,
+        "description": "Return a 2 sentence summary of the abstract. Use for broad search terms which may return a lot of results. Check with User if unsure."
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  }
+}

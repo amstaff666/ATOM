@@ -1,0 +1,31 @@
+{
+  "stt": {
+    "service": "deepgram",
+    "apiKey": ""
+  },
+  "tts": {
+    "service": "deepgram",
+    "apiKey": ""
+  },
+  "llm": {
+    "service": "openai",
+    "apiKey": ""
+  },
+  "integrations": {
+    "openai": "",
+    "google": "",
+    "notion": "",
+    "deepgram": "",
+    "zapier": "",
+    "hubspot": "",
+    "calendly": "",
+    "zoom": "",
+    "msteams": "",
+    "stripe": "",
+    "quickbooks": "",
+    "asana": "",
+    "jira": "",
+    "trello": ""
+  },
+  "silentAudioRecording": true
+}

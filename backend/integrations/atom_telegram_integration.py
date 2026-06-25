@@ -1,0 +1,1868 @@
+"""
+ATOM Telegram Integration
+Advanced Telegram platform integration with enterprise features and automation
+"""
+
+import asyncio
+from collections import Counter, defaultdict
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta, timezone
+from enum import Enum
+import hashlib
+import json
+import logging
+import os
+import time
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+import aiohttp
+import httpx
+
+# Handle numpy/pandas being disabled
+try:
+    import numpy as np
+    import pandas as pd
+except ImportError:
+    np = None
+    pd = None
+    logging.warning("NumPy/Pandas not available, some analytics features disabled")
+
+# Import existing ATOM services
+atom_enterprise_security_service = None
+atom_enterprise_unified_service = None
+atom_workflow_automation_service = None
+ai_enhanced_service = None
+
+try:
+    from ai_enhanced_service import (
+        AIModelType,
+        AIRequest,
+        AIResponse,
+        AIServiceType,
+        AITaskType,
+        ai_enhanced_service,
+    )
+    from atom_ai_integration import atom_ai_integration
+    from atom_discord_integration import atom_discord_integration
+    from atom_enterprise_security_service import (
+        ComplianceStandard,
+        SecurityLevel,
+        atom_enterprise_security_service,
+    )
+    from atom_enterprise_unified_service import (
+        WorkflowSecurityLevel,
+        atom_enterprise_unified_service,
+    )
+    from atom_google_chat_integration import atom_google_chat_integration
+    from atom_ingestion_pipeline import AtomIngestionPipeline
+    from atom_memory_service import AtomMemoryService
+    from atom_search_service import AtomSearchService
+    from atom_slack_integration import atom_slack_integration
+    from atom_teams_integration import atom_teams_integration
+    from atom_workflow_automation_service import (
+        AutomationPriority,
+        AutomationStatus,
+        atom_workflow_automation_service,
+    )
+    from atom_workflow_service import AtomWorkflowService
+except ImportError as e:
+    logging.warning("Enterprise services not available: {}. Using stubs/None.".format(e))
+    atom_enterprise_security_service = None
+    atom_enterprise_unified_service = None
+    atom_workflow_automation_service = None
+    ai_enhanced_service = None
+    atom_ai_integration = None
+    atom_slack_integration = None
+    atom_teams_integration = None
+    atom_google_chat_integration = None
+    atom_discord_integration = None
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+class TelegramMessageType(Enum):
+    """Telegram message types"""
+    TEXT = "text"
+    PHOTO = "photo"
+    VIDEO = "video"
+    AUDIO = "audio"
+    VOICE = "voice"
+    DOCUMENT = "document"
+    STICKER = "sticker"
+    ANIMATION = "animation"
+    VIDEO_NOTE = "video_note"
+    CONTACT = "contact"
+    LOCATION = "location"
+    POLL = "poll"
+    VENUE = "venue"
+    WEBPAGE_PREVIEW = "webpage_preview"
+
+class TelegramChatType(Enum):
+    """Telegram chat types"""
+    PRIVATE = "private"
+    GROUP = "group"
+    SUPERGROUP = "supergroup"
+    CHANNEL = "channel"
+
+class TelegramCommandType(Enum):
+    """Telegram command types"""
+    START = "start"
+    HELP = "help"
+    STATUS = "status"
+    SEARCH = "search"
+    WORKFLOW = "workflow"
+    AUTOMATE = "automate"
+    SECURITY = "security"
+    COMPLIANCE = "compliance"
+    ANALYTICS = "analytics"
+    MONITOR = "monitor"
+    REPORT = "report"
+    ADMIN = "admin"
+
+@dataclass
+class TelegramUser:
+    """Telegram user data model"""
+    user_id: int
+    username: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    language_code: Optional[str]
+    is_bot: bool
+    is_premium: bool
+    is_active: bool
+    permissions: List[str]
+    security_level: str
+    created_at: datetime
+    last_active: datetime
+    metadata: Dict[str, Any]
+
+@dataclass
+class TelegramChat:
+    """Telegram chat data model"""
+    chat_id: int
+    chat_type: TelegramChatType
+    title: Optional[str]
+    username: Optional[str]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    description: Optional[str]
+    permissions: Dict[str, Any]
+    security_level: str
+    is_active: bool
+    member_count: int
+    created_at: datetime
+    last_message: datetime
+    metadata: Dict[str, Any]
+
+@dataclass
+class TelegramMessage:
+    """Telegram message data model"""
+    message_id: int
+    chat_id: int
+    user_id: int
+    message_type: TelegramMessageType
+    content: str
+    media_path: Optional[str]
+    reply_to_message_id: Optional[int]
+    forward_from: Optional[int]
+    forward_from_chat: Optional[int]
+    edit_date: Optional[datetime]
+    timestamp: datetime
+    views: int
+    reactions: List[Dict[str, Any]]
+    security_flags: Dict[str, Any]
+    metadata: Dict[str, Any]
+
+class AtomTelegramIntegration:
+    """Advanced Telegram integration with enterprise features"""
+    
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+        self.db = config.get('database')
+        self.cache = config.get('cache')
+        
+        # Telegram configuration
+        self.telegram_config = {
+            'bot_token': config.get('bot_token') or os.getenv('TELEGRAM_BOT_TOKEN'),
+            'bot_username': config.get('bot_username') or os.getenv('TELEGRAM_BOT_USERNAME'),
+            'webhook_url': config.get('webhook_url') or os.getenv('TELEGRAM_WEBHOOK_URL'),
+            'admin_user_ids': config.get('admin_user_ids', []),
+            'allowed_chat_types': config.get('allowed_chat_types', ['private', 'group', 'supergroup', 'channel']),
+            'max_message_length': config.get('max_message_length', 4096),
+            'enable_enterprise_features': config.get('enable_enterprise_features', True),
+            'security_level': config.get('security_level', 'standard'),
+            'compliance_standards': config.get('compliance_standards', ['SOC2', 'ISO27001'])
+        }
+        
+        # Integration state
+        self.is_initialized = False
+        self.active_chats: Dict[int, TelegramChat] = {}
+        self.active_users: Dict[int, TelegramUser] = {}
+        self.message_history: Dict[int, List[TelegramMessage]] = {}
+        self.command_handlers: Dict[str, Callable] = {}
+        self.message_handlers: List[Callable] = []
+
+        # Callback query handlers registry
+        self.callback_handlers = {
+            "action_": self._handle_action_callback,
+            "search_": self._handle_search_callback,
+            "workflow_": self._handle_workflow_callback,
+            "settings_": self._handle_settings_callback,
+        }
+        
+        # Enterprise integration
+        self.enterprise_security = config.get('security_service') or atom_enterprise_security_service
+        self.enterprise_automation = config.get('automation_service') or atom_workflow_automation_service
+        self.ai_service = config.get('ai_service') or ai_enhanced_service
+
+        # LanceDB handler for semantic search
+        self.lancedb_handler = None
+        try:
+            from core.lancedb_handler import LanceDBHandler
+            self.lancedb_handler = LanceDBHandler()
+            logger.info("LanceDB handler initialized for Telegram integration")
+        except ImportError as e:
+            logger.warning(f"LanceDB not available for inline search: {e}")
+        
+        # Analytics and monitoring
+        self.analytics_metrics = {
+            'total_messages': 0,
+            'total_chats': 0,
+            'total_users': 0,
+            'commands_executed': 0,
+            'automations_triggered': 0,
+            'security_incidents': 0,
+            'compliance_checks': 0,
+            'ai_requests': 0,
+            'message_types': defaultdict(int),
+            'chat_types': defaultdict(int),
+            'active_chats': 0,
+            'active_users': 0
+        }
+        
+        # Security and compliance
+        self.security_policies = {}
+        self.compliance_rules = {}
+        self.automation_triggers = {}
+        self.message_filters = []
+        
+        # Performance metrics
+        self.performance_metrics = {
+            'message_processing_time': 0.0,
+            'command_response_time': 0.0,
+            'ai_processing_time': 0.0,
+            'security_check_time': 0.0,
+            'compliance_check_time': 0.0,
+            'automation_execution_time': 0.0,
+            'webhook_response_time': 0.0
+        }
+        
+        logger.info("Telegram Integration initialized")
+    
+    async def initialize(self) -> bool:
+        """Initialize Telegram integration"""
+        try:
+            if not self.telegram_config['bot_token']:
+                logger.error("Telegram bot token not provided")
+                return False
+            
+            # Setup enterprise features
+            if self.telegram_config['enable_enterprise_features']:
+                await self._setup_enterprise_features()
+            
+            # Setup security and compliance
+            await self._setup_security_and_compliance()
+            
+            # Setup automation
+            await self._setup_automation()
+            
+            # Load existing data
+            await self._load_existing_data()
+            
+            # Start bot (mock implementation)
+            await self._start_bot()
+            
+            self.is_initialized = True
+            logger.info("Telegram Integration initialized successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error initializing Telegram integration: {e}")
+            return False
+    
+    async def get_intelligent_workspaces(self, user_id: int) -> List[Dict[str, Any]]:
+        """Get intelligent workspaces for user"""
+        try:
+            workspaces = []
+            
+            for chat_id, chat in self.active_chats.items():
+                # Check if user has access to chat
+                if chat.is_active:
+                    workspace = {
+                        'id': chat.chat_id,
+                        'name': chat.title or f"Chat {chat.chat_id}",
+                        'type': chat.chat_type.value,
+                        'member_count': chat.member_count,
+                        'description': chat.description,
+                        'last_activity': chat.last_message.isoformat(),
+                        'security_level': chat.security_level,
+                        'permissions': chat.permissions,
+                        'platform': 'telegram'
+                    }
+                    workspaces.append(workspace)
+            
+            # Sort by last activity
+            workspaces.sort(key=lambda x: x['last_activity'], reverse=True)
+            
+            return workspaces
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent workspaces: {e}")
+            return []
+    
+    async def get_intelligent_channels(self, workspace_id: int, user_id: int) -> List[Dict[str, Any]]:
+        """Get intelligent channels for workspace"""
+        try:
+            channels = []
+            chat = self.active_chats.get(workspace_id)
+            
+            if chat:
+                # For Telegram, workspace is the chat itself
+                channel = {
+                    'id': chat.chat_id,
+                    'name': chat.title or f"Chat {chat.chat_id}",
+                    'type': chat.chat_type.value,
+                    'member_count': chat.member_count,
+                    'description': chat.description,
+                    'security_level': chat.security_level,
+                    'permissions': chat.permissions,
+                    'is_active': chat.is_active,
+                    'last_activity': chat.last_message.isoformat(),
+                    'platform': 'telegram'
+                }
+                channels.append(channel)
+            
+            return channels
+            
+        except Exception as e:
+            logger.error(f"Error getting intelligent channels: {e}")
+            return []
+    
+    async def send_intelligent_message(self, channel_id: int, message: str, metadata: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Send intelligent message"""
+        try:
+            # Mock implementation - would use actual Telegram API
+            result = {
+                'success': True,
+                'channel_id': channel_id,
+                'message': message,
+                'timestamp': datetime.utcnow().isoformat(),
+                'platform': 'telegram',
+                'metadata': metadata or {}
+            }
+            
+            # Log message
+            if self.telegram_config['enable_enterprise_features']:
+                await self._log_message_event('message_sent', channel_id, result)
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error sending intelligent message: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'platform': 'telegram'
+            }
+    
+    async def perform_intelligent_search(self, query: str, user_id: int, workspace_id: int = None) -> List[Dict[str, Any]]:
+        """Perform intelligent search"""
+        try:
+            search_results = []
+            
+            # Search in message history
+            for chat_id, messages in self.message_history.items():
+                if workspace_id and chat_id != workspace_id:
+                    continue
+                
+                for message in messages:
+                    if query.lower() in message.content.lower():
+                        result = {
+                            'id': message.message_id,
+                            'type': 'telegram_message',
+                            'title': f"Message {message.message_id}",
+                            'snippet': message.content[:100] + "..." if len(message.content) > 100 else message.content,
+                            'content': message.content,
+                            'channel_id': message.chat_id,
+                            'user_id': message.user_id,
+                            'timestamp': message.timestamp.isoformat(),
+                            'message_type': message.message_type.value,
+                            'platform': 'telegram',
+                            'relevance_score': self._calculate_relevance_score(query, message.content)
+                        }
+                        search_results.append(result)
+            
+            # Sort by relevance score
+            search_results.sort(key=lambda x: x['relevance_score'], reverse=True)
+            
+            # AI-enhanced search
+            if self.ai_service:
+                ai_results = await self._perform_ai_search(query, workspace_id)
+                search_results.extend(ai_results)
+            
+            return search_results[:20]  # Return top 20 results
+            
+        except Exception as e:
+            logger.error(f"Error performing intelligent search: {e}")
+            return []
+    
+    async def get_user_conversation_history(self, user_id: int, channel_id: int, limit: int = 50) -> List[Dict[str, Any]]:
+        """Get user conversation history"""
+        try:
+            conversation_history = []
+            messages = self.message_history.get(channel_id, [])
+            
+            # Filter by user and limit
+            user_messages = [m for m in messages if m.user_id == user_id][-limit:]
+            
+            for message in user_messages:
+                history_item = {
+                    'id': message.message_id,
+                    'content': message.content,
+                    'message_type': message.message_type.value,
+                    'timestamp': message.timestamp.isoformat(),
+                    'channel_id': message.chat_id,
+                    'platform': 'telegram',
+                    'metadata': message.metadata
+                }
+                conversation_history.append(history_item)
+            
+            return conversation_history
+            
+        except Exception as e:
+            logger.error(f"Error getting user conversation history: {e}")
+            return []
+    
+    async def get_service_status(self) -> Dict[str, Any]:
+        """Get Telegram service status"""
+        try:
+            return {
+                'platform': 'telegram',
+                'status': 'active' if self.is_initialized else 'inactive',
+                'bot_username': self.telegram_config['bot_username'],
+                'webhook_url': self.telegram_config['webhook_url'],
+                'enterprise_features': self.telegram_config['enable_enterprise_features'],
+                'security_level': self.telegram_config['security_level'],
+                'compliance_standards': self.telegram_config['compliance_standards'],
+                'total_messages': self.analytics_metrics['total_messages'],
+                'total_chats': self.analytics_metrics['total_chats'],
+                'total_users': self.analytics_metrics['total_users'],
+                'commands_executed': self.analytics_metrics['commands_executed'],
+                'automations_triggered': self.analytics_metrics['automations_triggered'],
+                'security_incidents': self.analytics_metrics['security_incidents'],
+                'compliance_checks': self.analytics_metrics['compliance_checks'],
+                'ai_requests': self.analytics_metrics['ai_requests'],
+                'active_chats': self.analytics_metrics['active_chats'],
+                'active_users': self.analytics_metrics['active_users'],
+                'performance_metrics': self.performance_metrics,
+                'uptime': time.time() - (self._start_time if hasattr(self, '_start_time') else time.time())
+            }
+        except Exception as e:
+            logger.error(f"Error getting service status: {e}")
+            return {'error': str(e), 'platform': 'telegram'}
+    
+    # Private helper methods
+    async def _setup_enterprise_features(self):
+        """Setup enterprise features"""
+        try:
+            if not self.enterprise_security or not self.enterprise_automation:
+                logger.warning("Enterprise services not available")
+                return
+            
+            # Setup security policies
+            await self._setup_security_policies()
+            
+            # Setup compliance rules
+            await self._setup_compliance_rules()
+            
+            # Setup automation triggers
+            await self._setup_automation_triggers()
+            
+            logger.info("Enterprise features setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up enterprise features: {e}")
+    
+    async def _setup_security_policies(self):
+        """Setup security policies"""
+        try:
+            self.security_policies = {
+                'message_content_filter': {
+                    'enabled': True,
+                    'blocked_patterns': ['spam', 'malware', 'suspicious'],
+                    'action': 'block'
+                },
+                'user_access_control': {
+                    'enabled': True,
+                    'allowed_domains': [],
+                    'blocked_users': [],
+                    'action': 'restrict'
+                },
+                'chat_security': {
+                    'enabled': True,
+                    'require_admin_approval': False,
+                    'encryption_required': False,
+                    'action': 'monitor'
+                }
+            }
+            
+            logger.info("Security policies setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up security policies: {e}")
+    
+    async def _setup_compliance_rules(self):
+        """Setup compliance rules"""
+        try:
+            self.compliance_rules = {
+                'message_retention': {
+                    'enabled': True,
+                    'retention_period': 365,
+                    'auto_delete': False
+                },
+                'content_moderation': {
+                    'enabled': True,
+                    'profanity_filter': True,
+                    'hate_speech_filter': True,
+                    'action': 'flag'
+                },
+                'audit_logging': {
+                    'enabled': True,
+                    'log_all_messages': True,
+                    'log_user_actions': True,
+                    'action': 'log'
+                }
+            }
+            
+            logger.info("Compliance rules setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up compliance rules: {e}")
+    
+    async def _setup_automation_triggers(self):
+        """Setup automation triggers"""
+        try:
+            self.automation_triggers = {
+                'message_received': {
+                    'enabled': True,
+                    'conditions': ['chat_type', 'user_role', 'message_content'],
+                    'actions': ['send_notification', 'execute_workflow', 'ai_analysis']
+                },
+                'user_joined': {
+                    'enabled': True,
+                    'conditions': ['user_verification', 'chat_permissions'],
+                    'actions': ['welcome_message', 'role_assignment', 'compliance_check']
+                },
+                'command_executed': {
+                    'enabled': True,
+                    'conditions': ['command_type', 'user_permissions'],
+                    'actions': ['process_command', 'security_check', 'logging']
+                }
+            }
+            
+            logger.info("Automation triggers setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up automation triggers: {e}")
+    
+    async def _setup_automation(self):
+        """Setup automation"""
+        try:
+            if not self.enterprise_automation:
+                logger.warning("Automation service not available")
+                return
+            
+            # Create Telegram-specific automation
+            telegram_automation_data = {
+                'name': 'Telegram Integration Automation',
+                'description': 'Automation for Telegram integration events',
+                'automation_type': 'integration',
+                'priority': 'medium',
+                'conditions': [
+                    {
+                        'type': 'event_triggered',
+                        'platform': 'telegram',
+                        'events': ['message_received', 'user_joined', 'command_executed']
+                    }
+                ],
+                'actions': [
+                    {
+                        'type': 'notification',
+                        'config': {
+                            'channels': ['platform_admin'],
+                            'message': 'Telegram integration event occurred',
+                            'urgency': 'low'
+                        }
+                    }
+                ],
+                'schedule': None,
+                'timeout': 300,
+                'retry_policy': {
+                    'max_retries': 2,
+                    'backoff': 'exponential'
+                },
+                'notification_rules': [
+                    {
+                        'condition': 'on_error',
+                        'channels': ['platform_admin'],
+                        'urgency': 'medium'
+                    }
+                ],
+                'metadata': {
+                    'platform': 'telegram',
+                    'integration_version': '1.0.0'
+                }
+            }
+            
+            result = await self.enterprise_automation.create_integration_automation('telegram', telegram_automation_data)
+            if result.get('ok'):
+                logger.info("Telegram automation created successfully")
+            else:
+                logger.error(f"Failed to create Telegram automation: {result.get('error')}")
+            
+        except Exception as e:
+            logger.error(f"Error setting up automation: {e}")
+    
+    async def _setup_security_and_compliance(self):
+        """Setup security and compliance monitoring"""
+        try:
+            # Setup monitoring for security events
+            if self.telegram_config['enable_enterprise_features']:
+                # Security monitoring
+                await self._setup_security_monitoring()
+                
+                # Compliance monitoring
+                await self._setup_compliance_monitoring()
+            
+            logger.info("Security and compliance setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up security and compliance: {e}")
+    
+    async def _setup_security_monitoring(self):
+        """Setup security monitoring"""
+        try:
+            # Define security monitoring rules
+            self.security_monitoring = {
+                'message_anomaly_detection': {
+                    'enabled': True,
+                    'threshold': 0.8,
+                    'action': 'alert'
+                },
+                'user_behavior_analysis': {
+                    'enabled': True,
+                    'baseline_period': 30,
+                    'action': 'monitor'
+                },
+                'chat_security_monitoring': {
+                    'enabled': True,
+                    'security_score_threshold': 0.7,
+                    'action': 'flag'
+                }
+            }
+            
+            logger.info("Security monitoring setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up security monitoring: {e}")
+    
+    async def _setup_compliance_monitoring(self):
+        """Setup compliance monitoring"""
+        try:
+            # Define compliance monitoring rules
+            self.compliance_monitoring = {
+                'message_compliance_checking': {
+                    'enabled': True,
+                    'check_frequency': 'real_time',
+                    'action': 'flag'
+                },
+                'user_activity_auditing': {
+                    'enabled': True,
+                    'audit_retention': 365,
+                    'action': 'log'
+                },
+                'data_retention_management': {
+                    'enabled': True,
+                    'retention_policy': 'standard',
+                    'action': 'manage'
+                }
+            }
+            
+            logger.info("Compliance monitoring setup complete")
+            
+        except Exception as e:
+            logger.error(f"Error setting up compliance monitoring: {e}")
+    
+    async def _load_existing_data(self):
+        """Load existing data"""
+        try:
+            # Mock implementation - would load from database
+            logger.info("Existing data loaded")
+            
+        except Exception as e:
+            logger.error(f"Error loading existing data: {e}")
+    
+    async def _start_bot(self):
+        """Start Telegram bot"""
+        try:
+            # Mock implementation - would start actual Telegram bot
+            self._start_time = time.time()
+            logger.info("Telegram bot started")
+            
+        except Exception as e:
+            logger.error(f"Error starting bot: {e}")
+    
+    def _calculate_relevance_score(self, query: str, content: str) -> float:
+        """Calculate relevance score for search"""
+        try:
+            # Simple relevance scoring
+            query_words = query.lower().split()
+            content_words = content.lower().split()
+            
+            matches = 0
+            for word in query_words:
+                if word in content_words:
+                    matches += 1
+            
+            return matches / len(query_words) if query_words else 0.0
+            
+        except Exception as e:
+            logger.error(f"Error calculating relevance score: {e}")
+            return 0.0
+    
+    async def _perform_ai_search(self, query: str, workspace_id: int = None) -> List[Dict[str, Any]]:
+        """Perform AI-enhanced search"""
+        try:
+            if not self.ai_service:
+                return []
+            
+            # Create AI request
+            ai_request = AIRequest(
+                request_id=f"telegram_search_{int(time.time())}",
+                task_type=AITaskType.SEARCH_QUERY,
+                model_type=AIModelType.GPT_4,
+                service_type=AIServiceType.OPENAI,
+                input_data={
+                    'query': query,
+                    'context': 'telegram_search',
+                    'workspace_id': workspace_id,
+                    'message_history': [asdict(m) for chat_messages in self.message_history.values() for m in chat_messages]
+                },
+                context={
+                    'platform': 'telegram',
+                    'workspace_id': workspace_id
+                },
+                platform='telegram'
+            )
+            
+            # Process AI request
+            ai_response = await self.ai_service.process_ai_request(ai_request)
+            
+            if ai_response.ok and ai_response.output_data:
+                return ai_response.output_data.get('results', [])
+            
+            return []
+            
+        except Exception as e:
+            logger.error(f"Error performing AI search: {e}")
+            return []
+    
+    async def _log_message_event(self, event_type: str, channel_id: int, data: Dict[str, Any]):
+        """Log message event"""
+        try:
+            if self.enterprise_security:
+                await self.enterprise_security.audit_event({
+                    'event_type': event_type,
+                    'user_id': data.get('user_id'),
+                    'resource': 'telegram_message',
+                    'action': event_type,
+                    'result': 'success',
+                    'ip_address': 'telegram',
+                    'user_agent': 'telegram_bot',
+                    'metadata': {
+                        'channel_id': channel_id,
+                        'platform': 'telegram',
+                        'data': data
+                    }
+                })
+                
+        except Exception as e:
+            logger.error(f"Error logging message event: {e}")
+    
+    async def close(self):
+        """Close Telegram integration"""
+        try:
+            # Mock implementation - would stop actual Telegram bot
+            logger.info("Telegram Integration closed")
+            
+        except Exception as e:
+            logger.error(f"Error closing Telegram integration: {e}")
+
+    # ========================================================================
+    # Interactive Keyboard Methods
+    # ========================================================================
+
+    async def send_message_with_keyboard(
+        self,
+        chat_id: int,
+        text: str,
+        keyboard: List[List[Dict[str, Any]]],
+        parse_mode: Optional[str] = None,
+        disable_web_page_preview: Optional[bool] = None,
+        disable_notification: Optional[bool] = None,
+        reply_to_message_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Send a message with interactive inline keyboard.
+
+        Args:
+            chat_id: Telegram chat ID
+            text: Message text
+            keyboard: List of rows of buttons
+            parse_mode: "Markdown" or "HTML"
+            disable_web_page_preview: Disable link previews
+            disable_notification: Send silently
+            reply_to_message_id: Reply to specific message
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            # Build API URL
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+            # Build keyboard (inline keyboard)
+            reply_markup = {
+                "inline_keyboard": keyboard
+            }
+
+            # Build request payload
+            payload = {
+                "chat_id": chat_id,
+                "text": text,
+                "reply_markup": reply_markup,
+            }
+
+            # Optional parameters
+            if parse_mode:
+                payload["parse_mode"] = parse_mode
+            if disable_web_page_preview is not None:
+                payload["disable_web_page_preview"] = disable_web_page_preview
+            if disable_notification is not None:
+                payload["disable_notification"] = disable_notification
+            if reply_to_message_id:
+                payload["reply_to_message_id"] = reply_to_message_id
+
+            # Send request
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Sent keyboard message to chat {chat_id}")
+                return {
+                    "success": True,
+                    "message_id": data.get("result", {}).get("message_id"),
+                    "chat_id": chat_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to send keyboard message: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error sending keyboard message: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def edit_message_keyboard(
+        self,
+        chat_id: int,
+        message_id: int,
+        keyboard: List[List[Dict[str, Any]]],
+    ) -> Dict[str, Any]:
+        """
+        Edit keyboard of an existing message.
+
+        Args:
+            chat_id: Telegram chat ID
+            message_id: Message to edit
+            keyboard: New keyboard layout
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/editMessageReplyMarkup"
+
+            reply_markup = {
+                "inline_keyboard": keyboard
+            }
+
+            payload = {
+                "chat_id": chat_id,
+                "message_id": message_id,
+                "reply_markup": reply_markup,
+            }
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Edited keyboard for message {message_id} in chat {chat_id}")
+                return {
+                    "success": True,
+                    "message_id": message_id,
+                    "chat_id": chat_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error editing message keyboard: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def answer_callback_query(
+        self,
+        callback_query_id: str,
+        text: Optional[str] = None,
+        show_alert: Optional[bool] = False,
+        url: Optional[str] = None,
+        cache_time: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Answer a callback query from an inline keyboard button.
+
+        Args:
+            callback_query_id: Callback query ID from update
+            text: Notification text (max 200 chars)
+            show_alert: Show as alert instead of notification
+            url: URL to open
+            cache_time: Cache button response (seconds)
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/answerCallbackQuery"
+
+            payload = {
+                "callback_query_id": callback_query_id,
+            }
+
+            if text:
+                payload["text"] = text
+            if show_alert:
+                payload["show_alert"] = show_alert
+            if url:
+                payload["url"] = url
+            if cache_time is not None:
+                payload["cache_time"] = cache_time
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Answered callback query {callback_query_id}")
+                return {
+                    "success": True,
+                    "callback_query_id": callback_query_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to answer callback query: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error answering callback query: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def handle_callback_query(self, callback_query: Dict[str, Any]) -> None:
+        """
+        Handle a callback query from button press.
+
+        Routes callback to appropriate handler based on callback_data.
+        """
+        try:
+            callback_id = callback_query.get("id")
+            data = callback_query.get("data", "")
+            message = callback_query.get("message", {})
+            from_user = callback_query.get("from", {})
+
+            logger.info(f"Received callback query {callback_id} with data: {data}")
+
+            # Send immediate answer to show processing
+            await self.answer_callback_query(
+                callback_query_id=callback_id,
+                text="Processing...",
+                cache_time=0,  # Don't cache while processing
+            )
+
+            # Route to appropriate handler based on data
+            if data:
+                for prefix, handler in self.callback_handlers.items():
+                    if data.startswith(prefix):
+                        await handler(callback_id, data, user_id)
+                        return
+
+                # No matching handler found
+                logger.warning(f"No handler found for callback data: {data}")
+                await self.answer_callback_query(
+                    callback_query_id=callback_id,
+                    text="Unknown action",
+                    show_alert=True
+                )
+            else:
+                logger.warning("Received callback query with no data")
+                await self.answer_callback_query(
+                    callback_query_id=callback_id,
+                    text="Invalid callback",
+                    show_alert=True
+                )
+
+        except Exception as e:
+            logger.error(f"Error handling callback query: {e}")
+
+    async def _handle_action_callback(self, callback_query_id: str, data: str, user_id: int):
+        """
+        Handle action callbacks (e.g., button presses for actions).
+
+        Expected format: action_<action_name>_<params>
+        Example: action_approve_request_123
+        """
+        try:
+            # Parse action from data
+            parts = data.split('_')
+            if len(parts) < 2:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text="Invalid action format",
+                    show_alert=True
+                )
+                return
+
+            action_name = parts[1]
+            params = parts[2:] if len(parts) > 2 else []
+
+            logger.info(f"Handling action callback: action={action_name}, params={params}, user={user_id}")
+
+            # Route to specific action handlers
+            if action_name == "approve_request":
+                await self._handle_approve_request(callback_query_id, params, user_id)
+            elif action_name == "deny_request":
+                await self._handle_deny_request(callback_query_id, params, user_id)
+            elif action_name == "execute_workflow":
+                await self._handle_execute_workflow(callback_query_id, params, user_id)
+            else:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text=f"Unknown action: {action_name}",
+                    show_alert=True
+                )
+
+        except Exception as e:
+            logger.error(f"Error handling action callback: {e}")
+            await self.answer_callback_query(
+                callback_query_id=callback_query_id,
+                text="Error processing action",
+                show_alert=True
+            )
+
+    async def _handle_search_callback(self, callback_query_id: str, data: str, user_id: int):
+        """
+        Handle search callbacks (e.g., search refinement).
+
+        Expected format: search_<search_type>_<query>
+        Example: search_recent_messages
+        """
+        try:
+            # Parse search type from data
+            parts = data.split('_')
+            if len(parts) < 2:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text="Invalid search format",
+                    show_alert=True
+                )
+                return
+
+            search_type = parts[1]
+            query = '_'.join(parts[2:]) if len(parts) > 2 else ""
+
+            logger.info(f"Handling search callback: type={search_type}, query={query}, user={user_id}")
+
+            # Route to specific search handlers
+            if search_type == "recent_messages":
+                await self._handle_search_recent_messages(callback_query_id, user_id)
+            elif search_type == "communications":
+                await self._handle_search_communications(callback_query_id, query, user_id)
+            elif search_type == "workflows":
+                await self._handle_search_workflows(callback_query_id, query, user_id)
+            else:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text=f"Unknown search type: {search_type}",
+                    show_alert=True
+                )
+
+        except Exception as e:
+            logger.error(f"Error handling search callback: {e}")
+            await self.answer_callback_query(
+                callback_query_id=callback_query_id,
+                text="Error processing search",
+                show_alert=True
+            )
+
+    async def _handle_workflow_callback(self, callback_query_id: str, data: str, user_id: int):
+        """
+        Handle workflow callbacks (e.g., workflow execution triggers).
+
+        Expected format: workflow_<workflow_id>_<action>
+        Example: workflow_123_start
+        """
+        try:
+            # Parse workflow info from data
+            parts = data.split('_')
+            if len(parts) < 3:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text="Invalid workflow format",
+                    show_alert=True
+                )
+                return
+
+            workflow_id = parts[1]
+            action = parts[2]
+
+            logger.info(f"Handling workflow callback: workflow={workflow_id}, action={action}, user={user_id}")
+
+            # Route to specific workflow actions
+            if action == "start":
+                await self._handle_start_workflow(callback_query_id, workflow_id, user_id)
+            elif action == "stop":
+                await self._handle_stop_workflow(callback_query_id, workflow_id, user_id)
+            elif action == "status":
+                await self._handle_workflow_status(callback_query_id, workflow_id, user_id)
+            else:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text=f"Unknown workflow action: {action}",
+                    show_alert=True
+                )
+
+        except Exception as e:
+            logger.error(f"Error handling workflow callback: {e}")
+            await self.answer_callback_query(
+                callback_query_id=callback_query_id,
+                text="Error processing workflow",
+                show_alert=True
+            )
+
+    async def _handle_settings_callback(self, callback_query_id: str, data: str, user_id: int):
+        """
+        Handle settings callbacks (e.g., settings changes).
+
+        Expected format: settings_<setting_name>_<value>
+        Example: settings_notifications_enabled
+        """
+        try:
+            # Parse setting from data
+            parts = data.split('_')
+            if len(parts) < 3:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text="Invalid settings format",
+                    show_alert=True
+                )
+                return
+
+            setting_name = parts[1]
+            value = '_'.join(parts[2:]) if len(parts) > 2 else ""
+
+            logger.info(f"Handling settings callback: setting={setting_name}, value={value}, user={user_id}")
+
+            # Route to specific setting handlers
+            if setting_name == "notifications":
+                await self._handle_notifications_setting(callback_query_id, value, user_id)
+            elif setting_name == "language":
+                await self._handle_language_setting(callback_query_id, value, user_id)
+            elif setting_name == "theme":
+                await self._handle_theme_setting(callback_query_id, value, user_id)
+            else:
+                await self.answer_callback_query(
+                    callback_query_id=callback_query_id,
+                    text=f"Unknown setting: {setting_name}",
+                    show_alert=True
+                )
+
+        except Exception as e:
+            logger.error(f"Error handling settings callback: {e}")
+            await self.answer_callback_query(
+                callback_query_id=callback_query_id,
+                text="Error updating settings",
+                show_alert=True
+            )
+
+    # ------------------------------------------------------------------------
+    # Action sub-handlers
+    # ------------------------------------------------------------------------
+
+    async def _handle_approve_request(self, callback_query_id: str, params: List[str], user_id: int):
+        """Handle request approval action"""
+        request_id = params[0] if params else None
+        logger.info(f"Approving request {request_id} by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Request approved"
+        )
+
+    async def _handle_deny_request(self, callback_query_id: str, params: List[str], user_id: int):
+        """Handle request denial action"""
+        request_id = params[0] if params else None
+        logger.info(f"Denying request {request_id} by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Request denied"
+        )
+
+    async def _handle_execute_workflow(self, callback_query_id: str, params: List[str], user_id: int):
+        """Handle workflow execution action"""
+        workflow_id = params[0] if params else None
+        logger.info(f"Executing workflow {workflow_id} by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Workflow execution started"
+        )
+
+    # ------------------------------------------------------------------------
+    # Search sub-handlers
+    # ------------------------------------------------------------------------
+
+    async def _handle_search_recent_messages(self, callback_query_id: str, user_id: int):
+        """Handle recent messages search"""
+        logger.info(f"Searching recent messages for user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Search completed"
+        )
+
+    async def _handle_search_communications(self, callback_query_id: str, query: str, user_id: int):
+        """Handle communications search"""
+        logger.info(f"Searching communications for '{query}' by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Search completed"
+        )
+
+    async def _handle_search_workflows(self, callback_query_id: str, query: str, user_id: int):
+        """Handle workflows search"""
+        logger.info(f"Searching workflows for '{query}' by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Search completed"
+        )
+
+    # ------------------------------------------------------------------------
+    # Workflow sub-handlers
+    # ------------------------------------------------------------------------
+
+    async def _handle_start_workflow(self, callback_query_id: str, workflow_id: str, user_id: int):
+        """Handle workflow start action"""
+        logger.info(f"Starting workflow {workflow_id} by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Workflow started"
+        )
+
+    async def _handle_stop_workflow(self, callback_query_id: str, workflow_id: str, user_id: int):
+        """Handle workflow stop action"""
+        logger.info(f"Stopping workflow {workflow_id} by user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Workflow stopped"
+        )
+
+    async def _handle_workflow_status(self, callback_query_id: str, workflow_id: str, user_id: int):
+        """Handle workflow status query"""
+        logger.info(f"Getting status of workflow {workflow_id} for user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Status: Running"
+        )
+
+    # ------------------------------------------------------------------------
+    # Settings sub-handlers
+    # ------------------------------------------------------------------------
+
+    async def _handle_notifications_setting(self, callback_query_id: str, value: str, user_id: int):
+        """Handle notifications setting"""
+        logger.info(f"Setting notifications to '{value}' for user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Notifications updated"
+        )
+
+    async def _handle_language_setting(self, callback_query_id: str, value: str, user_id: int):
+        """Handle language setting"""
+        logger.info(f"Setting language to '{value}' for user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Language updated"
+        )
+
+    async def _handle_theme_setting(self, callback_query_id: str, value: str, user_id: int):
+        """Handle theme setting"""
+        logger.info(f"Setting theme to '{value}' for user {user_id}")
+        await self.answer_callback_query(
+            callback_query_id=callback_query_id,
+            text="Theme updated"
+        )
+
+    # ========================================================================
+    # Inline Mode Methods
+    # ========================================================================
+
+    async def answer_inline_query(
+        self,
+        inline_query_id: str,
+        results: List[Dict[str, Any]],
+        cache_time: Optional[int] = 300,
+        personal: Optional[bool] = None,
+        next_offset: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Answer an inline query.
+
+        Args:
+            inline_query_id: Inline query ID
+            results: List of result objects
+            cache_time: Cache duration in seconds
+            personal: Cache only for user
+            next_offset: Offset for pagination
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/answerInlineQuery"
+
+            # Build inline query results
+            inline_results = []
+            for result in results[:50]:  # Limit to 50 results
+                inline_results.append({
+                    "type": "article",
+                    "id": result.get("id", str(result.get("result_id"))),
+                    "title": result.get("title", ""),
+                    "description": result.get("description", ""),
+                    "input_message_content": {
+                        "message_text": result.get("message", "")
+                    },
+                })
+
+            payload = {
+                "inline_query_id": inline_query_id,
+                "results": inline_results,
+                "cache_time": cache_time,
+                "is_personal": personal or False,
+            }
+
+            if next_offset:
+                payload["next_offset"] = next_offset
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Answered inline query {inline_query_id}")
+                return {
+                    "success": True,
+                    "inline_query_id": inline_query_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to answer inline query: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error answering inline query: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def handle_inline_query(self, inline_query: Dict[str, Any]) -> None:
+        """
+        Handle an inline query.
+
+        Searches for results and responds to the inline query using semantic search.
+        """
+        try:
+            query_id = inline_query.get("id")
+            query = inline_query.get("query", "")
+            from_user = inline_query.get("from", {})
+            user_id = from_user.get("id")
+
+            logger.info(f"Received inline query {query_id} from user {user_id}: {query}")
+
+            # Perform semantic search
+            results = []
+
+            if query and len(query.strip()) >= 2:
+                # Use LanceDB for semantic search if available
+                if self.lancedb_handler:
+                    try:
+                        # Search in communications table
+                        search_results = await self.lancedb_handler.semantic_search(
+                            table_name="communications",
+                            query_text=query,
+                            limit=10
+                        )
+
+                        # Convert LanceDB results to Telegram inline format
+                        for result in search_results:
+                            inline_result = self._format_lancedb_result_for_inline(result)
+                            if inline_result:
+                                results.append(inline_result)
+
+                        logger.info(f"Found {len(results)} semantic search results for query: {query}")
+
+                    except Exception as e:
+                        logger.error(f"Error performing semantic search: {e}")
+                        # Fall back to simple results
+                        results = await self._perform_simple_inline_search(query)
+                else:
+                    # Use simple search if LanceDB not available
+                    results = await self._perform_simple_inline_search(query)
+
+            # Answer with results
+            await self.answer_inline_query(
+                inline_query_id=query_id,
+                results=results,
+                cache_time=300,
+            )
+
+        except Exception as e:
+            logger.error(f"Error handling inline query: {e}")
+
+        except Exception as e:
+            logger.error(f"Error handling inline query: {e}")
+
+    def _format_lancedb_result_for_inline(self, result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Format LanceDB search result for Telegram inline query response.
+
+        Args:
+            result: LanceDB search result
+
+        Returns:
+            Formatted inline result dict or None if formatting fails
+        """
+        try:
+            # Extract relevant fields from result
+            comm_id = result.get('id', '')
+            subject = result.get('subject', 'No Subject')
+            body = result.get('body', '')
+            sender = result.get('sender', 'Unknown')
+            platform = result.get('platform', 'unknown')
+            timestamp = result.get('timestamp', '')
+
+            # Create message text for the inline result
+            message_text = f"*{subject}*\n\n"
+            message_text += f"From: {sender}\n"
+            message_text += f"Platform: {platform}\n\n"
+
+            # Add truncated body
+            if body:
+                body_preview = body[:200] + "..." if len(body) > 200 else body
+                message_text += f"{body_preview}"
+
+            # Format as Telegram inline result
+            inline_result = {
+                "type": "article",
+                "id": comm_id or str(hash(subject + body)),
+                "title": subject,
+                "description": f"From {sender} via {platform}",
+                "input_message_content": {
+                    "message_text": message_text,
+                    "parse_mode": "Markdown"
+                }
+            }
+
+            return inline_result
+
+        except Exception as e:
+            logger.error(f"Error formatting LanceDB result: {e}")
+            return None
+
+    async def _perform_simple_inline_search(self, query: str) -> List[Dict[str, Any]]:
+        """
+        Perform a simple inline search without LanceDB (fallback).
+
+        Args:
+            query: Search query string
+
+        Returns:
+            List of inline results
+        """
+        try:
+            # Return simple static results as fallback
+            results = [
+                {
+                    "type": "article",
+                    "id": "help_1",
+                    "title": f"Search: {query}",
+                    "description": "Advanced search not available",
+                    "input_message_content": {
+                        "message_text": f"Semantic search is not configured. Your query: {query}"
+                    }
+                }
+            ]
+
+            logger.debug(f"Performed simple inline search for: {query}")
+            return results
+
+        except Exception as e:
+            logger.error(f"Error in simple inline search: {e}")
+            return []
+
+    # ========================================================================
+    # Chat Action Methods
+    # ========================================================================
+
+    async def send_chat_action(
+        self,
+        chat_id: int,
+        action: str,
+        progress: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Send a chat action indicator.
+
+        Args:
+            chat_id: Telegram chat ID
+            action: Action type (typing, upload_photo, etc.)
+            progress: Progress percentage (0-100)
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendChatAction"
+
+            payload = {
+                "chat_id": chat_id,
+                "action": action,
+            }
+
+            if progress is not None:
+                payload["progress"] = progress
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Sent chat action '{action}' to chat {chat_id}")
+                return {
+                    "success": True,
+                    "chat_id": chat_id,
+                    "action": action,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to send chat action: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error sending chat action: {e}")
+            return {"success": False, "error": str(e)}
+
+    # ========================================================================
+    # Enhanced Message Methods
+    # ========================================================================
+
+    async def send_intelligent_message(
+        self,
+        channel_id: int,
+        message: str,
+        metadata: Optional[Dict[str, Any]] = None,
+        parse_mode: Optional[str] = None,
+        disable_web_page_preview: Optional[bool] = None,
+        disable_notification: Optional[bool] = None,
+        reply_to_message_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Enhanced send message with support for parse mode and reply.
+
+        Args:
+            channel_id: Telegram chat ID
+            message: Message text
+            metadata: Optional metadata
+            parse_mode: Markdown or HTML
+            disable_web_page_preview: Disable link previews
+            disable_notification: Send silently
+            reply_to_message_id: Reply to specific message
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+            payload = {
+                "chat_id": channel_id,
+                "text": message,
+            }
+
+            # Optional parameters
+            if parse_mode:
+                payload["parse_mode"] = parse_mode
+            if disable_web_page_preview is not None:
+                payload["disable_web_page_preview"] = disable_web_page_preview
+            if disable_notification is not None:
+                payload["disable_notification"] = disable_notification
+            if reply_to_message_id:
+                payload["reply_to_message_id"] = reply_to_message_id
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Sent intelligent message to channel {channel_id}")
+                return {
+                    "success": True,
+                    "message_id": data.get("result", {}).get("message_id"),
+                    "channel_id": channel_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to send message: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error sending intelligent message: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def send_photo(
+        self,
+        chat_id: int,
+        photo: str,
+        caption: Optional[str] = None,
+        parse_mode: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Send a photo to Telegram chat.
+
+        Args:
+            chat_id: Telegram chat ID
+            photo: Photo URL or file_id
+            caption: Photo caption
+            parse_mode: Markdown or HTML
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendPhoto"
+
+            payload = {
+                "chat_id": chat_id,
+                "photo": photo,
+            }
+
+            if caption:
+                payload["caption"] = caption
+            if parse_mode:
+                payload["parse_mode"] = parse_mode
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Sent photo to chat {chat_id}")
+                return {
+                    "success": True,
+                    "message_id": data.get("result", {}).get("message_id"),
+                    "chat_id": chat_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to send photo: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error sending photo: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def send_poll(
+        self,
+        chat_id: int,
+        question: str,
+        options: List[str],
+        is_anonymous: bool = False,
+        allows_multiple_answers: bool = False,
+        explanation: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Send a poll to Telegram chat.
+
+        Args:
+            chat_id: Telegram chat ID
+            question: Poll question
+            options: List of answer options
+            is_anonymous: Anonymous poll
+            allows_multiple_answers: Allow multiple selections
+            explanation: Additional explanation
+
+        Returns:
+            Result dict with success status
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendPoll"
+
+            # Build poll options
+            poll_options = []
+            for option in options:
+                poll_options.append({"text": option})
+
+            payload = {
+                "chat_id": chat_id,
+                "question": question,
+                "options": poll_options,
+                "is_anonymous": is_anonymous,
+                "allows_multiple_answers": allows_multiple_answers,
+            }
+
+            if explanation:
+                payload["explanation"] = explanation
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                logger.info(f"Sent poll to chat {chat_id}")
+                return {
+                    "success": True,
+                    "message_id": data.get("result", {}).get("message_id"),
+                    "poll_id": data.get("result", {}).get("poll_id"),
+                    "chat_id": chat_id,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to send poll: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error sending poll: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def get_chat_info(
+        self,
+        chat_id: int,
+    ) -> Dict[str, Any]:
+        """
+        Get information about a Telegram chat.
+
+        Args:
+            chat_id: Telegram chat ID
+
+        Returns:
+            Chat information dict
+        """
+        try:
+            bot_token = self.config.get('bot_token')
+            if not bot_token:
+                return {"success": False, "error": "Bot token not configured"}
+
+            url = f"https://api.telegram.org/bot{bot_token}/getChat"
+
+            payload = {"chat_id": chat_id}
+
+            import httpx
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload)
+                data = response.json()
+
+            if data.get("ok"):
+                result = data.get("result", {})
+                logger.info(f"Retrieved chat info for {chat_id}")
+                return {
+                    "success": True,
+                    "chat_id": chat_id,
+                    "chat_info": result,
+                }
+            else:
+                error_msg = data.get("description", "Unknown error")
+                logger.error(f"Failed to get chat info: {error_msg}")
+                return {"success": False, "error": error_msg}
+
+        except Exception as e:
+            logger.error(f"Error getting chat info: {e}")
+            return {"success": False, "error": str(e)}
+
+# Global Telegram integration instance
+atom_telegram_integration = AtomTelegramIntegration({
+    'bot_token': os.getenv('TELEGRAM_BOT_TOKEN'),
+    'bot_username': os.getenv('TELEGRAM_BOT_USERNAME'),
+    'webhook_url': os.getenv('TELEGRAM_WEBHOOK_URL'),
+    'enable_enterprise_features': True,
+    'security_level': 'standard',
+    'compliance_standards': ['SOC2', 'ISO27001'],
+    'database': None,  # Would be actual database connection
+    'cache': None,  # Would be actual cache client
+    'security_service': atom_enterprise_security_service,
+    'automation_service': atom_workflow_automation_service,
+    'ai_service': ai_enhanced_service
+})
