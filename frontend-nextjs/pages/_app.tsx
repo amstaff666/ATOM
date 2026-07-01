@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { SessionProvider } from "next-auth/react";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import "../styles/globals.css";
 import Layout from "../components/layout/Layout";
 import { ToastProvider } from "../components/ui/use-toast";
@@ -25,15 +26,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <SessionProvider session={(pageProps as any).session}>
-      <ToastProvider>
-        {hasOwnLayout ? (
-          <Component {...pageProps} />
-        ) : (
-          <Layout>
+      <ChakraProvider value={defaultSystem}>
+        <ToastProvider>
+          {hasOwnLayout ? (
             <Component {...pageProps} />
-          </Layout>
-        )}
-      </ToastProvider>
+          ) : (
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          )}
+        </ToastProvider>
+      </ChakraProvider>
     </SessionProvider>
   );
 }
