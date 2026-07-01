@@ -150,6 +150,15 @@ class AgentGovernanceService:
         self.activity_publisher = activity_publisher
         self.continuous_learning = ContinuousLearningService(db)
 
+    def list_agents(self, category: Optional[str] = None) -> List[AgentRegistry]:
+        """List registered agents for the current workspace."""
+        query = self.db.query(AgentRegistry).filter(
+            AgentRegistry.workspace_id == self.workspace_id
+        )
+        if category:
+            query = query.filter(AgentRegistry.category == category)
+        return query.order_by(AgentRegistry.name.asc()).all()
+
     def register_or_update_agent(
         self, 
         name: str, 
@@ -394,7 +403,7 @@ class AgentGovernanceService:
             return {"proceed": False, "status": "BLOCKED", "reason": check["reason"], "action_required": "HUMAN_APPROVAL"}
         
         if check["requires_approval"]:
-            return {"proceed": True, "status": "PENDING_APPROVAL", "reason": "Requires oversight", "action_required": "WAIT_FOR_APPROVAL"}
+            return {"proceed": False, "status": "PENDING_APPROVAL", "reason": "Requires oversight", "action_required": "WAIT_FOR_APPROVAL"}
 
         # Autonomous Guardrails
         if check["agent_status"] == AgentStatus.AUTONOMOUS.value:
