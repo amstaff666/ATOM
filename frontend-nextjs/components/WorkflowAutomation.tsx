@@ -118,12 +118,47 @@ interface ServiceInfo {
 
 import WorkflowBuilder from "./Automations/WorkflowBuilder";
 
+async function parseJsonResponse(response: Response, fallback: any) {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    return {
+      ...fallback,
+      success: false,
+      error: text || `HTTP ${response.status}`,
+      status: response.status,
+    };
+  }
+
+  if (!contentType.includes("application/json")) {
+    const text = await response.text().catch(() => "");
+    return {
+      ...fallback,
+      success: false,
+      error: text || "Non-JSON response",
+      status: response.status,
+    };
+  }
+
+  try {
+    return await response.json();
+  } catch (error: any) {
+    return {
+      ...fallback,
+      success: false,
+      error: error?.message || "Invalid JSON response",
+      status: response.status,
+    };
+  }
+}
 
 const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) => {
   const [templates, setTemplates] = useState<WorkflowTemplate[]>([]);
   const [workflows, setWorkflows] = useState<WorkflowDefinition[]>([]);
   const [executions, setExecutions] = useState<WorkflowExecution[]>([]);
   const [services, setServices] = useState<Record<string, ServiceInfo>>({});
+  const [workflowDataError, setWorkflowDataError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] =
     useState<WorkflowTemplate | null>(null);
   const [selectedWorkflow, setSelectedWorkflow] =
@@ -254,54 +289,74 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
   const fetchTemplates = async () => {
     try {
       const response = await fetch("/api/workflow-templates/"); // Fixed endpoint with trailing slash
-      if (response.ok) {
-        const data = await response.json();
-        // The API returns the list directly, not { success: true, templates: ... }
-        // Also map template_id -> id for frontend compatibility
-        const mapped = Array.isArray(data) ? data.map((t: any) => ({
-          ...t,
-          id: t.template_id
-        })) : [];
-        setTemplates(mapped);
+      const data = await parseJsonResponse(response, []);
+      if (data.success === false) {
+        setTemplates([]);
+        setWorkflowDataError(data.error || "Failed to load workflow templates");
+        return;
       }
+      // The API returns the list directly, not { success: true, templates: ... }
+      // Also map template_id -> id for frontend compatibility
+      const mapped = Array.isArray(data) ? data.map((t: any) => ({
+        ...t,
+        id: t.template_id
+      })) : [];
+      setTemplates(mapped);
     } catch (e) {
       console.error("Failed to fetch templates", e);
+      setTemplates([]);
+      setWorkflowDataError("Failed to load workflow templates");
     }
   };
 
   const fetchWorkflows = async () => {
     try {
       const response = await fetch("/api/workflows/definitions");
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false, workflows: [] });
       if (data.success) {
-        setWorkflows(data.workflows);
+        setWorkflows(data.workflows || []);
+      } else {
+        setWorkflows([]);
+        setWorkflowDataError(data.error || "Failed to load workflows");
       }
     } catch (e) {
       console.error("Failed to fetch workflows", e);
+      setWorkflows([]);
+      setWorkflowDataError("Failed to load workflows");
     }
   };
 
   const fetchExecutions = async () => {
     try {
       const response = await fetch("/api/workflows/executions");
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false, executions: [] });
       if (data.success) {
-        setExecutions(data.executions);
+        setExecutions(data.executions || []);
+      } else {
+        setExecutions([]);
+        setWorkflowDataError(data.error || "Failed to load workflow executions");
       }
     } catch (e) {
       console.error("Failed to fetch executions", e);
+      setExecutions([]);
+      setWorkflowDataError("Failed to load workflow executions");
     }
   };
 
   const fetchServices = async () => {
     try {
       const response = await fetch("/api/workflows/services");
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false, services: {} });
       if (data.success) {
-        setServices(data.services);
+        setServices(Array.isArray(data.services) ? {} : (data.services || {}));
+      } else {
+        setServices({});
+        setWorkflowDataError(data.error || "Failed to load workflow services");
       }
     } catch (e) {
       console.error("Failed to fetch services", e);
+      setServices({});
+      setWorkflowDataError("Failed to load workflow services");
     }
 
   };
@@ -322,7 +377,7 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
           definition: builderData,
         }),
       });
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false });
       if (data.success) {
         toast({
           title: "Workflow Saved",
@@ -392,7 +447,7 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
         }),
       });
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false });
       if (data.success) {
         toast({
           title: "Workflow Started",
@@ -429,7 +484,7 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
         },
       );
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false });
       if (data.success) {
         toast({
           title: "Execution Cancelled",
@@ -466,7 +521,7 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
         }
       );
 
-      const data = await response.json();
+      const data = await parseJsonResponse(response, { success: false });
       if (data.success) {
         toast({
           title: "Execution Resumed",
@@ -511,8 +566,8 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
         }
       );
 
-      const data = await response.json();
-      if (response.ok) {
+      const data = await parseJsonResponse(response, { success: false });
+      if (data.success !== false) {
         toast({
           title: "Timeline Forked! 🌌",
           description: `Created parallel universe: ${data.new_execution_id}`,
@@ -756,6 +811,14 @@ const WorkflowAutomation: React.FC<{ triggerNew?: number }> = ({ triggerNew }) =
           </Button>
         </div>
       </div>
+
+      {workflowDataError && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Workflow data unavailable</AlertTitle>
+          <AlertDescription>{workflowDataError}</AlertDescription>
+        </Alert>
+      )}
 
       {viewMode === "builder" ? (
         <WorkflowBuilder

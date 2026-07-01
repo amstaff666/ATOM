@@ -1,49 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import {
-  Search,
-  MessageSquare,
-  CheckSquare,
-  Play,
+  AlertTriangle,
+  BarChart3,
+  Bot,
   Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  FileText,
+  Play,
+  RefreshCw,
   Server,
+  Shield,
+  Zap,
 } from "lucide-react";
 
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import {
   Card,
-  CardHeader,
-
-  CardTitle,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "../components/ui/card";
 import { OnboardingWizard } from "../components/Onboarding/OnboardingWizard";
+import { AiWorkbenchDashboard } from "../components/workbench/AiWorkbenchDashboard";
+import { safeJson } from "../lib/safe-fetch";
+
+type DashboardMetric = {
+  label: string;
+  value: string;
+  detail: string;
+  icon: React.ElementType;
+  path: string;
+};
+
+const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4490";
 
 const Home = () => {
   const router = useRouter();
   const [showWizard, setShowWizard] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [backendHealthy, setBackendHealthy] = useState<boolean | null>(null);
+  const [documentsCount, setDocumentsCount] = useState(0);
+  const [agentsCount, setAgentsCount] = useState(0);
+  const [workflowCount, setWorkflowCount] = useState(0);
+  const [lastChecked, setLastChecked] = useState<string>("Kontrollimata");
 
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
         const token =
           localStorage.getItem("auth_token") || localStorage.getItem("token");
-        // Only check if we have a token (logged in)
         if (token) {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4490'}/api/onboarding/status`, {
-            headers: { "Authorization": `Bearer ${token}` }
+          const status = await safeJson(`${apiBase}/api/onboarding/status`, { onboarding_completed: true }, {
+            headers: { Authorization: `Bearer ${token}` },
           });
-          if (res.ok) {
-            const data = await res.json();
+          if (status.ok) {
+            const data = status.data;
             if (!data.onboarding_completed) {
               setShowWizard(true);
-              // Fetch full user details for wizard personalized greeting
-              const userRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4490'}/api/users/me`, {
-                headers: { "Authorization": `Bearer ${token}` }
+              const userRes = await safeJson(`${apiBase}/api/users/me`, null, {
+                headers: { Authorization: `Bearer ${token}` },
               });
               if (userRes.ok) {
-                setUser(await userRes.json());
+                setUser(userRes.data);
               }
             }
           }
@@ -55,132 +80,250 @@ const Home = () => {
     checkOnboarding();
   }, []);
 
-  const features = [
-    {
-      title: "Search",
-      description:
-        "AI-powered search across all your documents, meetings, and notes",
-      icon: Search,
-      path: "/search",
-      color: "text-blue-500",
-    },
-    {
-      title: "Communication",
-      description: "Unified messaging hub for all your communication platforms",
-      icon: MessageSquare,
-      path: "/communication",
-      color: "text-green-500",
-    },
-    {
-      title: "Tasks",
-      description: "Smart task management with AI-powered prioritization",
-      icon: CheckSquare,
-      path: "/tasks",
-      color: "text-orange-500",
-    },
-    {
-      title: "Workflow Automation",
-      description: "Create and manage automated workflows across services",
-      icon: Play,
-      path: "/automations",
-      color: "text-purple-500",
-    },
-    {
-      title: "Calendar",
-      description: "Smart scheduling and calendar management",
-      icon: Calendar,
-      path: "/calendar",
-      color: "text-red-500",
-    },
-    {
-      title: "Finance",
-      description: "Manage subscriptions, invoices, and financial integrations",
-      icon: Server,
-      path: "/finance",
-      color: "text-green-500",
-    },
-    {
-      title: "Integrations",
-      description: "Connect and manage all your third-party integrations",
-      icon: Server,
-      path: "/integrations",
-      color: "text-blue-500",
-    },
-    {
-      title: "Voice",
-      description: "AI voice assistants and phone integration",
-      icon: MessageSquare,
-      path: "/voice",
-      color: "text-pink-500",
-    },
-    {
-      title: "Settings",
-      description: "Workspace preferences and data pipelines",
-      icon: Server,
-      path: "/settings",
-      color: "text-gray-500 dark:text-gray-400",
-    },
+  useEffect(() => {
+    const refreshDashboard = async () => {
+      const [health, documents, agents, workflows] = await Promise.all([
+        safeJson(`${apiBase}/healthz`, null),
+        safeJson(`${apiBase}/api/documents`, { data: [] }),
+        safeJson(`${apiBase}/api/agents/`, []),
+        safeJson("/api/workflows/executions", { executions: [] }),
+      ]);
+
+      setBackendHealthy(Boolean((health.data as any)?.ok || (health.data as any)?.status === "healthy"));
+      setDocumentsCount(Array.isArray((documents.data as any)?.data) ? (documents.data as any).data.length : 0);
+      setAgentsCount(Array.isArray(agents.data) ? agents.data.length : 0);
+      setWorkflowCount(Array.isArray((workflows.data as any)?.executions) ? (workflows.data as any).executions.length : 0);
+      setLastChecked(new Date().toLocaleTimeString());
+    };
+
+    refreshDashboard();
+  }, []);
+
+  const metrics: DashboardMetric[] = useMemo(
+    () => [
+      {
+        label: "Aktiivsed dokumendid",
+        value: String(documentsCount),
+        detail: "Indekseeritud failid ülevaatuseks",
+        icon: FileText,
+        path: "/documents",
+      },
+      {
+        label: "Agendid",
+        value: String(agentsCount),
+        detail: "Saadaval kohalikud operaatorid",
+        icon: Bot,
+        path: "/agents",
+      },
+      {
+        label: "Töövood",
+        value: String(workflowCount),
+        detail: "Praegune käivituste järjekord",
+        icon: Play,
+        path: "/automations",
+      },
+      {
+        label: "Backend",
+        value: backendHealthy ? "Töös" : backendHealthy === false ? "Kontrolli" : "...",
+        detail: `Viimati kontrollitud ${lastChecked}`,
+        icon: Server,
+        path: "/settings",
+      },
+    ],
+    [agentsCount, backendHealthy, documentsCount, lastChecked, workflowCount],
+  );
+
+  const recentCases = [
+    { name: "Dokumentide vastuvõtt", status: "Ootel", detail: "Aktiivseid üleslaadimisi pole" },
+    { name: "Agentide register", status: "Valmis", detail: `${agentsCount} agenti saadaval` },
+    { name: "Töövoogude jälgija", status: "Rahulik", detail: "Käimasolevaid töövooge pole" },
+    { name: "Laenu Haldur", status: "Valmis", detail: "Rahastusjuhtumite töölaud on peamenüüs" },
+  ];
+
+  const warnings = [
+    "Turunduse töölaud kasutab praegu lokaalset fallback-andmestikku.",
+    "Töövoogude käivitused on tühjad kuni orkestreerimise teenus on ühendatud.",
+    "NextAuth töötab lokaalses arendusrežiimis.",
+  ];
+
+  const quickActions = [
+    { label: "Lisa dokument", icon: FileText, path: "/documents" },
+    { label: "Ava agendid", icon: Bot, path: "/agents" },
+    { label: "Uus automatsioon", icon: Zap, path: "/automations" },
+    { label: "Laenu Haldur", icon: CreditCard, path: "/laenu-haldur" },
   ];
 
   return (
-    <div className="container mx-auto py-8 max-w-6xl">
+    <>
+    <Head>
+      <title>Annaator | Töölaud</title>
+      <meta name="description" content="Annaatori kohalik operaatori töölaud." />
+    </Head>
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 text-slate-100">
       <OnboardingWizard
         isOpen={showWizard}
         onClose={() => setShowWizard(false)}
         user={user}
         onUpdate={(data) => {
-          // Optimistically update local state if needed
           if (data.onboarding_completed) {
             setShowWizard(false);
           }
         }}
       />
-      <div className="flex flex-col space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to ATOM</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            Your AI-powered personal automation platform
-          </p>
-          <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2">
-            Free Edition — no account required
+
+      <div className="flex flex-col gap-4 border-b border-slate-800/80 pb-5 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <Badge variant={backendHealthy ? "default" : "secondary"}>
+              {backendHealthy ? "Kohalik backend töös" : "Kohalik režiim"}
+            </Badge>
+            <span className="text-xs text-slate-400">Operaatori töölaud</span>
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight">Annaator AI Workbench</h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">
+            Jälgi kohalikke teenuseid, PDF orkestrit, agente, automatsioone ja järgmisi ehitust vajavaid mooduleid.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div key={index}>
-              <Card
-                className="h-full cursor-pointer hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
-                onClick={() => router.push(feature.path)}
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <feature.icon className={`h-6 w-6 ${feature.color}`} />
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center mt-8">
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
-            Ready to automate your workflow?
-          </p>
-          <Button
-            size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => router.push("/automations")}
-          >
-            Get Started with Automation
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => router.push("/analytics")}>
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Analüütika
+          </Button>
+          <Button onClick={() => router.push("/automations")}>
+            <Play className="mr-2 h-4 w-4" />
+            Automatsioonid
           </Button>
         </div>
       </div>
+
+      {backendHealthy === false && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Backend vajab tähelepanu</AlertTitle>
+          <AlertDescription>
+            Töölaud ei saanud `/healthz` vastust kinnitada. Lokaalsed fallback-vaated võivad siiski avaneda.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <AiWorkbenchDashboard compact />
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <Card
+            key={metric.label}
+            className="cursor-pointer border-slate-800 bg-slate-900/70 transition-colors hover:border-cyan-400/40"
+            onClick={() => router.push(metric.path)}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{metric.label}</CardTitle>
+              <metric.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-semibold">{metric.value}</div>
+              <p className="mt-1 text-xs text-muted-foreground">{metric.detail}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Clock className="h-4 w-4 text-slate-400" />
+              Hiljutised tööd
+            </CardTitle>
+            <CardDescription>Praegune kohalik tööjärjekord ja teenuste seis.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {recentCases.map((item) => (
+              <div key={item.name} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/30 p-3">
+                <div>
+                  <p className="text-sm font-medium">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">{item.detail}</p>
+                </div>
+                <Badge variant="secondary">{item.status}</Badge>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              Puuduvad asjad
+            </CardTitle>
+            <CardDescription>Teadaolevad lokaalsed puudused, mis ei tohiks UI tööd peatada.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {warnings.map((warning) => (
+              <div key={warning} className="flex gap-2 text-sm">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <span className="text-muted-foreground">{warning}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <RefreshCw className="h-4 w-4 text-muted-foreground" />
+              Kiirtegevused
+            </CardTitle>
+            <CardDescription>Liigu otse peamistesse töövoogudesse.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {quickActions.map((action) => (
+              <Button
+                key={action.label}
+                variant="outline"
+                className="justify-start"
+                onClick={() => router.push(action.path)}
+              >
+                <action.icon className="mr-2 h-4 w-4" />
+                {action.label}
+              </Button>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              Halduskontrollid
+            </CardTitle>
+            <CardDescription>Haldusvaated on saadaval vasakust menüüst.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm">Ärifaktid</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => router.push("/admin/business-facts")}>
+                Ava
+              </Button>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">JIT kontroll</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => router.push("/admin/jit-verification")}>
+                Ava
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
+    </>
   );
 };
 

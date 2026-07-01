@@ -16,11 +16,11 @@ import { cn } from '@/lib/utils';
 type TabType = 'flows' | 'agents' | 'templates' | 'tables' | 'versions';
 
 const TABS = [
-  { id: 'flows' as TabType, label: 'Flows', icon: Play, description: 'Build and manage your automations' },
-  { id: 'agents' as TabType, label: 'AI Agents', icon: Bot, description: 'Specialty agents create workflows' },
-  { id: 'templates' as TabType, label: 'Templates', icon: LayoutTemplate, description: 'Pre-built workflow templates' },
-  { id: 'tables' as TabType, label: 'Tables', icon: Database, description: 'Data storage for workflows' },
-  { id: 'versions' as TabType, label: 'Versions', icon: History, description: 'Version history' },
+  { id: 'flows' as TabType, label: 'Töövood', icon: Play, description: 'Ehita ja halda automatsioone' },
+  { id: 'agents' as TabType, label: 'AI agendid', icon: Bot, description: 'Spetsialist-agendid loovad töövooge' },
+  { id: 'templates' as TabType, label: 'Mallid', icon: LayoutTemplate, description: 'Valmis töövoomallid' },
+  { id: 'tables' as TabType, label: 'Tabelid', icon: Database, description: 'Töövoogude andmesalvestus' },
+  { id: 'versions' as TabType, label: 'Versioonid', icon: History, description: 'Versioonide ajalugu' },
 ];
 
 const AutomationsPage: React.FC = () => {
@@ -38,12 +38,12 @@ const AutomationsPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Automations | Atom</title>
-        <meta name="description" content="Build powerful workflow automations with AI. Connect your apps and automate tasks." />
+        <title>Automatsioonid | Annaator</title>
+        <meta name="description" content="Ehita AI abil töövoogude automatsioone ja ühenda teenuseid." />
       </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-800 flex flex-col">
+      <div className="min-h-screen bg-[#070b12] flex flex-col text-slate-100">
         {/* Header with Tabs */}
-        <div className="bg-white dark:bg-gray-900 border-b">
+        <div className="border-b border-slate-800/80 bg-[#0a0f1a]/90">
           <div className="max-w-screen-2xl mx-auto px-4">
             <div className="flex items-center justify-between py-4">
               <div className="flex items-center gap-3">
@@ -51,13 +51,13 @@ const AutomationsPage: React.FC = () => {
                   <Zap className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold">Automations</h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Build workflows with AI • 30+ integrations</p>
+                  <h1 className="text-xl font-bold">Automatsioonid</h1>
+                  <p className="text-sm text-slate-400">Ehita AI töövooge • 30+ integratsiooni</p>
                 </div>
               </div>
               <Button onClick={() => { setActiveTab('flows'); setTriggerNew(function(n) { return n + 1; }); }}>
                 <Plus className="w-4 h-4 mr-2" />
-                New Automation
+                Uus automatsioon
               </Button>
             </div>
 

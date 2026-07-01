@@ -10,13 +10,13 @@ export interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, className = '' }) => {
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-[#070b12] text-slate-100">
       {/* Sidebar Navigation */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className={cn("flex-1 overflow-y-auto p-6", className)}>
+        <main className={cn("flex-1 overflow-y-auto bg-[#070b12] p-6", className)}>
           {children}
         </main>
       </div>

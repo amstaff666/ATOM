@@ -22,6 +22,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Brain } from "lucide-react";
 import ReasoningChainViewer from "@/components/ReasoningChainViewer";
+import { AgentOrchestratorGrid } from "@/components/Agents/AgentOrchestratorGrid";
+import { AiWorkbenchDashboard } from "@/components/workbench/AiWorkbenchDashboard";
+import { safeJson } from "@/lib/safe-fetch";
+
+const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4490';
 
 const AgentsDashboard = () => {
     const router = useRouter();
@@ -44,7 +49,7 @@ const AgentsDashboard = () => {
     const [selectedReasoningId, setSelectedReasoningId] = useState<string | null>(null);
 
     // WebSocket Integration
-    const { isConnected, lastMessage, subscribe } = useWebSocket();
+    const { isConnected, lastMessage, subscribe } = useWebSocket({ autoConnect: false });
 
     useEffect(() => {
         if (isConnected) {
@@ -94,21 +99,19 @@ const AgentsDashboard = () => {
 
         try {
             setError(null);
-            const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4490';
-            const res = await fetch(`${apiBase}/api/agents/`, { headers });
+            const result = await safeJson<AgentInfo[]>(`${apiBase}/api/agents/`, [], { headers });
 
-            if (res.ok) {
-                const data = await res.json();
-                setAgents(data);
-            } else if (res.status === 401 || res.status === 403) {
-                setError("Could not load agents. Check that the backend is running.");
+            if (result.ok && Array.isArray(result.data)) {
+                setAgents(result.data);
+            } else if (result.status === 401 || result.status === 403) {
+                setError("Agente ei saanud laadida. Kontrolli, et backend töötab.");
                 localStorage.removeItem('auth_token');
             } else {
-                setError(`Failed to load agents: ${res.statusText}`);
+                setError(result.error || "Agentide laadimine ebaõnnestus. Näitan orkestri lokaalse plaani.");
             }
         } catch (err: any) {
             console.error("Agents fetch error:", err);
-            setError(`Failed to load agents: ${err.message || String(err)}. Check console for details.`);
+            setError(`Agentide laadimine ebaõnnestus: ${err.message || String(err)}. Vaata detaile konsoolist.`);
         } finally {
             setIsLoading(false);
         }
@@ -131,10 +134,10 @@ const AgentsDashboard = () => {
 
         setIsRunning(true);
         setActiveAgentId(selectedAgentId);
-        setLogs([`Initializing agent: ${selectedAgentId}...`, "Connecting to real-time stream...", `Instructions: ${runInstructions || "Default behavior"}`]);
+        setLogs([`Käivitan agenti: ${selectedAgentId}...`, "Ühendan reaalaja vooga...", `Juhised: ${runInstructions || "Vaikekäitumine"}`]);
 
         try {
-            const res = await fetch(`http://localhost:8000/api/agents/${selectedAgentId}/run/`, {
+            const result = await safeJson<any>(`${apiBase}/api/agents/${selectedAgentId}/run/`, { detail: "Käivitamine pole lokaalselt ühendatud." }, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -147,20 +150,19 @@ const AgentsDashboard = () => {
                 })
             });
 
-            if (res.ok) {
+            if (result.ok) {
                 toast({
-                    title: "Agent Started Successfully",
-                    description: `Agent ${selectedAgentId} is now running with your instructions.`,
+                    title: "Agent käivitati",
+                    description: `Agent ${selectedAgentId} töötab nüüd sinu juhistega.`,
                     duration: 5000
                 });
                 setIsRunDialogOpen(false); // Close dialog on success
             } else {
-                const err = await res.json();
-                toast({ title: "Failed to start", description: err.detail, variant: "error" });
-                setLogs(prev => [...prev, `Error: ${err.detail || 'Unknown error'}`]);
+                toast({ title: "Käivitamine ebaõnnestus", description: result.data?.detail || result.error, variant: "error" });
+                setLogs(prev => [...prev, `Viga: ${result.data?.detail || result.error || 'Tundmatu viga'}`]);
             }
         } catch (e) {
-            toast({ title: "Error", description: "Network error", variant: "error" });
+            toast({ title: "Viga", description: "Võrguviga", variant: "error" });
         } finally {
             setIsRunning(false);
         }
@@ -168,23 +170,22 @@ const AgentsDashboard = () => {
 
     const handleStopAgent = async (id: string) => {
         try {
-            const res = await fetch(`/api/agents/${id}/stop`, {
+            const result = await safeJson<any>(`${apiBase}/api/agents/${id}/stop`, { detail: "Peatamine pole lokaalselt ühendatud." }, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
                 },
                 method: 'POST'
             });
 
-            if (res.ok) {
-                toast({ title: "Agent Stopped", description: `Agent ${id} termination requested.` });
-                setLogs(prev => [...prev, "Termination requested by user..."]);
+            if (result.ok) {
+                toast({ title: "Agent peatatud", description: `Agendi ${id} peatamine küsitud.` });
+                setLogs(prev => [...prev, "Kasutaja küsis peatamist..."]);
                 fetchAgents();
             } else {
-                const err = await res.json();
-                toast({ title: "Failed to stop", description: err.detail, variant: "error" });
+                toast({ title: "Peatamine ebaõnnestus", description: result.data?.detail || result.error, variant: "error" });
             }
         } catch (e) {
-            toast({ title: "Error", description: "Network error", variant: "error" });
+            toast({ title: "Viga", description: "Võrguviga", variant: "error" });
         }
     };
 
@@ -214,7 +215,7 @@ const AgentsDashboard = () => {
     const handleStepFeedback = async (stepId: string, score: number, comment?: string) => {
         try {
             // Internal path for single-tenant feedback
-            const res = await fetch(`http://localhost:8000/api/v1/agents/steps/feedback`, {
+            const result = await safeJson<any>(`${apiBase}/api/v1/agents/steps/feedback`, { detail: "Tagasiside endpoint pole lokaalselt ühendatud." }, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -227,11 +228,11 @@ const AgentsDashboard = () => {
                 })
             });
 
-            if (res.ok) {
-                toast({ title: "Feedback Recorded", description: "The agent will learn from this correction." });
+            if (result.ok) {
+                toast({ title: "Tagasiside salvestatud", description: "Agent õpib sellest parandusest." });
             }
         } catch (e) {
-            toast({ title: "Error", description: "Failed to submit feedback", variant: "error" });
+            toast({ title: "Viga", description: "Tagasiside saatmine ebaõnnestus", variant: "error" });
         }
     };
 
@@ -239,7 +240,7 @@ const AgentsDashboard = () => {
         if (!selectedAgentId) return;
 
         try {
-            const res = await fetch(`/api/agents/${selectedAgentId}`, {
+            const result = await safeJson<any>(`${apiBase}/api/agents/${selectedAgentId}`, { detail: "Uuendamine pole lokaalselt ühendatud." }, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,16 +252,15 @@ const AgentsDashboard = () => {
                 })
             });
 
-            if (res.ok) {
-                toast({ title: "Agent Updated", description: "Agent details saved successfully." });
+            if (result.ok) {
+                toast({ title: "Agent uuendatud", description: "Agendi detailid salvestati." });
                 setIsEditDialogOpen(false);
                 fetchAgents();
             } else {
-                const err = await res.json();
-                toast({ title: "Failed to update", description: err.detail || "Unknown error", variant: "error" });
+                toast({ title: "Uuendamine ebaõnnestus", description: result.data?.detail || result.error || "Tundmatu viga", variant: "error" });
             }
         } catch (e) {
-            toast({ title: "Error", description: "Network error", variant: "error" });
+            toast({ title: "Viga", description: "Võrguviga", variant: "error" });
         }
     };
 
@@ -269,43 +269,57 @@ const AgentsDashboard = () => {
     const activeAgentMaturity = agents.find(a => a.id === activeAgentId)?.maturity_level || "student";
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8 font-sans">
+        <div className="min-h-screen bg-[#070b14] p-6 font-sans text-slate-100 lg:p-8">
             <Head>
-                <title>Atom AI | Agent Control Center</title>
+                <title>Agendid | Annaator</title>
             </Head>
 
-            <div className="max-w-6xl mx-auto space-y-8">
+            <div className="mx-auto max-w-7xl space-y-8">
 
                 {/* Header */}
-                <div className="flex flex-col space-y-2">
-                    <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
-                        <LayoutDashboard className="w-8 h-8 text-blue-600" />
-                        Agent Control Center
+                <div className="flex flex-col gap-4 border-b border-slate-800/80 pb-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                    <div className="mb-2 flex items-center gap-2">
+                        <Badge className="border-cyan-400/20 bg-cyan-400/10 text-cyan-200">AI Center</Badge>
+                        <Badge variant={isConnected ? "default" : "secondary"}>
+                            {isConnected ? "Reaalajas" : "Lokaalne fallback"}
+                        </Badge>
+                    </div>
+                    <h1 className="flex items-center gap-2 text-3xl font-bold text-slate-100">
+                        <LayoutDashboard className="h-8 w-8 text-cyan-300" />
+                        Agentide juhtimiskeskus
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400">Monitor and orchestrate your autonomous workforce.</p>
+                    <p className="mt-2 max-w-3xl text-sm text-slate-400">Jälgi ja orkestreeri autonoomseid tööagente, PDF agente ja töövoogude haldureid.</p>
+                    </div>
+                    <Button variant="outline" onClick={() => router.push("/center/agents-workspace")}>
+                        Ava .agents tööruum
+                    </Button>
                 </div>
+
+                <AgentOrchestratorGrid />
+                <AiWorkbenchDashboard compact initialModuleId="master-agent" title="Agentide AI ehitusplaan" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* Agent Grid */}
                     <div className="lg:col-span-2 space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Available Agents</h2>
+                        <h2 className="text-xl font-semibold text-slate-100">Saadaval agendid</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {isLoading && agents.length === 0 && (
-                                <div className="col-span-1 md:col-span-2 py-12 text-center text-gray-500 dark:text-gray-400">
-                                    <p>Loading agents...</p>
+                                <div className="col-span-1 py-12 text-center text-slate-400 md:col-span-2">
+                                    <p>Laadin agente...</p>
                                 </div>
                             )}
 
                             {error && (
-                                <div className="col-span-1 md:col-span-2 p-4 bg-red-50 text-red-600 rounded border border-red-200">
+                                <div className="col-span-1 rounded border border-amber-400/20 bg-amber-400/10 p-4 text-amber-100 md:col-span-2">
                                     {error}
                                 </div>
                             )}
 
                             {!isLoading && !error && agents.length === 0 && (
-                                <div className="col-span-1 md:col-span-2 py-12 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600">
-                                    <p>No agents found. Create your first agent or spawn from a template.</p>
+                                <div className="col-span-1 rounded border border-dashed border-slate-700 bg-slate-900/70 py-12 text-center text-slate-400 md:col-span-2">
+                                    <p>Agente ei leitud. Loo esimene agent või käivita mallist.</p>
                                 </div>
                             )}
 
@@ -326,9 +340,9 @@ const AgentsDashboard = () => {
                     {/* Terminal Panel */}
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Live Logs</h2>
+                            <h2 className="text-xl font-semibold text-slate-100">Reaalaja logid</h2>
                             <Badge variant={isConnected ? "default" : "outline"} className={isConnected ? "bg-green-500" : ""}>
-                                {isConnected ? "Live Connection" : "Offline"}
+                                {isConnected ? "Reaalajas ühendus" : "Võrgust väljas"}
                             </Badge>
                         </div>
                         <MaturityProgression 
@@ -342,10 +356,10 @@ const AgentsDashboard = () => {
                             activeTools={['outlook', 'zoho', 'whatsapp', 'excel']} // For Demo
                         />
 
-                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border shadow-sm mt-4">
-                            <h3 className="font-semibold mb-2 text-sm text-gray-700 dark:text-gray-100">System Capability</h3>
-                            <div className="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/20 p-2 rounded border border-blue-100 dark:border-blue-800">
-                                WebSocket stream active. Real-time updates from GenericAgent ReAct loop.
+                        <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950/60 p-4 shadow-sm">
+                            <h3 className="mb-2 text-sm font-semibold text-slate-100">Süsteemi võimekus</h3>
+                            <div className="rounded border border-blue-400/20 bg-blue-400/10 p-2 text-xs text-blue-100">
+                                WebSocketi voog on valikuline. Kui teenus pole ühendatud, jääb UI lokaalse fallbackiga töökorda.
                             </div>
                         </div>
                     </div>
@@ -357,14 +371,14 @@ const AgentsDashboard = () => {
             <Dialog open={isRunDialogOpen} onOpenChange={setIsRunDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Run Agent</DialogTitle>
+                        <DialogTitle>Käivita agent</DialogTitle>
                         <DialogDescription>
-                            Provide specific instructions for this agent execution. Leave empty for default behavior.
+                            Anna sellele agendile täpsed juhised. Vaikekäitumiseks jäta väli tühjaks.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <Textarea
-                            placeholder="e.g. Reconcile inventory for SKU-123 and SKU-999..."
+                            placeholder="Nt kontrolli kliendi dokumendid ja too puudused välja..."
                             value={runInstructions}
                             onChange={(e) => setRunInstructions(e.target.value)}
                             className="min-h-[100px]"
@@ -372,10 +386,10 @@ const AgentsDashboard = () => {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsRunDialogOpen(false)}>
-                            Cancel
+                            Tühista
                         </Button>
                         <Button onClick={executeAgentRun} disabled={isRunning}>
-                            {isRunning ? "Starting..." : "Run Agent"}
+                            {isRunning ? "Käivitan..." : "Käivita agent"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -385,14 +399,14 @@ const AgentsDashboard = () => {
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Agent</DialogTitle>
+                        <DialogTitle>Muuda agenti</DialogTitle>
                         <DialogDescription>
-                            Update agent details.
+                            Uuenda agendi detaile.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Nimi</Label>
                             <Input
                                 id="name"
                                 value={editAgentName}
@@ -400,7 +414,7 @@ const AgentsDashboard = () => {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="description">Description</Label>
+                            <Label htmlFor="description">Kirjeldus</Label>
                             <Textarea
                                 id="description"
                                 value={editAgentDescription}
@@ -411,10 +425,10 @@ const AgentsDashboard = () => {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                            Cancel
+                            Tühista
                         </Button>
                         <Button onClick={saveAgentChanges}>
-                            Save Changes
+                            Salvesta muudatused
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -425,10 +439,10 @@ const AgentsDashboard = () => {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Brain className="w-5 h-5 text-purple-600" />
-                            Agent Reasoning Audit: {agents.find(a => a.id === selectedReasoningId)?.name}
+                            Agendi mõttekäigu audit: {agents.find(a => a.id === selectedReasoningId)?.name}
                         </DialogTitle>
                         <DialogDescription>
-                            Review the agent's internal thought process and provide corrections to improve its accuracy.
+                            Vaata agendi sisemist mõttekäiku ja lisa parandusi täpsuse tõstmiseks.
                         </DialogDescription>
                     </DialogHeader>
                     {selectedReasoningId && (
@@ -440,7 +454,7 @@ const AgentsDashboard = () => {
                         </div>
                     )}
                     <DialogFooter>
-                        <Button onClick={() => setIsReasoningModalOpen(false)}>Close</Button>
+                        <Button onClick={() => setIsReasoningModalOpen(false)}>Sulge</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

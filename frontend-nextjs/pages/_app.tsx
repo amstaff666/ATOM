@@ -1,47 +1,40 @@
-import React, { useState, useEffect } from "react";
+﻿import type { AppProps } from "next/app";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { SessionProvider } from "next-auth/react";
-import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
-import type { AppProps } from "next/app";
-
-import { ToastProvider } from "../components/ui/use-toast";
-import { GlobalChatWidget } from "../components/GlobalChatWidget";
 import "../styles/globals.css";
-
 import Layout from "../components/layout/Layout";
-import { WakeWordProvider } from "../contexts/WakeWordContext";
-import { useCliHandler } from "../hooks/useCliHandler";
-import { AuthTokenSync } from "../components/AuthTokenSync";
-
-const TauriHooks = () => {
-  useCliHandler();
-  return null;
-};
-
-function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
-  const [mounted, setMounted] = useState(false);
-
+import { ToastProvider } from "../components/ui/use-toast";
+const routesWithOwnLayout = [
+  "/workflows/builder",
+  "/workflows/editor",
+  "/settings/ai",
+  "/dashboard/risk",
+  "/dashboard/owner",
+  "/dashboard/forensics",
+];
+function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const hasOwnLayout = routesWithOwnLayout.some((route) =>
+    router.pathname === route || router.pathname.startsWith(`${route}/`),
+  );
 
   useEffect(() => {
-    setMounted(true);
+    document.documentElement.classList.add("dark");
   }, []);
 
   return (
-    <SessionProvider session={session}>
-      <AuthTokenSync />
-      <TauriHooks />
-      <ChakraProvider value={defaultSystem}>
-        <ToastProvider>
-          <WakeWordProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-            {mounted && <GlobalChatWidget />}
-          </WakeWordProvider>
-        </ToastProvider>
-      </ChakraProvider>
+    <SessionProvider session={(pageProps as any).session}>
+      <ToastProvider>
+        {hasOwnLayout ? (
+          <Component {...pageProps} />
+        ) : (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
+      </ToastProvider>
     </SessionProvider>
   );
 }
-
 export default MyApp;
-

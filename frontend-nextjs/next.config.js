@@ -61,10 +61,6 @@ const nextConfig = {
         destination: `${backendUrl}/api/integrations/:path*`,
       },
       {
-        source: "/api/workflows/:path*",
-        destination: `${backendUrl}/api/v1/workflow-ui/:path*`,
-      },
-      {
         source: "/api/ai/:path*",
         destination: `${backendUrl}/api/v1/ai/:path*`,
       },

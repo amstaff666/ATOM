@@ -42,6 +42,20 @@ export interface PieceTrigger {
     description: string;
 }
 
+async function parseJsonResponse<T>(response: Response, fallback: T): Promise<T> {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (!response.ok || !contentType.includes('application/json')) {
+        return fallback;
+    }
+
+    try {
+        return await response.json();
+    } catch {
+        return fallback;
+    }
+}
+
 // All available pieces - modeled after Activepieces
 const PIECES: Piece[] = [
     // Core Pieces (built-in control flow)
@@ -611,9 +625,7 @@ const PiecesSidebar: React.FC<PiecesSidebarProps> = ({ onSelectPiece, className 
         const fetchAgentSkills = async () => {
             try {
                 const response = await fetch('/api/skills/list');
-                if (!response.ok) throw new Error("Failed to fetch agent skills");
-
-                const result = await response.json();
+                const result = await parseJsonResponse<any>(response, { data: { skills: [] } });
 
                 if (result.data && result.data.skills) {
                     const agentSkills: Piece[] = result.data.skills.map((s: any) => ({
@@ -636,7 +648,7 @@ const PiecesSidebar: React.FC<PiecesSidebarProps> = ({ onSelectPiece, className 
                     setAllPieces(prev => [...prev, ...agentSkills]);
                 }
             } catch (err) {
-                console.error("Failed to load agent skills:", err);
+                console.warn("Agent skills catalog unavailable; using built-in pieces only.", err);
             }
         };
 
@@ -648,33 +660,35 @@ const PiecesSidebar: React.FC<PiecesSidebarProps> = ({ onSelectPiece, className 
         const fetchExternalPieces = async () => {
             try {
                 const response = await fetch('/api/v1/external-integrations/');
-                if (!response.ok) throw new Error("Failed to fetch");
+                const externalPiecesRaw = await parseJsonResponse<any[]>(response, []);
 
-                const externalPiecesRaw = await response.json();
+                if (!Array.isArray(externalPiecesRaw) || externalPiecesRaw.length === 0) {
+                    return;
+                }
 
                 // Map external pieces to UI format
                 const externalPieces: Piece[] = externalPiecesRaw.map((p: any) => ({
                     id: p.name, // e.g., @activepieces/piece-slack
-                    name: p.displayName,
+                    name: p.displayName || p.name,
                     icon: () => p.logoUrl ? <img src={p.logoUrl} className="w-5 h-5 object-contain" alt={p.displayName} /> : <Globe className="w-5 h-5" />,
                     color: '#64748b', // Default color
                     category: 'other', // Default category or map from p.tags
-                    actions: Object.values(p.actions).map((a: any) => ({
+                    actions: Object.values(p.actions || {}).map((a: any) => ({
                         id: a.name,
-                        name: a.displayName,
-                        description: a.description
+                        name: a.displayName || a.name,
+                        description: a.description || ''
                     })),
-                    triggers: Object.values(p.triggers).map((t: any) => ({
+                    triggers: Object.values(p.triggers || {}).map((t: any) => ({
                         id: t.name,
-                        name: t.displayName,
-                        description: t.description
+                        name: t.displayName || t.name,
+                        description: t.description || ''
                     })),
                     connected: false
                 }));
 
                 setAllPieces(prev => [...prev, ...externalPieces]);
             } catch (err) {
-                console.error("Failed to load external pieces:", err);
+                console.warn("External pieces catalog unavailable; using built-in pieces only.", err);
             } finally {
                 setIsLoading(false);
             }

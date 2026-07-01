@@ -2,29 +2,47 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
-    Search,
-    MessageSquare,
-    CheckSquare,
     Play,
     Calendar,
     Settings,
     ChevronLeft,
     ChevronRight,
     Home,
-    Target,
     CreditCard,
     Layers,
-    Layout,
-    Mic,
     Zap,
-    Heart,
     Bot,
-    Store,
     BarChart3,
     Sparkles,
     FileText,
     Shield,
     CheckCircle,
+    Search,
+    MessageSquare,
+    CheckSquare,
+    Store,
+    Briefcase,
+    Headphones,
+    BookOpen,
+    Radio,
+    Workflow,
+    Timer,
+    GraduationCap,
+    BrainCircuit,
+    Factory,
+    Music,
+    Video,
+    Wand2,
+    Users,
+    FileStack,
+    Network,
+    FileCog,
+    Route,
+    Database,
+    KeyRound,
+    Terminal,
+    Gauge,
+    GitBranch,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
@@ -33,6 +51,17 @@ import { FREE_EDITION_LABEL } from "../../lib/default-user";
 interface SidebarProps {
     className?: string;
 }
+
+type SidebarItem = {
+    label: string;
+    icon: React.ElementType;
+    path: string;
+};
+
+type SidebarCategory = {
+    name: string;
+    items: SidebarItem[];
+};
 
 const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     const router = useRouter();
@@ -46,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
                 setIsCollapsed(true);
             } else {
                 setIsMobile(false);
-                setIsCollapsed(false);
             }
         };
 
@@ -55,59 +83,84 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const categories = [
+    const categories: SidebarCategory[] = [
         {
-            name: "CORE",
+            name: "Core",
             items: [
-                { label: "Dashboard", icon: Home, path: "/" },
-                { label: "Chat", icon: MessageSquare, path: "/chat" },
-                { label: "Search", icon: Search, path: "/search" },
-                { label: "Documents", icon: FileText, path: "/documents" },
-                { label: "Tasks", icon: CheckSquare, path: "/tasks" },
-                { label: "Automations", icon: Play, path: "/automations" },
-                { label: "Agents", icon: Bot, path: "/agents" },
+                { label: "Avaleht", icon: Home, path: "/" },
+                { label: "Vestlus", icon: MessageSquare, path: "/chat" },
+                { label: "Otsing", icon: Search, path: "/search" },
+                { label: "Dokumendid", icon: FileText, path: "/documents" },
+                { label: "Ülesanded", icon: CheckSquare, path: "/tasks" },
+                { label: "Automatsioonid", icon: Play, path: "/automations" },
+                { label: "Agendid", icon: Bot, path: "/agents" },
                 { label: "Marketplace", icon: Store, path: "/marketplace" },
             ]
         },
         {
-            name: "COMMAND CENTERS",
+            name: "AI juhtimine",
             items: [
-                { label: "Projects", icon: Target, path: "/dashboards/projects" },
+                { label: "Peaagent", icon: BrainCircuit, path: "/center/master-agent" },
+                { label: "Cron jobid", icon: Timer, path: "/center/cron-jobs" },
+                { label: "Jobide järjekord", icon: Workflow, path: "/center/job-queue" },
+                { label: "Agentide treening", icon: GraduationCap, path: "/center/agent-training" },
+                { label: "Skill Factory", icon: Factory, path: "/center/skill-factory" },
+                { label: "Agentide ladu", icon: Database, path: "/center/agent-registry" },
+            ]
+        },
+        {
+            name: "PDF Editor Orkester",
+            items: [
+                { label: "PDF Orkester", icon: FileCog, path: "/center/pdf-orchestrator" },
+                { label: "PDF Editorid", icon: FileStack, path: "/center/pdf-editors" },
+                { label: "PDF agendid", icon: Network, path: "/center/pdf-agents" },
+                { label: "NexusPDF Alchemy", icon: Wand2, path: "/center/nexuspdf-alchemy" },
+                { label: "OnePDF klient", icon: FileText, path: "/center/onepdf-client" },
+                { label: ".agents tööruum", icon: Terminal, path: "/center/agents-workspace" },
+            ]
+        },
+        {
+            name: "Creator Studio",
+            items: [
+                { label: "Visual Flow PWA", icon: Route, path: "/center/visual-flow-pwa" },
+                { label: "Aurora Multimedia", icon: Video, path: "/center/aurora-multimedia" },
+                { label: "AI Multimedia Editor", icon: Wand2, path: "/center/ai-multimedia-editor" },
+                { label: "AI Muusika", icon: Music, path: "/center/ai-muusika" },
+                { label: "AI Influencer", icon: Users, path: "/center/ai-influencer" },
+                { label: "Sisu kalender", icon: Calendar, path: "/center/content-calendar" },
+            ]
+        },
+        {
+            name: "Command Centers",
+            items: [
+                { label: "Projektid", icon: Briefcase, path: "/dashboards/projects" },
                 { label: "Sales & CRM", icon: Zap, path: "/dashboards/sales" },
-                { label: "Support", icon: Heart, path: "/dashboards/support" },
-                { label: "Knowledge", icon: Layout, path: "/dashboards/knowledge" },
-                { label: "Communication", icon: MessageSquare, path: "/communication" },
+                { label: "Support", icon: Headphones, path: "/dashboards/support" },
+                { label: "Knowledge", icon: BookOpen, path: "/dashboards/knowledge" },
+                { label: "Communication", icon: Radio, path: "/dashboard/communication" },
             ]
         },
         {
-            name: "BUSINESS",
+            name: "Äri",
             items: [
-                { label: "Sales", icon: Target, path: "/sales" },
-                { label: "Marketing", icon: Zap, path: "/marketing" },
-                { label: "Finance", icon: CreditCard, path: "/finance" },
-                { label: "Analytics", icon: BarChart3, path: "/analytics" },
+                { label: "Laenu Haldur", icon: CreditCard, path: "/laenu-haldur" },
+                { label: "Analüütika", icon: BarChart3, path: "/analytics" },
+                { label: "Turundus", icon: Zap, path: "/marketing" },
+                { label: "Finantsid", icon: CreditCard, path: "/finance" },
+                { label: "Kalender", icon: Calendar, path: "/calendar" },
+                { label: "Influencer CRM", icon: Users, path: "/center/influencer-crm" },
             ]
         },
         {
-            name: "PRODUCTIVITY",
+            name: "System",
             items: [
-                { label: "Calendar", icon: Calendar, path: "/calendar" },
-                { label: "Health", icon: Heart, path: "/health" },
-                { label: "Voice", icon: Mic, path: "/voice" },
-            ]
-        },
-        {
-            name: "GOVERNANCE",
-            items: [
-                { label: "JIT Verification", icon: Shield, path: "/admin/jit-verification" },
-                { label: "Business Facts", icon: CheckCircle, path: "/admin/business-facts" },
-            ]
-        },
-        {
-            name: "PLATFORM",
-            items: [
-                { label: "Integrations", icon: Layers, path: "/integrations" },
-                { label: "Settings", icon: Settings, path: "/settings" },
+                { label: "Integratsioonid", icon: Layers, path: "/integrations" },
+                { label: "API võtmed", icon: KeyRound, path: "/center/api-keys" },
+                { label: "Tervis & logid", icon: Gauge, path: "/center/health-logs" },
+                { label: "Deploy/Git", icon: GitBranch, path: "/center/deploy-git" },
+                { label: "Seaded", icon: Settings, path: "/settings" },
+                { label: "Ärifaktid", icon: CheckCircle, path: "/admin/business-facts" },
+                { label: "JIT kontroll", icon: Shield, path: "/admin/jit-verification" },
             ]
         }
     ];
@@ -119,45 +172,45 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     return (
         <div
             className={cn(
-                "relative flex flex-col h-screen bg-background border-r border-border transition-all duration-300 ease-in-out z-40 backdrop-blur-xl bg-opacity-80",
-                isCollapsed ? "w-20" : "w-64",
+                "relative z-40 flex h-screen flex-col border-r border-slate-800/80 bg-[#0a0f1a]/95 shadow-[18px_0_60px_rgba(0,0,0,0.24)] backdrop-blur-xl transition-all duration-300 ease-in-out",
+                isCollapsed ? "w-20" : "w-72",
                 className
             )}
         >
-            <div className="flex items-center justify-center h-16 border-b border-border">
+            <div className="flex items-center justify-center h-16 border-b border-slate-800/80">
                 <div className={cn("flex items-center transition-all duration-300", isCollapsed ? "justify-center" : "px-6 w-full")}>
-                    <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                    <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_20px_rgba(34,211,238,0.35)]">
                         A
                     </div>
                     {!isCollapsed && (
-                        <span className="ml-3 font-bold text-xl tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
-                            ATOM
+                        <span className="ml-3 font-bold text-xl tracking-tight text-slate-100">
+                            Annaator
                         </span>
                     )}
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto py-6 space-y-6 px-3 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto py-5 space-y-5 px-3">
                 {categories.map((category) => (
                     <div key={category.name} className="space-y-1">
                         {!isCollapsed && (
-                            <h3 className="px-3 text-[10px] font-bold tracking-widest text-muted-foreground uppercase mb-2 ml-1">
+                            <h3 className="px-3 text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-2 ml-1">
                                 {category.name}
                             </h3>
                         )}
                         <div className="space-y-1">
                             {category.items.map((item) => {
-                                const isActive = router.pathname === item.path ||
-                                    (item.path !== "/" && router.pathname.startsWith(item.path));
+                                const currentPath = router.asPath.split("?")[0];
+                                const isActive = currentPath === item.path;
 
                                 return (
                                     <Link key={item.path} href={item.path} passHref>
                                         <div
                                             className={cn(
-                                                "relative flex items-center px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 group",
+                                                "relative flex items-center px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 group",
                                                 isActive
-                                                    ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(59,130,246,0.05)]"
-                                                    : "text-muted-foreground hover:bg-secondary/80 hover:text-foreground",
+                                                    ? "border border-cyan-400/25 bg-cyan-400/10 text-cyan-200 shadow-[0_0_18px_rgba(34,211,238,0.08)]"
+                                                    : "text-slate-400 hover:bg-slate-800/80 hover:text-slate-100",
                                                 isCollapsed ? "justify-center" : ""
                                             )}
                                             title={isCollapsed ? item.label : ""}
@@ -166,22 +219,22 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
                                                 className={cn(
                                                     "h-[18px] w-[18px] transition-all duration-300",
                                                     isActive
-                                                        ? "text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.6)] scale-110"
-                                                        : "group-hover:text-foreground group-hover:scale-105"
+                                                        ? "text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.55)] scale-110"
+                                                        : "group-hover:text-slate-100 group-hover:scale-105"
                                                 )}
                                             />
                                             {!isCollapsed && (
-                                                <span className="ml-3 font-semibold text-[13.5px] truncate transition-colors">
+                                                <span className="ml-3 font-semibold text-[13px] truncate transition-colors">
                                                     {item.label}
                                                 </span>
                                             )}
 
                                             {isCollapsed && isActive && (
-                                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-l-full shadow-[0_0_10px_rgba(59,130,246,1)]" />
+                                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-300 rounded-l-full shadow-[0_0_10px_rgba(34,211,238,1)]" />
                                             )}
 
                                             {isActive && !isCollapsed && (
-                                                <div className="absolute left-0 w-1 h-4 bg-primary rounded-r-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                                                <div className="absolute left-0 w-1 h-4 bg-cyan-300 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
                                             )}
                                         </div>
                                     </Link>
@@ -192,15 +245,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
                 ))}
             </div>
 
-            <div className="p-3 border-t border-border bg-secondary/20 space-y-3">
+            <div className="p-3 border-t border-slate-800/80 bg-slate-950/35 space-y-3">
                 {!isCollapsed && (
-                    <div className="flex items-center p-2 rounded-xl bg-background/50 border border-border/50">
+                    <div className="flex items-center p-2 rounded-xl bg-slate-900/70 border border-slate-800">
                         <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white ring-2 ring-background border border-emerald-400/30">
                             <Sparkles className="h-5 w-5" />
                         </div>
                         <div className="ml-3 flex-1 overflow-hidden">
-                            <p className="text-sm font-bold text-foreground truncate">{FREE_EDITION_LABEL}</p>
-                            <p className="text-[11px] text-muted-foreground truncate">No account required</p>
+                            <p className="text-sm font-bold text-slate-100 truncate">{FREE_EDITION_LABEL}</p>
+                            <p className="text-[11px] text-slate-500 truncate">Kontot pole vaja</p>
                         </div>
                     </div>
                 )}
@@ -227,7 +280,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
                             variant="ghost"
                             size="icon"
                             onClick={toggleSidebar}
-                            className="text-muted-foreground hover:text-foreground hover:bg-secondary mx-auto"
+                            className="text-slate-400 hover:text-slate-100 hover:bg-slate-800 mx-auto"
                         >
                             <ChevronRight className="h-5 w-5" />
                         </Button>

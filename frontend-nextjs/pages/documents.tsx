@@ -29,15 +29,16 @@ export default function DocumentsPage() {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFile(e.dataTransfer.files[0]);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleFiles(Array.from(e.dataTransfer.files));
         }
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
-        if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            handleFiles(Array.from(e.target.files));
+            e.target.value = "";
         }
     };
 
@@ -60,22 +61,33 @@ export default function DocumentsPage() {
             console.error("Failed to fetch documents", error);
             if (error?.response?.status === 401) {
                 setDocuments([]);
-                toast.error("Session expired. Reload the page to continue in dev mode.");
+                toast.error("Sessioon aegus. Laadi leht uuesti, et arendusrežiimis jätkata.");
             } else {
-                toast.error("Failed to load documents");
+                toast.error("Dokumentide laadimine ebaõnnestus");
             }
         } finally {
             setLoadingDocs(false);
         }
     };
 
-    const handleFile = async (file: File) => {
+    async function handleFiles(files: File[]) {
+        const allowedFiles = files.filter((file) =>
+            /\.(pdf|docx|txt|md)$/i.test(file.name),
+        );
+
+        if (allowedFiles.length === 0) {
+            const message = "Vali vähemalt üks PDF, DOCX, TXT või MD fail.";
+            setUploadStatus({ type: "error", message });
+            toast.error(message);
+            return;
+        }
+
         setIsUploading(true);
         setUploadStatus(null);
 
         // Create FormData
         const formData = new FormData();
-        formData.append('file', file);
+        allowedFiles.forEach((file) => formData.append('file', file));
 
         try {
             const response = await api.post('/api/documents/upload', formData, {
@@ -83,18 +95,25 @@ export default function DocumentsPage() {
                 headers: { 'Content-Type': undefined },
             } as any);
 
+            const uploadedDocuments = response.data?.documents ?? (response.data?.data ? [response.data.data] : []);
+            if (uploadedDocuments.length) {
+                setDocuments((prev) => [...uploadedDocuments, ...prev]);
+            }
+
             setUploadStatus({
                 type: 'success',
-                message: `Successfully uploaded "${file.name}". It is now searchable.`
+                message: allowedFiles.length === 1
+                    ? `"${allowedFiles[0].name}" laaditi üles ja on nüüd PDF töötluseks valmis.`
+                    : `${allowedFiles.length} faili laaditi üles ja on nüüd PDF töötluseks valmis.`
             });
-            toast.success("Document uploaded successfully");
+            toast.success("Dokument laaditi üles");
             fetchDocuments(); // Refresh list
 
         } catch (error: any) {
             console.error("Upload failed", error);
             const message = coerceToDisplayString(
-                getApiErrorMessage(error, "Failed to upload document."),
-                "Failed to upload document.",
+                getApiErrorMessage(error, "Dokumendi üleslaadimine ebaõnnestus."),
+                "Dokumendi üleslaadimine ebaõnnestus.",
             );
             setUploadStatus({
                 type: 'error',
@@ -104,19 +123,19 @@ export default function DocumentsPage() {
         } finally {
             setIsUploading(false);
         }
-    };
+    }
 
     return (
         <>
             <Head>
-                <title>Knowledge Base | Atom</title>
+                <title>Dokumendid | Annaator</title>
             </Head>
 
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Knowledge Base</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Dokumendid</h1>
                     <p className="text-muted-foreground mt-2">
-                        Upload documents to your knowledge base to make them searchable by Atom agents.
+                        Laadi dokumendid teadmistebaasi, et Annaatori agendid saaksid neid otsida ja kasutada.
                     </p>
                 </div>
 
@@ -124,9 +143,9 @@ export default function DocumentsPage() {
                     {/* Upload Area */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Upload Document</CardTitle>
+                            <CardTitle>Laadi dokument üles</CardTitle>
                             <CardDescription>
-                                Supported formats: PDF, DOCX, TXT, MD
+                                Toetatud vormingud: PDF, DOCX, TXT, MD
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -145,6 +164,7 @@ export default function DocumentsPage() {
                                 <input
                                     id="file-upload"
                                     type="file"
+                                    multiple
                                     className="hidden"
                                     onChange={handleChange}
                                     accept=".pdf,.docx,.txt,.md"
@@ -160,10 +180,10 @@ export default function DocumentsPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-lg">
-                                            {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
+                                            {isUploading ? "Laadin üles..." : "Kliki üleslaadimiseks või lohista PDF-id siia"}
                                         </h3>
                                         <p className="text-sm text-muted-foreground mt-1">
-                                            PDF, DOCX, TXT or MD (MAX. 10MB)
+                                            PDF, DOCX, TXT või MD. Võid valida mitu faili korraga.
                                         </p>
                                     </div>
                                 </div>
@@ -188,22 +208,22 @@ export default function DocumentsPage() {
                     {/* Quick Actions / Status */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Search & Verify</CardTitle>
+                            <CardTitle>Otsi ja kontrolli</CardTitle>
                             <CardDescription>
-                                Test your uploaded documents immediately.
+                                Testi üleslaaditud dokumente kohe.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="bg-muted/50 p-4 rounded-lg">
                                 <h4 className="font-medium flex items-center gap-2 mb-2">
                                     <FileText className="h-4 w-4" />
-                                    How it works
+                                    Kuidas see töötab
                                 </h4>
                                 <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
-                                    <li>Documents are parsed and split into chunks.</li>
-                                    <li>Chunks are embedded using AI models.</li>
-                                    <li>They are stored in LanceDB for semantic search.</li>
-                                    <li>Agents can access this knowledge immediately.</li>
+                                    <li>Dokumendid parsitakse ja jagatakse tükkideks.</li>
+                                    <li>Tükid vektoriseeritakse AI mudelite abil.</li>
+                                    <li>Need salvestatakse LanceDB-sse semantiliseks otsinguks.</li>
+                                    <li>Agendid saavad seda teadmist kohe kasutada.</li>
                                 </ul>
                             </div>
 
@@ -213,7 +233,7 @@ export default function DocumentsPage() {
                                 onClick={() => router.push('/search')}
                             >
                                 <Search className="mr-2 h-4 w-4" />
-                                Go to Search Page
+                                Ava otsing
                             </Button>
                         </CardContent>
                     </Card>
@@ -222,10 +242,10 @@ export default function DocumentsPage() {
                 {/* Documents List */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold tracking-tight">Your Documents</h2>
+                        <h2 className="text-xl font-bold tracking-tight">Sinu dokumendid</h2>
                         <Button variant="ghost" size="sm" onClick={fetchDocuments} disabled={loadingDocs}>
                             <RefreshCw className={`h-4 w-4 mr-2 ${loadingDocs ? 'animate-spin' : ''}`} />
-                            Refresh
+                            Värskenda
                         </Button>
                     </div>
 
@@ -233,7 +253,7 @@ export default function DocumentsPage() {
                         <Card>
                             <CardContent className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
                                 <FileText className="h-12 w-12 mb-4 opacity-20" />
-                                <p>No documents uploaded yet.</p>
+                                <p>Ühtegi dokumenti pole veel üles laaditud.</p>
                             </CardContent>
                         </Card>
                     ) : (
@@ -246,7 +266,7 @@ export default function DocumentsPage() {
                                 >
                                     <CardHeader className="flex flex-row items-top justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium leading-none truncate pr-4">
-                                            {coerceToDisplayString(doc.title, 'Untitled')}
+                                            {coerceToDisplayString(doc.title, 'Pealkirjata')}
                                         </CardTitle>
                                         <File className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                                     </CardHeader>
