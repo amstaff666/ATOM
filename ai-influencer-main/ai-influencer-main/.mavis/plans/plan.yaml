@@ -1,0 +1,304 @@
+version: 1
+plan:
+  name: 'Build MiniMax Code core-feature advisor squad'
+  max_concurrency: 4
+  max_consecutive_failures: 2
+  max_cycles: 8
+  auto_reject_retries: 1
+  verifier_config:
+    default_verifiers: [verifier]
+    audit_sample_rate: 0.0
+tasks:
+  - id: 'build-cron-advisor'
+    title: 'Build cron-advisor agent'
+    prompt: |
+      Create a new Mavis standalone agent named `cron-advisor` using the `create-agent` skill.
+
+      **Path**: `~/.mavis/agents/cron-advisor/` (cross-project helper, NOT a project rein).
+
+      **Why this agent exists**: The user wants a single owner for "everything Mavis cron" so they
+      can route cron-related questions and requests to one place.
+
+      **Scope to encode in `agent.md`**:
+      - Owns Mavis cron end-to-end: self-reminders (`mavis cron self`), recurring tasks
+        (`mavis cron create`), listing (`mavis cron list`), inspecting, updating, deleting.
+      - Knows the cron.md reference inside the `mavis` skill — should load `mavis` skill and read
+        `references/cron.md` before answering cron-shape questions.
+      - Acts as the single point of truth: when async work (CI, background job, MR auto-merge,
+        external API call, human reply) is in flight and needs a wakeup, the user routes here.
+      - Hands off skill-creation work to `skill-advisor`, team-plan cron scheduling to
+        `team-advisor`, Feishu-delivered reminders to `im-advisor`.
+
+      **Required structure (per create-agent skill)**:
+      - First read the create-agent skill's `references/commands-windows-powershell.md` if you need
+        shell recipes (you're on `win32`).
+      - Run `mavis agent new cron-advisor --description "<one concrete line>" --display-name "Cron Advisor"`.
+      - Replace `agent.md` body with: frontmatter `name: cron-advisor` + concrete one-sentence
+        `description`, then `# Cron Advisor`, then `## Scope`, `## How you work`, `## Stop when`.
+      - The description must be concrete enough that the orchestrator can route cron tasks to it
+        unambiguously (avoid "helpful cron assistant").
+      - Add `config.yaml` only if the default model is wrong — otherwise skip.
+      - Add a `PERSONA.md` only if tone matters — Cron Advisor can ship without one initially;
+        add a short voice note (concise, action-oriented, names the command it's about to run)
+        only if it helps.
+
+      **Stop condition**: `mavis agent info cron-advisor` prints a parsed prompt, `mavis agent
+      list --human` shows it, no name collision with built-ins (coder, verifier, general, mavis)
+      or with im-advisor / team-advisor / skill-advisor (those don't exist yet but verify
+      anyway).
+
+      **Report back**: agent name, config dir path, the description line you wrote, and the
+      output of `mavis agent info cron-advisor` (first 20 lines).
+    assigned_to: 'general'
+    verified_by: 'verifier'
+    verify_prompt: |
+      Independently verify the cron-advisor agent. Do NOT just re-read the producer's summary —
+      run the commands yourself and inspect the files.
+
+      1. `mavis agent info cron-advisor` — confirm exit code 0 and parsed prompt visible.
+      2. `mavis agent list --human` — confirm `cron-advisor` appears.
+      3. Read `~/.mavis/agents/cron-advisor/agent.md`:
+         - frontmatter `name: cron-advisor` matches folder
+         - `description:` is concrete (mentions cron / Mavis cron / scheduling — NOT "helpful
+           assistant", NOT "general assistant", NOT vague)
+         - body has `## Scope`, `## How you work`, `## Stop when` sections
+         - Scope names what the agent owns AND what it hands off (handoff targets must be
+           realistic agent names, not invented ones)
+         - Stop condition is measurable (a verification step, not "task is complete")
+      4. Confirm no project rein was created (path must be `~/.mavis/agents/cron-advisor/`,
+         NOT `<workspace>/.harness/reins/cron-advisor/`).
+      5. Confirm no other agent named `cron-advisor` exists at any other path.
+
+      PASS / FAIL with the actual evidence: commands run + relevant file excerpts.
+    max_retries: 2
+
+  - id: 'build-im-advisor'
+    title: 'Build im-advisor agent'
+    prompt: |
+      Create a new Mavis standalone agent named `im-advisor` using the `create-agent` skill.
+
+      **Path**: `~/.mavis/agents/im-advisor/` (cross-project helper, NOT a project rein).
+
+      **Why this agent exists**: The user wants one owner for "Feishu/IM integration" — they
+      specifically mentioned Feishu/WeChat. Mavis has rich Feishu/Lark tooling via the
+      `lark-cli` ecosystem (calendar, contacts, IM, docs, sheets, drive, approvals, events,
+      video meetings, whiteboards, mail, minutes). Mavis does NOT have a native WeChat
+      integration in the OpenCode runtime today. The agent must be honest about that and not
+      pretend WeChat works.
+
+      **Scope to encode in `agent.md`**:
+      - Owns Feishu / Lark integration end-to-end: `lark-cli` auth/login, calendar, contacts,
+        IM messages, docs, sheets, drive, approvals, events, video meetings, whiteboards,
+        mail, minutes.
+      - Knows the `lark-tools` mega-skill and its sub-skills (lark-calendar, lark-im, lark-doc,
+        lark-base, lark-sheets, lark-contact, lark-drive, lark-approval, lark-vc, lark-event,
+        lark-whiteboard, lark-mail, lark-minutes, lark-task, lark-shared, lark-openapi-explorer,
+        lark-skill-maker). Should load `lark-tools` first and follow its router.
+      - Knows about IM routing for non-Feishu channels (`mavis im ...`, currently Telegram is
+        wired in). Must clearly tell the user "WeChat is not a built-in Mavis IM channel today
+        — options are: (a) use Feishu/Lark which has full coverage, (b) wire a WeChat bot into
+        the IM bridge if the daemon supports it, (c) hand off to a human to extend the bridge".
+        Do not pretend WeChat works.
+      - Hands off skill-creation around IM to `skill-advisor`, cron-style reminders via Feishu
+        to `cron-advisor`, multi-agent team coordination around IM bots to `team-advisor`.
+
+      **Required structure (per create-agent skill)**:
+      - First read the create-agent skill's `references/commands-windows-powershell.md` if you
+        need shell recipes.
+      - Run `mavis agent new im-advisor --description "<one concrete line>" --display-name "IM Advisor"`.
+      - Replace `agent.md` body with: frontmatter `name: im-advisor` + concrete one-sentence
+        description, then `# IM Advisor`, then `## Scope`, `## How you work`, `## Stop when`.
+      - Description must mention Feishu / Lark specifically — NOT "messaging assistant" or
+        "communication helper".
+
+      **Stop condition**: `mavis agent info im-advisor` parses, lists in roster, no collision.
+
+      **Report back**: agent name, config dir path, the description line, and `mavis agent info
+      im-advisor` first 20 lines.
+    assigned_to: 'general'
+    verified_by: 'verifier'
+    verify_prompt: |
+      Independently verify the im-advisor agent. Run the commands yourself; do not just trust
+      the producer summary.
+
+      1. `mavis agent info im-advisor` — confirm parsed prompt visible.
+      2. `mavis agent list --human` — confirm `im-advisor` appears.
+      3. Read `~/.mavis/agents/im-advisor/agent.md`:
+         - frontmatter `name: im-advisor` matches folder
+         - `description:` is concrete (mentions Feishu / Lark — NOT generic "messaging assistant")
+         - body has Scope / How you work / Stop when
+         - Scope explicitly addresses the WeChat gap honestly — either acknowledges native
+           WeChat is not supported today and offers alternatives, OR scopes Feishu-only and
+           routes WeChat questions elsewhere. Pretending WeChat works is a FAIL.
+         - Scope mentions `lark-tools` or the lark-cli sub-skills the agent owns
+         - Stop condition is measurable
+      4. Confirm standalone path `~/.mavis/agents/im-advisor/`, no project rein duplicate.
+
+      PASS / FAIL with the actual evidence: commands run + relevant file excerpts.
+    max_retries: 2
+
+  - id: 'build-team-advisor'
+    title: 'Build team-advisor agent'
+    prompt: |
+      Create a new Mavis standalone agent named `team-advisor` using the `create-agent` skill.
+
+      **Path**: `~/.mavis/agents/team-advisor/` (cross-project helper, NOT a project rein).
+
+      **Why this agent exists**: The user wants one owner for "team building" — designing agent
+      rosters, planning `mavis team plan` runs, coordinating multi-agent work end-to-end.
+
+      **Scope to encode in `agent.md`**:
+      - Owns the `mavis-team` workflow end-to-end: preflight (deliverable / why-team / split /
+        agents / closure), YAML plan authoring, launch (`mavis team plan run`), monitor
+        (`mavis team plan status`), steer / extend / unblock / update-verify, decision submission,
+        cancel. Loads the `mavis-team` skill before any plan work.
+      - Owns agent-roster design: which roles are missing, what existing agents to reuse, when
+        to spawn a new agent vs. extend an existing one. Hands agent creation off to itself
+        running `mavis agent new` (or via the `create-agent` skill) — team-advisor is the owner
+        of "decide if a new agent is needed".
+      - Picks `verified_by: verifier` correctly: serious/risky produce tasks get independent
+        verification; low-risk produce tasks use `verify_skip_reason` with a concrete rationale;
+        final `verify-as-task` only when there is a distinct end-to-end boundary.
+      - Hands off pure coding to `coder`, pure verification to `verifier`, skill creation to
+        `skill-advisor`, generic one-off work to `general`.
+      - Uses the `mavis` skill for agent / session / communication / memory references when
+        designing rosters.
+      - Knows about the `create-agent` skill so it can dispatch agent creation work — but does
+        not write agent files directly without consulting that skill.
+
+      **Required structure (per create-agent skill)**:
+      - First read the create-agent skill's `references/commands-windows-powershell.md` if you
+        need shell recipes.
+      - Run `mavis agent new team-advisor --description "<one concrete line>" --display-name "Team Advisor"`.
+      - Replace `agent.md` body: frontmatter + `# Team Advisor` + Scope + How you work + Stop when.
+      - Description must mention `mavis team` / multi-agent team planning — NOT "teamwork
+        helper" or "collaboration assistant".
+
+      **Stop condition**: parses, lists, no collision.
+
+      **Report back**: agent name, config dir path, description, `mavis agent info team-advisor`
+      first 20 lines.
+    assigned_to: 'general'
+    verified_by: 'verifier'
+    verify_prompt: |
+      Independently verify team-advisor. Run commands yourself.
+
+      1. `mavis agent info team-advisor` — confirm parsed prompt.
+      2. `mavis agent list --human` — confirm `team-advisor` appears.
+      3. Read `~/.mavis/agents/team-advisor/agent.md`:
+         - `name: team-advisor` matches folder
+         - `description:` mentions multi-agent team planning or `mavis team plan` — NOT vague
+         - body has Scope / How you work / Stop when
+         - Scope names the `mavis-team` skill (or `mavis team plan` workflow) and explicitly
+           lists which agents it hands off to (coder / verifier / general / skill-advisor)
+         - Scope names the validation-closure rules (verified_by vs verify_skip_reason vs
+           verify-as-task) — this is a hard requirement because team-advisor will write plans
+         - Stop condition is measurable
+      4. Confirm standalone path.
+
+      PASS / FAIL with the actual evidence.
+    max_retries: 2
+
+  - id: 'build-skill-advisor'
+    title: 'Build skill-advisor agent'
+    prompt: |
+      Create a new Mavis standalone agent named `skill-advisor` using the `create-agent` skill.
+
+      **Path**: `~/.mavis/agents/skill-advisor/` (cross-project helper, NOT a project rein).
+
+      **Why this agent exists**: The user wants one owner for "skill creation" — turning
+      repeated workflows into reusable Mavis skills, refining existing skills with evidence,
+      and filing skill-evolution signals/proposals.
+
+      **Scope to encode in `agent.md`**:
+      - Owns the full skill lifecycle: `skill-creator` (new skill), `skill-refiner` (fix an
+        existing skill), `skill-evolution` (signals + proposals). Loads the right one first
+        before doing work.
+      - Decides which channel to use: `mavis skill signal report` for "existing skill is
+        wrong/missing", `mavis skill proposal report` for "this session reveals a reusable new
+        skill". Reads the `skill-evolution` skill's scope decision tree before filing.
+      - For skill creation: writes a SKILL.md with frontmatter (name, description in user's
+        language + descriptions.zh-Hans if relevant), body answering when to load + how to
+        apply, sub-references for subproblems, and bundles scripts/templates only when the
+        workflow needs them.
+      - Hands off agent-roster changes triggered by a new skill to `team-advisor`, code
+        changes triggered by a new skill to `coder`, verification of a new skill's behavior to
+        `verifier`.
+      - Knows that `skill-creator` and `skill-refiner` are the right skills to load — does
+        NOT use `create-agent` (that's for agents, not skills). Knows the difference.
+
+      **Required structure (per create-agent skill)**:
+      - First read the create-agent skill's `references/commands-windows-powershell.md` if you
+        need shell recipes.
+      - Run `mavis agent new skill-advisor --description "<one concrete line>" --display-name "Skill Advisor"`.
+      - Replace `agent.md` body: frontmatter + `# Skill Advisor` + Scope + How you work + Stop when.
+      - Description must mention Mavis skills (creation / refinement / evolution) — NOT
+        "general skill maker" or "skill expert".
+
+      **Stop condition**: parses, lists, no collision.
+
+      **Report back**: agent name, config dir path, description, `mavis agent info
+      skill-advisor` first 20 lines.
+    assigned_to: 'general'
+    verified_by: 'verifier'
+    verify_prompt: |
+      Independently verify skill-advisor. Run commands yourself.
+
+      1. `mavis agent info skill-advisor` — confirm parsed prompt.
+      2. `mavis agent list --human` — confirm `skill-advisor` appears.
+      3. Read `~/.mavis/agents/skill-advisor/agent.md`:
+         - `name: skill-advisor` matches folder
+         - `description:` mentions Mavis skill lifecycle (creation / refinement / evolution),
+           NOT generic "skill expert"
+         - body has Scope / How you work / Stop when
+         - Scope names `skill-creator`, `skill-refiner`, `skill-evolution` (or the
+           `mavis skill ...` commands they wrap)
+         - Scope distinguishes signal-vs-proposal channel choice — this is non-negotiable
+           because the agent will file these reports
+         - Scope explicitly does NOT confuse `create-agent` (for agents) with `skill-creator`
+           (for skills)
+         - Stop condition is measurable
+      4. Confirm standalone path.
+
+      PASS / FAIL with the actual evidence.
+    max_retries: 2
+
+  - id: 'final-roster-gate'
+    title: 'Verify all 4 advisor agents coexist and route correctly'
+    role: 'verify-as-task'
+    prompt: |
+      Cross-cutting end-to-end check that all 4 advisor agents are simultaneously present,
+      bootable, and routable. Per-task verifiers already confirmed each individually; this
+      gate confirms the squad as a coherent whole.
+
+      Run and report:
+
+      1. `mavis agent list --human` — confirm all 4 appear in one roster snapshot:
+         cron-advisor, im-advisor, team-advisor, skill-advisor.
+      2. Each of the following must exit 0:
+         `mavis agent info cron-advisor > $null`
+         `mavis agent info im-advisor > $null`
+         `mavis agent info team-advisor > $null`
+         `mavis agent info skill-advisor > $null`
+      3. Confirm the 4 description lines from each `agent.md` and judge whether the
+         orchestrator can disambiguate between the 4 from description alone. FAIL if two
+         agents have overlapping "I do everything" descriptions, or if any description is
+         generic enough to fit multiple domains.
+      4. Confirm no project rein duplicates under `<workspace>/.harness/reins/` for these 4
+         names.
+      5. Confirm none of the 4 names collide with existing built-in agents
+         (coder, verifier, general, mavis).
+
+      Output a roster table with columns:
+      | agent name | path | description line | boots |
+
+      Final verdict: PASS if all 4 boot, all 4 list, descriptions are unambiguous, no
+      collisions, no project rein duplicates.
+      FAIL with the specific gap otherwise.
+    assigned_to: 'verifier'
+    depends_on:
+      - 'build-cron-advisor'
+      - 'build-im-advisor'
+      - 'build-team-advisor'
+      - 'build-skill-advisor'
+    max_retries: 1

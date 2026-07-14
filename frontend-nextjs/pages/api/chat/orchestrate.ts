@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "@/lib/get-api-base-url";
 
 interface ChatRequest {
   userId: string;
@@ -47,7 +48,7 @@ export default async function handler(
 
     // Forward the request to the backend Python API
     const backendResponse = await fetch(
-      "http://localhost:8000/api/workflow_agent/chat",
+      `${getServerApiBaseUrl()}/api/workflow_agent/chat`,
       {
         method: "POST",
         headers: {

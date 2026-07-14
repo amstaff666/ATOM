@@ -1,0 +1,101 @@
+examples:
+  - id: feature-development
+    title:
+      zh: 功能开发计划制定
+      en: Feature Development Planning
+    description:
+      zh: 为软件功能开发制定详细实施计划
+      en: Create detailed implementation plans for software feature development
+    prompt:
+      zh: |-
+        我需要为电商网站添加商品推荐功能。
+
+        功能需求：
+        - 基于用户浏览历史的个性化推荐
+        - 热门商品排行榜
+        - 相似商品推荐
+        - 推荐算法效果监控
+
+        技术约束：
+        - 后端：Node.js + Express
+        - 数据库：MongoDB
+        - 前端：React
+        - 部署：Docker容器化
+
+        请帮我制定：
+        1. 详细的开发时间线
+        2. 技术架构设计方案
+        3. 数据库表结构设计
+        4. API接口规划
+        5. 测试策略和验收标准
+      en: |-
+        I need to add product recommendation functionality to an e-commerce website.
+
+        Feature requirements:
+        - Personalized recommendations based on user browsing history
+        - Popular product rankings
+        - Similar product recommendations
+        - Recommendation algorithm performance monitoring
+
+        Technical constraints:
+        - Backend: Node.js + Express
+        - Database: MongoDB
+        - Frontend: React
+        - Deployment: Docker containerization
+
+        Please help me create:
+        1. Detailed development timeline
+        2. Technical architecture design plan
+        3. Database table structure design
+        4. API interface planning
+        5. Testing strategy and acceptance criteria
+  - id: refactoring-project
+    title:
+      zh: 代码重构项目规划
+      en: Code Refactoring Project Planning
+    description:
+      zh: 制定大型代码重构项目的实施计划
+      en: Create implementation plans for large-scale code refactoring projects
+    prompt:
+      zh: |-
+        我们需要重构一个5年历史的遗留系统。
+
+        现状分析：
+        - 代码库：约10万行Java代码
+        - 技术栈：Spring Boot 1.x + MySQL
+        - 问题：代码耦合度高、测试覆盖率低、性能瓶颈多
+
+        重构目标：
+        1. 升级到Spring Boot 3.x
+        2. 引入微服务架构
+        3. 提升代码质量和可维护性
+        4. 建立完善的测试体系
+        5. 优化系统性能
+
+        请帮我规划：
+        1. 分阶段重构策略
+        2. 风险评估和缓解措施
+        3. 团队分工和资源配置
+        4. 迁移过程中的数据一致性保障
+        5. 回滚和应急预案
+      en: |-
+        We need to refactor a 5-year-old legacy system.
+
+        Current situation analysis:
+        - Codebase: Approximately 100,000 lines of Java code
+        - Tech stack: Spring Boot 1.x + MySQL
+        - Issues: High code coupling, low test coverage, multiple performance bottlenecks
+
+        Refactoring goals:
+        1. Upgrade to Spring Boot 3.x
+        2. Introduce microservices architecture
+        3. Improve code quality and maintainability
+        4. Establish comprehensive testing system
+        5. Optimize system performance
+
+        Please help me plan:
+        1. Phased refactoring strategy
+        2. Risk assessment and mitigation measures
+        3. Team division and resource allocation
+        4. Data consistency assurance during migration
+        5. Rollback and emergency response plans

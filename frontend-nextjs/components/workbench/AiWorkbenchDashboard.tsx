@@ -23,6 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LuunaAutoflowPanel } from "@/components/workbench/LuunaAutoflowPanel";
 
 export type WorkbenchModule = {
   id: string;
@@ -167,6 +168,8 @@ export function AiWorkbenchDashboard({
           Generate plan
         </Button>
       </div>
+
+      <LuunaAutoflowPanel />
 
       <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

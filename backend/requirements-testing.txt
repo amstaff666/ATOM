@@ -1,0 +1,50 @@
+# Property-Based Testing & Fuzzy Testing Dependencies
+# For Phase 0: Foundation Setup
+
+# Property-Based Testing (already in requirements.txt)
+# hypothesis>=6.92.0,<7.0.0
+
+# API Contract Testing
+schemathesis>=3.30.0,<4.0.0  # OpenAPI contract testing with Hypothesis
+
+# Fuzzy Testing
+atheris>=2.2.0  # Coverage-guided fuzzing for Python
+# python-fuzz>=0.1.0  # NOTE: Package doesn't exist on PyPI, removed
+
+# Mutation Testing
+mutmut>=2.4.0  # Mutation testing tool
+
+# Chaos Engineering
+# chaos-toolkit>=0.23.0  # NOTE: Package doesn't exist on PyPI, removed
+
+# Parallel Test Execution
+pytest-xdist>=3.6.0,<4.0.0  # Parallel pytest execution (constrain to avoid pytest 9)
+
+# Coverage & Quality
+pytest-cov>=4.1.0  # Coverage reporting (already in requirements.txt)
+coverage[toml]>=7.0.0  # Enhanced coverage with TOML support
+diff-cover>=7.0  # Diff coverage enforcement for PRs
+radon>=6.0  # Cyclomatic complexity analysis for Python
+
+# Performance Testing
+pytest-benchmark>=4.0.0  # Benchmarking tests
+locust>=2.15.0  # Load testing
+memray>=1.12.0  # Memory profiler and leak detector (Python 3.11+, Phase 243-01)
+
+# Additional Testing Utilities
+pytest-mock>=3.12.0  # Mocking utilities (already in requirements.txt)
+pytest-timeout>=2.2.0,<3.0.0  # Test timeout enforcement
+pytest-randomly>=3.15.0,<4.0.0  # Randomize test execution order
+pytest-random-order>=1.1.0  # Test independence validation (seeded randomization)
+pytest-rerunfailures>=13.0,<15.0.0  # Flaky test automatic retry
+pytest-json-report>=0.6.0  # Structured JSON output for pass rate parsing
+allure-pytest>=2.13.0  # Allure reporting integration for test results aggregation
+pytest-html>=4.1.0  # HTML test reports with embedded screenshots
+freezegun>=1.4.0,<2.0.0  # Time freezing for tests
+factory-boy>=3.3.0  # Test data factories
+faker>=22.0.0  # Fake data generation for tests
+
+# Security Testing Tools (Phase 2-03)
+bandit>=1.7.0  # OWASP Top 10 scanning
+pip-audit>=2.7.0  # Dependency vulnerability scanning (PyPA official)
+safety>=3.0.0  # Alternative dependency checker with policy enforcement

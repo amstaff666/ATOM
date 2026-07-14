@@ -1,0 +1,99 @@
+examples:
+  - id: tax-preparation
+    title:
+      zh: 年度税务申报发票整理
+      en: Annual Tax Preparation Invoice Organization
+    description:
+      zh: 为年度税务申报系统化整理所有发票和收据
+      en: Systematically organize all invoices and receipts for annual tax preparation
+    prompt:
+      zh: |-
+        我需要整理2023年度的所有业务发票准备税务申报。
+
+        发票情况：
+        - 数量：约500张各类发票和收据
+        - 类型：增值税发票、普通发票、电子发票、手写收据
+        - 来源：邮件附件、手机拍照、纸质文件扫描
+        - 时间跨度：2023年1月-12月
+
+        整理要求：
+        1. 按月份和发票类型分类归档
+        2. 提取关键信息：金额、税额、开票日期、商户名称
+        3. 识别并标记异常或可疑发票
+        4. 生成税务申报所需的数据报表
+        5. 建立电子化档案便于查询
+
+        请帮我：
+        1. 设计发票分类和命名规则
+        2. 自动提取和验证发票信息
+        3. 处理模糊或不清晰的图片
+        4. 生成税务统计分析报告
+        5. 建立长期发票管理机制
+      en: |-
+        I need to organize all business invoices from 2023 for tax preparation.
+
+        Invoice situation:
+        - Quantity: Approximately 500 various invoices and receipts
+        - Types: VAT invoices, regular invoices, electronic invoices, handwritten receipts
+        - Sources: Email attachments, mobile photos, scanned paper documents
+        - Time span: January-December 2023
+
+        Organization requirements:
+        1. Categorize and archive by month and invoice type
+        2. Extract key information: amount, tax, invoice date, merchant name
+        3. Identify and flag abnormal or suspicious invoices
+        4. Generate data reports required for tax filing
+        5. Create digitized archives for easy querying
+
+        Please help me:
+        1. Design invoice classification and naming rules
+        2. Automatically extract and verify invoice information
+        3. Process fuzzy or unclear images
+        4. Generate tax statistical analysis reports
+        5. Establish long-term invoice management mechanisms
+  - id: business-expenses
+    title:
+      zh: 差旅费用报销整理
+      en: Business Travel Expense Reimbursement Organization
+    description:
+      zh: 整理员工差旅费用票据并生成报销清单
+      en: Organize employee travel expense receipts and generate reimbursement lists
+    prompt:
+      zh: |-
+        我需要整理销售团队第一季度的差旅费用报销。
+
+        费用类型：
+        - 交通费：机票、火车票、出租车票
+        - 住宿费：酒店发票
+        - 餐饮费：餐厅发票和收据
+        - 其他：会议费、通讯费等
+
+        团队规模：15名销售人员
+        时间范围：2024年1-3月
+        报销要求：按人按月分别统计
+
+        请帮我：
+        1. 按员工和月份分类整理票据
+        2. 自动计算各项费用总额
+        3. 验证发票真实性和合规性
+        4. 生成个人报销明细表
+        5. 提供费用分析和优化建议
+      en: |-
+        I need to organize the sales team's Q1 travel expense reimbursements.
+
+        Expense types:
+        - Transportation: Air tickets, train tickets, taxi receipts
+        - Accommodation: Hotel invoices
+        - Meals: Restaurant invoices and receipts
+        - Others: Conference fees, communication costs, etc.
+
+        Team size: 15 sales personnel
+        Time range: January-March 2024
+        Reimbursement requirements: Statistics by person and month
+
+        Please help me:
+        1. Categorize and organize receipts by employee and month
+        2. Automatically calculate total amounts for each expense category
+        3. Verify invoice authenticity and compliance
+        4. Generate individual reimbursement detail sheets
+        5. Provide expense analysis and optimization suggestions

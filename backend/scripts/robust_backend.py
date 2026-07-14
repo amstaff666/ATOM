@@ -12,7 +12,7 @@ import signal
 import sys
 import time
 import traceback
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -222,6 +222,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3001",
+        "http://localhost:4491",
+        "http://127.0.0.1:4491",
         "http://localhost:8080",
         "http://127.0.0.1:8080",
     ],
@@ -230,6 +232,24 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+
+try:
+    from backend.api.autoflow_routes import router as autoflow_router
+
+    app.include_router(autoflow_router)
+    logger.info("✓ Luuna Autoflow Core Routes Loaded")
+except Exception as exc:
+    logger.warning(f"Failed to load Luuna Autoflow Core routes: {exc}")
+
+
+try:
+    from backend.api.kingpdf_routes import router as kingpdf_router
+
+    app.include_router(kingpdf_router)
+    logger.info("✓ KingPDF Routes Loaded")
+except Exception as exc:
+    logger.warning(f"Failed to load KingPDF routes: {exc}")
 
 
 # Global exception handler
@@ -274,6 +294,120 @@ async def health_check():
         restart_count=backend_state.restart_count,
         memory_usage_mb=memory_info.rss / 1024 / 1024,
     )
+
+
+@app.get("/healthz")
+async def healthz():
+    """Lightweight local health check alias."""
+    return {
+        "ok": True,
+        "status": "healthy" if backend_state.healthy else "starting",
+        "service": "atom-robust-backend",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+@app.get("/api/documents")
+async def list_documents():
+    """Local development fallback for the documents page."""
+    return {"success": True, "data": [], "source": "local-fallback"}
+
+
+LOCAL_AGENTS: List[Dict[str, Any]] = [
+    {
+        "id": "local-research-agent",
+        "name": "Research Agent",
+        "description": "Local fallback agent for research and synthesis.",
+        "status": "idle",
+        "last_run": None,
+        "category": "research",
+    },
+    {
+        "id": "local-workflow-agent",
+        "name": "Workflow Agent",
+        "description": "Local fallback agent for workflow planning.",
+        "status": "idle",
+        "last_run": None,
+        "category": "automation",
+    },
+]
+
+
+@app.get("/api/agents")
+@app.get("/api/agents/")
+async def list_agents(category: Optional[str] = None):
+    """Local development fallback for agent registry."""
+    if category:
+        return [agent for agent in LOCAL_AGENTS if agent["category"] == category]
+    return LOCAL_AGENTS
+
+
+@app.get("/api/analytics/dashboard/kpis")
+async def analytics_dashboard_kpis():
+    """Stable local analytics fallback."""
+    return {
+        "success": True,
+        "source": "local-fallback",
+        "kpis": {
+            "documents": 0,
+            "agents": len(LOCAL_AGENTS),
+            "workflow_executions": 0,
+            "active_integrations": 0,
+        },
+    }
+
+
+@app.get("/api/workflow-templates")
+@app.get("/api/workflow-templates/")
+async def workflow_templates():
+    """Stable local workflow template fallback."""
+    return []
+
+
+@app.get("/api/marketing/dashboard/summary")
+async def marketing_dashboard_summary():
+    """Stable local marketing dashboard fallback."""
+    return {
+        "success": True,
+        "source": "local-fallback",
+        "summary": {
+            "campaigns": 0,
+            "leads": 0,
+            "conversions": 0,
+            "spend": 0,
+        },
+    }
+
+
+@app.get("/api/v1/workflow-ui/executions")
+@app.get("/api/workflows/executions")
+async def workflow_executions():
+    """Stable JSON fallback for workflow executions."""
+    return {"success": True, "executions": [], "source": "local-fallback"}
+
+
+@app.get("/api/v1/workflow-ui/services")
+@app.get("/api/workflows/services")
+async def workflow_services():
+    return {"success": True, "services": {}, "source": "local-fallback"}
+
+
+@app.get("/api/v1/workflow-ui/definitions")
+@app.get("/api/workflows/definitions")
+async def workflow_definitions():
+    return {"success": True, "workflows": [], "source": "local-fallback"}
+
+
+@app.get("/ws/stats")
+async def websocket_stats():
+    """Stable local WebSocket stats fallback."""
+    return {
+        "success": True,
+        "source": "local-fallback",
+        "connections": 0,
+        "active_channels": 0,
+        "messages_sent": 0,
+    }
 
 
 # Root endpoint with comprehensive info

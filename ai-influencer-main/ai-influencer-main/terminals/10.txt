@@ -1,0 +1,14 @@
+---
+pid: 52820
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "foreach ($port in 8642,8643,8080,3000,18789,18790,1234) { $r = Test-NetConnection -ComputerName 127.0.0.1 -Port $port -WarningAction SilentlyContinue; Write-Host \"port $port : $($r.TcpTestSucceeded)\" }"
+started_at: 2026-06-14T23:34:15.906Z
+running_for_ms: 35539998 
+---
+port 8642 : False
+port 8643 : False
+port 8080 : False
+port 3000 : True
+port 18789 : False
+port 18790 : False
+port 1234 : True

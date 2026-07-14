@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DesignFlow AI — Tootekirjeldusest UI-ni minutitega</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ====================================================
+         TOP BAR
+         ==================================================== -->
+    <header class="topbar" role="banner">
+
+      <!-- Logo -->
+      <a class="topbar-logo" href="#" aria-label="DesignFlow AI">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="8" height="8" rx="2" fill="#4f98a3"/>
+          <rect x="14" y="2" width="8" height="8" rx="2" fill="#4f98a3" opacity="0.5"/>
+          <rect x="2" y="14" width="8" height="8" rx="2" fill="#4f98a3" opacity="0.5"/>
+          <rect x="14" y="14" width="8" height="8" rx="2" fill="#4f98a3" opacity="0.3"/>
+          <path d="M10 6h4M6 10v4M14 18h4M18 14v-4" stroke="#4f98a3" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="topbar-logo-text">Design<span>Flow</span> AI</span>
+      </a>
+
+      <div class="topbar-divider" aria-hidden="true"></div>
+
+      <!-- Version Timeline -->
+      <div class="topbar-timeline-section">
+        <span class="topbar-timeline-label">Ajalugu</span>
+        <div class="timeline-container" id="timelineContainer" role="group" aria-label="Version history">
+          <div class="timeline-track" id="timelineTrack">
+            <div class="timeline-progress" id="timelineProgress" style="width: 100%"></div>
+            <div class="timeline-dots" id="timelineDots"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="topbar-controls">
+
+        <!-- Branch indicator -->
+        <div class="branch-badge" id="branchBadge" title="Current branch — click to manage">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="6" y1="3" x2="6" y2="15"/>
+            <circle cx="18" cy="6" r="3"/>
+            <circle cx="6" cy="18" r="3"/>
+            <path d="M18 9a9 9 0 01-9 9"/>
+          </svg>
+          <span id="branchName">main</span>
+          <svg width="10" height="10" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- Undo/Redo -->
+        <button class="icon-btn" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="9 14 4 9 9 4"/>
+            <path d="M20 20v-7a4 4 0 00-4-4H4"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="15 14 20 9 15 4"/>
+            <path d="M4 20v-7a4 4 0 014-4h12"/>
+          </svg>
+        </button>
+
+        <div class="topbar-divider" aria-hidden="true"></div>
+
+        <!-- Theme selector -->
+        <div class="theme-selector" id="themeSelector">
+          <button class="btn-theme" id="themeSelectorBtn" aria-expanded="false" aria-haspopup="true">
+            <div class="theme-dot" id="themeDot"></div>
+            <span id="themeNameLabel">Modern SaaS</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="theme-popover" id="themePopover" role="listbox" aria-label="Design theme">
+            <div class="theme-popover-title">Disainiteema</div>
+            <div class="theme-option active" data-theme-preset="modern-saas" role="option">
+              <div class="theme-swatch">
+                <div class="theme-color-dot" style="background:#6366f1"></div>
+                <div class="theme-color-dot" style="background:#ffffff"></div>
+                <div class="theme-color-dot" style="background:#f8fafc"></div>
+              </div>
+              <div class="theme-option-info">
+                <div class="theme-option-name">Modern SaaS</div>
+                <div class="theme-option-desc">Indigo · Inter · 8px radius</div>
+              </div>
+            </div>
+            <div class="theme-option" data-theme-preset="consumer-mobile" role="option">
+              <div class="theme-swatch">
+                <div class="theme-color-dot" style="background:#8b5cf6"></div>
+                <div class="theme-color-dot" style="background:#fafafa"></div>
+                <div class="theme-color-dot" style="background:#ffffff"></div>
+              </div>
+              <div class="theme-option-info">
+                <div class="theme-option-name">Consumer Mobile</div>
+                <div class="theme-option-desc">Purple · Jakarta · 16px radius</div>
+              </div>
+            </div>
+            <div class="theme-option" data-theme-preset="enterprise" role="option">
+              <div class="theme-swatch">
+                <div class="theme-color-dot" style="background:#3b82f6"></div>
+                <div class="theme-color-dot" style="background:#f1f5f9"></div>
+                <div class="theme-color-dot" style="background:#ffffff"></div>
+              </div>
+              <div class="theme-option-info">
+                <div class="theme-option-name">Enterprise Dashboard</div>
+                <div class="theme-option-desc">Blue · IBM Plex · 4px radius</div>
+              </div>
+            </div>
+            <div class="theme-custom-section">
+              <div class="theme-popover-title">Custom Theme</div>
+              <div class="theme-custom-row">
+                <span class="theme-custom-label">Primary</span>
+                <input type="color" class="theme-color-input" id="customColor" value="#6366f1">
+              </div>
+              <div class="theme-custom-row">
+                <span class="theme-custom-label">Font</span>
+                <select class="theme-font-select" id="customFont">
+                  <option value="Inter">Inter</option>
+                  <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                  <option value="IBM Plex Sans">IBM Plex Sans</option>
+                  <option value="DM Sans">DM Sans</option>
+                  <option value="Geist">Geist</option>
+                  <option value="Nunito">Nunito</option>
+                  <option value="Lato">Lato</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm w-full mt-3" id="applyCustomTheme">Apply Custom</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark/Light toggle -->
+        <button class="icon-btn" id="darkLightToggle" data-theme-toggle aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+
+        <!-- Export -->
+        <div class="export-dropdown" id="exportDropdown">
+          <button class="btn-export" id="exportBtn" aria-haspopup="true" aria-expanded="false">
+            Ekspordi
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M1 1l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="exportMenu" role="menu">
+            <button class="dropdown-item" role="menuitem" data-export="html">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Ekspordi HTML-ina
+            </button>
+            <button class="dropdown-item" role="menuitem" data-export="png">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Ekspordi PNG-na
+            </button>
+            <button class="dropdown-item" role="menuitem" data-export="copy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Kopeeri HTML
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====================================================
+         LEFT SIDEBAR
+         ==================================================== -->
+    <aside class="left-sidebar" role="complementary" aria-label="Left panel">
+
+      <nav class="sidebar-tabs" aria-label="Left sidebar tabs">
+        <button class="sidebar-tab active" data-tab-target="tab-prd" aria-selected="true" role="tab">PRD</button>
+        <button class="sidebar-tab" data-tab-target="tab-parsed" aria-selected="false" role="tab">Parsed</button>
+        <button class="sidebar-tab" data-tab-target="tab-screens" aria-selected="false" role="tab">Screens</button>
+        <button class="sidebar-tab" data-tab-target="tab-sitemap" aria-selected="false" role="tab">Map</button>
+      </nav>
+
+      <!-- Tab 1: PRD Input -->
+      <div class="sidebar-panel active" id="tab-prd" role="tabpanel">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Tootekirjelduse dokument (PRD)</div>
+          <textarea class="prd-textarea" id="prdInput" placeholder="Kleebi oma PRD siia või kasuta näidet…" spellcheck="false" aria-label="PRD input"></textarea>
+          <div style="margin-top: var(--space-3); display: flex; gap: var(--space-2);">
+            <button class="btn btn-primary btn-full" id="parsePrdBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Analüüsi PRD
+            </button>
+            <button class="btn btn-secondary btn-sm" id="clearPrdBtn" title="Clear">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Parsed Sections -->
+      <div class="sidebar-panel" id="tab-parsed" role="tabpanel">
+        <div class="sidebar-section" id="parsedContent">
+          <div class="empty-state" style="padding: var(--space-8) var(--space-4);">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <p class="empty-state-desc">Parse a PRD first to see extracted sections here.</p>
+          </div>
+        </div>
+        <div class="sidebar-section" id="generateBtnSection" style="display: none;">
+          <button class="btn btn-primary btn-full" id="generateDesignsBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Genereeri disainid
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Screen List -->
+      <div class="sidebar-panel" id="tab-screens" role="tabpanel">
+        <div class="sidebar-section" id="screenListContainer">
+          <div class="empty-state" style="padding: var(--space-8) var(--space-4);">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <p class="empty-state-desc">Generate designs to see all screens here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Sitemap -->
+      <div class="sidebar-panel" id="tab-sitemap" role="tabpanel">
+        <div class="sitemap-container" id="sitemapContainer">
+          <div class="empty-state" style="padding: var(--space-8) var(--space-4);">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v4M12 11l-5 6M12 11l5 6"/></svg>
+            <p class="empty-state-desc">Screen map appears after designs are generated.</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ====================================================
+         CENTER PANEL
+         ==================================================== -->
+    <main class="center-panel" role="main" aria-label="Preview panel">
+
+      <!-- Screen tabs -->
+      <div class="center-panel-header" id="screenTabsBar" role="tablist" aria-label="Screen tabs"></div>
+
+      <!-- Toolbar -->
+      <div class="center-panel-toolbar">
+        <div class="toolbar-left">
+          <div class="view-toggle" role="group" aria-label="View mode">
+            <button class="view-toggle-btn active" id="previewModeBtn" aria-pressed="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+              Eelvaade
+            </button>
+            <button class="view-toggle-btn" id="gridModeBtn" aria-pressed="false">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Ruudustik
+            </button>
+          </div>
+          <span id="previewScreenLabel" style="font-size: var(--text-xs); color: var(--color-text-faint);"></span>
+        </div>
+        <div class="toolbar-right">
+          <button class="icon-btn" id="refreshPreviewBtn" title="Refresh preview" aria-label="Refresh preview">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body: preview or grid -->
+      <div class="center-panel-body" id="centerPanelBody">
+        <!-- Initial empty state -->
+        <div class="empty-state" id="centerEmptyState">
+          <svg class="empty-state-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="4" y="4" width="18" height="18" rx="3"/>
+            <rect x="26" y="4" width="18" height="18" rx="3"/>
+            <rect x="4" y="26" width="18" height="18" rx="3"/>
+            <rect x="26" y="26" width="18" height="18" rx="3"/>
+          </svg>
+          <div class="empty-state-title">Disaine pole veel</div>
+          <div class="empty-state-desc">Kleebi PRD vasakpaneeli, analüüsi see, seejärel klõpsa "Genereeri disainid" esimeste UI ekraanide loomiseks.</div>
+          <button class="btn btn-primary" id="centerStartBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+            Alusta näidisPRD-ga
+          </button>
+        </div>
+
+        <!-- Preview iframe wrapper (hidden initially) -->
+        <div class="preview-wrapper hidden" id="previewWrapper">
+          <div class="preview-browser-chrome">
+            <div class="browser-dots" aria-hidden="true">
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+              <div class="browser-dot"></div>
+            </div>
+            <div class="browser-address" id="browserAddress">app.taskflow.io</div>
+          </div>
+          <iframe
+            id="previewIframe"
+            class="preview-iframe"
+            sandbox="allow-scripts allow-same-origin allow-popups"
+            title="Screen preview"
+            aria-label="Screen preview"
+          ></iframe>
+        </div>
+
+        <!-- Grid view (hidden initially) -->
+        <div class="grid-view hidden" id="gridView" role="list" aria-label="All screens thumbnail grid"></div>
+
+        <!-- Generating overlay -->
+        <div class="generating-overlay hidden" id="generatingOverlay" aria-live="polite" aria-label="Generating designs">
+          <div class="generating-spinner" aria-hidden="true"></div>
+          <div class="generating-text" id="generatingText">Generating designs…</div>
+          <div class="generating-step" id="generatingStep">Analyzing PRD structure</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ====================================================
+         RIGHT SIDEBAR
+         ==================================================== -->
+    <aside class="right-sidebar" role="complementary" aria-label="Right panel">
+
+      <!-- Scope Selector -->
+      <div class="scope-selector-section">
+        <div class="scope-label">Muutmise ulatus</div>
+        <div class="scope-dropdowns">
+          <select class="scope-select" id="scopeScreen" aria-label="Select screen to edit">
+            <option value="">— Vali ekraan —</option>
+          </select>
+          <select class="scope-select" id="scopeSection" aria-label="Select section to edit" disabled>
+            <option value="">— Vali sektsioon —</option>
+          </select>
+        </div>
+        <div class="scope-indicator" id="scopeIndicator" style="display: none;" aria-live="polite">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span id="scopeIndicatorText">Vali ekraan ja sektsioon</span>
+        </div>
+      </div>
+
+      <!-- Chat area -->
+      <div class="chat-messages" id="chatMessages" aria-live="polite" aria-label="AI chat messages">
+        <!-- Welcome message -->
+        <div class="chat-message">
+          <div class="msg-bubble ai">
+            <strong>Tere tulemast DesignFlow AI-sse</strong>
+            <ul class="msg-list">
+              <li>Analüüsi oma PRD vasakpaneeli kasutades</li>
+              <li>Genereeri UI ekraanid analüüsitud sektsioonidest</li>
+              <li>Vali ekraan ja sektsioon ülalolevast ulatus-valikust</li>
+              <li>Kirjuta siia prompte konkreetsete osade itereerimiseks</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat input -->
+      <div class="chat-input-section">
+        <div class="chat-input-wrapper">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Kirjelda muutust… nt. 'Tee statistikakaardid suuremaks ja muuda värv teal-iks'"
+            rows="2"
+            aria-label="Chat prompt input"
+          ></textarea>
+          <button class="btn-send" id="sendBtn" aria-label="Send prompt" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+        <div style="margin-top: var(--space-2); font-size: var(--text-xs); color: var(--color-text-faint);">
+          Muutmise aktiveerimiseks vali ulatus ülalt
+        </div>
+      </div>
+
+      <!-- Changelog / Diff -->
+      <div class="changelog-section" id="changelogSection">
+        <div class="changelog-header" id="changelogToggle" role="button" aria-expanded="true" aria-controls="changelogBody" tabindex="0">
+          <div class="changelog-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Muudatuste logi
+            <span class="changelog-badge" id="changelogCount">0</span>
+          </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="changelogChevron"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="changelog-body" id="changelogBody" role="log" aria-label="Change history">
+          <div style="padding: var(--space-3) 0; text-align: center; font-size: var(--text-xs); color: var(--color-text-faint);">
+            Muudatusi pole veel
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ====================================================
+       BRANCH MODAL
+       ==================================================== -->
+  <div class="modal-overlay hidden" id="branchModal" role="dialog" aria-modal="true" aria-labelledby="branchModalTitle">
+    <div class="modal">
+      <h2 class="modal-title" id="branchModalTitle">Loo haru siit</h2>
+      <input type="text" class="modal-input" id="branchNameInput" placeholder="nt. tume-režiim-eksperiment" aria-label="Branch name">
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelBranchBtn">Tühista</button>
+        <button class="btn btn-primary" id="confirmBranchBtn">Loo haru</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- html2canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

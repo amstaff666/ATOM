@@ -1,0 +1,110 @@
+/* base.css — DesignFlow AI — Resets + Foundation */
+
+/* Box model reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent font-size inflation on mobile */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  hanging-punctuation: first last;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Dashboard: no body scroll */
+body {
+  height: 100%;
+  overflow: hidden;
+  line-height: 1.5;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* Improved media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Remove list styles on ul, ol with role="list" */
+ul[role="list"], ol[role="list"] {
+  list-style: none;
+}
+
+/* Consistent form elements */
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Text wrap improvements */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  line-height: 1.15;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+/* Selection styling */
+::selection {
+  background: color-mix(in oklab, var(--color-primary) 25%, transparent);
+  color: var(--color-text);
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove default button styles */
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Table defaults */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Accessible hidden */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

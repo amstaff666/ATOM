@@ -1,0 +1,7 @@
+---
+pid: 133808
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-07T23:10:58.143Z
+running_for_ms: 28175010 
+---

@@ -1,0 +1,57 @@
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "6ea73679824c47be8b57c073fec8e0fe.CXxExQh6BSQiUnrS",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(printf:*)",
+      "Bash(pkill:*)",
+      "Bash(ps:*)",
+      "Bash(../notes/credentials.md)",
+      "Bash(git pull:*)",
+      "Bash(git log:*)",
+      "Bash(mkdir:*)",
+      "Bash(src-tauri/icons/32.png)",
+      "Bash(src-tauri/icons/32x32.png)",
+      "Bash(src-tauri/icons/128x128.png)",
+      "Bash(src-tauri/icons/128x128@2x.png)",
+      "Bash(src-tauri/icons/tray_icon.png)",
+      "Bash(src-tauri/icons/tray_icon_small.png)",
+      "Bash(git ls-tree:*)",
+      "Bash(rm:*)",
+      "Bash(src-tauri/icons/android/mipmap-hdpi/ic_launcher.png)",
+      "Bash(src-tauri/icons/android/mipmap-mdpi/ic_launcher.png)",
+      "Bash(src-tauri/icons/android/mipmap-xhdpi/ic_launcher.png)",
+      "Bash(src-tauri/icons/android/mipmap-xxhdpi/ic_launcher.png)",
+      "Bash(src-tauri/icons/android/mipmap-xxxhdpi/ic_launcher.png)",
+      "Bash(src-tauri/icons/appstore.png)",
+      "Bash(src-tauri/icons/playstore.png)",
+      "Bash(src-tauri/icons/atom-ai-2.ico)",
+      "Bash(src-tauri/icons/tray_icon.svg)",
+      "Bash(src-tauri/icons/new/preview_icon.svg)",
+      "Bash(src-tauri/icons/Assets.xcassets/AppIcon.appiconset/Contents.json)",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(brew install:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(python:*)",
+      "Bash(source:*)",
+      "Bash(PYTHONPATH=. python -m pytest:*)",
+      "Skill(gsd:execute-phase)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enabledMcpjsonServers": [
+    "chrome-devtools",
+    "brave-search"
+  ]
+}

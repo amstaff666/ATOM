@@ -1,5 +1,6 @@
 // Simple API backend helper for ATOM platform
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "./get-api-base-url";
 
 export { resilientFetch };
 
@@ -56,7 +57,7 @@ const resilientFetch = async (
 
 // Google OAuth helpers
 export const exchangeCodeForTokens = async (code: string): Promise<any> => {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  const backendUrl = getServerApiBaseUrl();
   return resilientFetch(
     "POST",
     `${backendUrl}/api/auth/google/token`,
@@ -68,7 +69,7 @@ export const exchangeCodeForTokens = async (code: string): Promise<any> => {
 };
 
 export const generateGoogleAuthUrl = (state?: string): string => {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  const backendUrl = getServerApiBaseUrl();
   const url = `${backendUrl}/api/auth/google/authorize`;
   return state ? `${url}?state=${encodeURIComponent(state)}` : url;
 };
@@ -78,7 +79,7 @@ export const getMinimalCalendarIntegrationByResource = async (
   userId: string,
   resource: string,
 ): Promise<any> => {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  const backendUrl = getServerApiBaseUrl();
   return resilientFetch(
     "POST",
     `${backendUrl}/api/graphql`,
@@ -114,7 +115,7 @@ export const getAllCalendarIntegrationsByResourceAndClientType = async (
   resource: string,
   clientType: string,
 ): Promise<any> => {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  const backendUrl = getServerApiBaseUrl();
   return resilientFetch(
     "POST",
     `${backendUrl}/api/graphql`,
@@ -150,7 +151,7 @@ export const getAllCalendarIntegrationsByResourceAndClientType = async (
 
 // Schedule meeting helper
 export const scheduleMeeting = async (meetingData: any): Promise<any> => {
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL || process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  const backendUrl = getServerApiBaseUrl();
   return resilientFetch(
     "POST",
     `${backendUrl}/api/schedule/meeting`,

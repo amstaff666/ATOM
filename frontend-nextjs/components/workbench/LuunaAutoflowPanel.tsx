@@ -1,0 +1,496 @@
+﻿import React, { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  Bot,
+  CheckCircle2,
+  FileCog,
+  Loader2,
+  Play,
+  RefreshCw,
+  Server,
+  ShieldCheck,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { safeJson } from "@/lib/safe-fetch";
+
+type AutoflowHealth = {
+  status?: string;
+  service?: string;
+  version?: string;
+};
+
+type AutoflowProvider = {
+  id: string;
+  name: string;
+  description?: string;
+  domains?: string[];
+  can_execute?: boolean;
+  requires_approval?: boolean;
+  status?: string;
+};
+
+type AutoflowProvidersResponse = {
+  providers: AutoflowProvider[];
+  count: number;
+};
+
+type AutoflowTaskResponse = {
+  success: boolean;
+  execution_id?: string;
+  selected_adapter?: string;
+  plan?: string[];
+  result?: Record<string, unknown>;
+  warnings?: string[];
+  requires_approval?: boolean;
+  status?: string;
+  error?: string;
+  details?: unknown;
+};
+
+type TaskMode = "plan_only" | "execute_mock";
+type TaskDomain = "pdf" | "workflow" | "agent" | "document" | "general";
+
+const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4490";
+
+const fallbackHealth: AutoflowHealth = {
+  status: "offline",
+  service: "luuna-autoflow",
+  version: "-",
+};
+
+const fallbackProviders: AutoflowProvidersResponse = {
+  providers: [],
+  count: 0,
+};
+
+const expectedProviders = ["mock-llm", "pdf-orchestrator", "atom-tools"];
+const modes: TaskMode[] = ["plan_only", "execute_mock"];
+const domains: TaskDomain[] = ["pdf", "workflow", "agent", "document", "general"];
+
+export function LuunaAutoflowPanel() {
+  const [health, setHealth] = useState<AutoflowHealth>(fallbackHealth);
+  const [providers, setProviders] = useState<AutoflowProvidersResponse>(fallbackProviders);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState(
+    "Loo PDF editor, mis teeb laenutaotluse pÃµhja ja loeb pangavÃ¤ljavÃµtteid",
+  );
+  const [mode, setMode] = useState<TaskMode>("plan_only");
+  const [domain, setDomain] = useState<TaskDomain>("pdf");
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState(false);
+  const [result, setResult] = useState<AutoflowTaskResponse | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const providerList = useMemo(() => {
+    if (Array.isArray(providers)) return providers;
+    if (providers && Array.isArray((providers as any).providers)) {
+      return (providers as any).providers;
+    }
+    return [];
+  }, [providers]);
+  const providerIds = useMemo(
+    () => new Set(providerList.map((provider: any) => provider?.id).filter(Boolean)),
+    [providerList],
+  );
+  const backendOnline = health.status === "ok" && !statusError;
+
+  const refreshStatus = async () => {
+    setLoadingStatus(true);
+    setStatusError(null);
+
+    const [healthResult, providersResult] = await Promise.all([
+      safeJson<AutoflowHealth>(`${apiBase}/api/autoflow/health`, fallbackHealth),
+      safeJson<AutoflowProvidersResponse>(
+        `${apiBase}/api/autoflow/providers`,
+        fallbackProviders,
+      ),
+    ]);
+
+    setHealth(healthResult.data);
+    setProviders(providersResult.data);
+
+    const errors = [healthResult.error, providersResult.error].filter(Boolean);
+    if (errors.length) {
+      setStatusError(errors.join(" | "));
+    }
+
+    setLoadingStatus(false);
+  };
+
+  useEffect(() => {
+    refreshStatus();
+  }, []);
+
+  const submitTask = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+    setResult(null);
+
+    const response = await safeJson<AutoflowTaskResponse>(
+      `${apiBase}/api/autoflow/tasks`,
+      { success: false, error: "Autoflow task failed" },
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          goal: prompt,
+          mode,
+          domain,
+          approval_required: true,
+        }),
+      },
+    );
+
+    setResult(response.data);
+    if (!response.ok || response.data.success === false) {
+      setSubmitError(response.data.error || response.error || "Autoflow request failed");
+    }
+
+    setSubmitting(false);
+  };
+
+  return (
+    <Card className="border-slate-800 bg-slate-950/70">
+      <CardHeader className="space-y-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Badge className="border-cyan-400/20 bg-cyan-400/10 text-cyan-200">
+                Luuna Autoflow Core
+              </Badge>
+              <Badge variant={backendOnline ? "default" : "secondary"}>
+                {backendOnline ? "online" : "fallback"}
+              </Badge>
+            </div>
+            <CardTitle className="flex items-center gap-2 text-slate-100">
+              <Bot className="h-5 w-5 text-cyan-300" />
+              Autoflow plan generator
+            </CardTitle>
+            <CardDescription>
+              Loo turvaline plaan ilma pÃ¤ris vÃ¤lise provider executionita. Lubatud on ainult
+              plan_only ja execute_mock.
+            </CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={refreshStatus} disabled={loadingStatus}>
+            {loadingStatus ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            VÃ¤rskenda
+          </Button>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <StatusTile
+            icon={Server}
+            label="Health"
+            value={health.status || "offline"}
+            detail={health.service || "luuna-autoflow"}
+            ok={backendOnline}
+          />
+          <StatusTile
+            icon={ShieldCheck}
+            label="Version"
+            value={health.version || "-"}
+            detail="Autoflow API"
+            ok={!statusError}
+          />
+          <StatusTile
+            icon={FileCog}
+            label="Providers"
+            value={String(providerList.length || providerList.length || 0)}
+            detail="registered adapters"
+            ok={providerList.length > 0}
+          />
+        </div>
+
+        {statusError && (
+          <InlineError
+            title="Backend offline vÃµi Autoflow pole saadaval"
+            message={statusError}
+          />
+        )}
+      </CardHeader>
+
+      <CardContent className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="space-y-4">
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
+              Providers
+            </h3>
+            <div className="grid gap-2">
+              {expectedProviders.map((providerId) => {
+                const provider = providerList.find((item) => item.id === providerId);
+                return (
+                  <div
+                    key={providerId}
+                    className="rounded-lg border border-slate-800 bg-slate-900/70 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-mono text-sm font-semibold text-slate-100">
+                          {providerId}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {provider?.description || "Provider not reported by backend yet."}
+                        </p>
+                      </div>
+                      <Badge variant={providerIds.has(providerId) ? "default" : "secondary"}>
+                        {providerIds.has(providerId) ? "available" : "missing"}
+                      </Badge>
+                    </div>
+                    {provider?.domains?.length ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {provider.domains.map((item) => (
+                          <Badge key={item} variant="secondary" className="text-[10px]">
+                            {item}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/70 p-4">
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-slate-500">
+                Prompt
+              </span>
+              <Textarea
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                className="min-h-[118px] border-slate-700 bg-slate-950/70 text-slate-100"
+                placeholder="Kirjelda tÃ¶Ã¶ eesmÃ¤rki..."
+              />
+            </label>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Selector
+                label="Mode"
+                value={mode}
+                options={modes}
+                onChange={(value) => setMode(value as TaskMode)}
+              />
+              <Selector
+                label="Domain"
+                value={domain}
+                options={domains}
+                onChange={(value) => setDomain(value as TaskDomain)}
+              />
+            </div>
+
+            <Button
+              className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400"
+              onClick={submitTask}
+              disabled={submitting || !prompt.trim()}
+            >
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Generate Plan
+            </Button>
+          </div>
+        </div>
+
+        <ResultPanel result={result} error={submitError} />
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatusTile({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  ok,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  detail: string;
+  ok: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-800 bg-slate-900/70 p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">
+          {label}
+        </span>
+        <Icon className={`h-4 w-4 ${ok ? "text-emerald-300" : "text-slate-500"}`} />
+      </div>
+      <p className="text-lg font-semibold text-slate-100">{value}</p>
+      <p className="text-xs text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function Selector({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-slate-500">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-10 w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 text-sm text-slate-100 outline-none transition focus:border-cyan-400"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function ResultPanel({
+  result,
+  error,
+}: {
+  result: AutoflowTaskResponse | null;
+  error: string | null;
+}) {
+  if (!result && !error) {
+    return (
+      <div className="flex min-h-[420px] flex-col items-center justify-center rounded-lg border border-dashed border-slate-800 bg-slate-900/40 p-8 text-center">
+        <FileCog className="mb-3 h-10 w-10 text-slate-600" />
+        <p className="font-semibold text-slate-200">Autoflow plaan ootab prompti</p>
+        <p className="mt-2 max-w-md text-sm text-slate-500">
+          Submit loob execution_id, valib adapteri ja tagastab plaani sammud ilma pÃ¤ris vÃ¤list
+          kÃ¤ivitust tegemata.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/70 p-4">
+      {error && <InlineError title="Autoflow request failed" message={error} />}
+
+      {result?.success && (
+        <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 p-3">
+          <div className="flex items-center gap-2 font-semibold text-emerald-200">
+            <CheckCircle2 className="h-4 w-4" />
+            Plaan genereeritud
+          </div>
+        </div>
+      )}
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <MetaBox label="execution_id" value={result?.execution_id || "-"} mono />
+        <MetaBox label="selected_adapter" value={result?.selected_adapter || "-"} />
+        <MetaBox
+          label="approval"
+          value={result?.requires_approval ? "approval required" : "not required"}
+        />
+        <MetaBox label="status" value={result?.status || (error ? "failed" : "-")} />
+      </div>
+
+      {result?.plan?.length ? (
+        <div>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
+            Plan steps
+          </h3>
+          <ol className="space-y-2">
+            {result.plan.map((step, index) => (
+              <li
+                key={`${index}-${step}`}
+                className="rounded-md border border-slate-800 bg-slate-950/50 px-3 py-2 text-sm text-slate-200"
+              >
+                {step}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+
+      {result?.warnings?.length ? (
+        <div>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
+            Warnings
+          </h3>
+          <div className="space-y-2">
+            {result.warnings.map((warning) => (
+              <div
+                key={warning}
+                className="flex gap-2 rounded-md border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-sm text-amber-100"
+              >
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{warning}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {result?.details ? (
+        <pre className="max-h-48 overflow-auto rounded-md border border-slate-800 bg-slate-950/70 p-3 text-xs text-slate-300">
+          {JSON.stringify(result.details, null, 2)}
+        </pre>
+      ) : null}
+    </div>
+  );
+}
+
+function MetaBox({
+  label,
+  value,
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="rounded-md border border-slate-800 bg-slate-950/50 p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+        {label}
+      </p>
+      <p className={`mt-1 break-words text-sm text-slate-100 ${mono ? "font-mono" : ""}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function InlineError({ title, message }: { title: string; message: string }) {
+  return (
+    <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-100">
+      <div className="mb-1 flex items-center gap-2 font-semibold">
+        <AlertTriangle className="h-4 w-4" />
+        {title}
+      </div>
+      <p className="break-words text-amber-100/90">{message}</p>
+    </div>
+  );
+}
+

@@ -4,6 +4,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerApiBaseUrl } from '@/lib/get-api-base-url';
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,7 +28,7 @@ export default async function handler(
     }
 
     // Forward request to backend service
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5058';
+    const backendUrl = getServerApiBaseUrl();
     const response = await fetch(`${backendUrl}/api/integrations/nextjs/projects`, {
       method: 'POST',
       headers: {

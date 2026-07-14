@@ -97,6 +97,13 @@ def _log(msg: str, quiet: bool = False) -> None:
         print(msg, flush=True)
 
 
+def _rel(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 # ---------------------------------------------------------------------------
 # Diagnostics
 # ---------------------------------------------------------------------------
@@ -213,9 +220,9 @@ def check_env_files(report: HealReport) -> None:
                 id=f"env_missing_{target.name}",
                 category="config",
                 severity="warning",
-                message=f"Missing {target.relative_to(ROOT)} — can copy from {source.relative_to(ROOT)}",
+                message=f"Missing {_rel(target)} — can copy from {_rel(source)}",
                 fixable=True,
-                fix_action=f"copy_env:{target}:{source}",
+                fix_action=f"copy_env|{target}|{source}",
             )
         )
 
@@ -233,7 +240,7 @@ def check_data_dirs(report: HealReport) -> None:
                     id=f"dir_missing_{d.name}",
                     category="data",
                     severity="warning",
-                    message=f"Missing directory: {d.relative_to(ROOT)}",
+                    message=f"Missing directory: {_rel(d)}",
                     fixable=True,
                     fix_action=f"mkdir:{d}",
                 )
@@ -266,7 +273,7 @@ def check_known_code_issues(report: HealReport) -> None:
                     id=issue_id,
                     category="frontend",
                     severity="error",
-                    message=f"Known code issue in {path.relative_to(ROOT)}",
+                    message=f"Known code issue in {_rel(path)}",
                     fixable=True,
                     fix_action=f"code_fix:{path}:{bad}:{good}",
                 )
@@ -618,16 +625,16 @@ def fix_npm_install(report: HealReport, quiet: bool) -> bool:
 def fix_copy_env(report: HealReport, target: Path, source: Path, quiet: bool) -> bool:
     if target.exists():
         return True
-    _log(f"  → copy {source.relative_to(ROOT)} → {target.relative_to(ROOT)}", quiet)
+    _log(f"  → copy {_rel(source)} → {_rel(target)}", quiet)
     shutil.copy2(source, target)
     report.log_fix(f"copy env {target.name}")
     return True
 
 
 def fix_mkdir(report: HealReport, path: Path, quiet: bool) -> bool:
-    _log(f"  → mkdir {path.relative_to(ROOT)}", quiet)
+    _log(f"  → mkdir {_rel(path)}", quiet)
     path.mkdir(parents=True, exist_ok=True)
-    report.log_fix(f"mkdir {path.relative_to(ROOT)}")
+    report.log_fix(f"mkdir {_rel(path)}")
     return True
 
 
@@ -638,8 +645,8 @@ def fix_code_replace(report: HealReport, path: Path, bad: str, good: str, quiet:
     if bad not in content:
         return True
     path.write_text(content.replace(bad, good), encoding="utf-8")
-    _log(f"  → patched {path.relative_to(ROOT)}", quiet)
-    report.log_fix(f"code patch {path.relative_to(ROOT)}")
+    _log(f"  → patched {_rel(path)}", quiet)
+    report.log_fix(f"code patch {_rel(path)}")
     return True
 
 
@@ -732,8 +739,8 @@ def apply_fixes(report: HealReport, quiet: bool = False) -> int:
             ok = fix_alembic_upgrade(report, quiet)
         elif action == "fix_error_recovery_test":
             ok = fix_error_recovery_test(report, quiet)
-        elif action.startswith("copy_env:"):
-            _, target_s, source_s = action.split(":", 2)
+        elif action.startswith("copy_env|"):
+            _, target_s, source_s = action.split("|", 2)
             ok = fix_copy_env(report, Path(target_s), Path(source_s), quiet)
         elif action.startswith("mkdir:"):
             ok = fix_mkdir(report, Path(action.split(":", 1)[1]), quiet)
@@ -884,7 +891,7 @@ def run_self_heal(
 
     report_dict = asdict(report)
     REPORT_FILE.write_text(json.dumps(report_dict, indent=2), encoding="utf-8")
-    _log(f"\nReport saved: {REPORT_FILE.relative_to(ROOT)}", quiet)
+    _log(f"\nReport saved: {_rel(REPORT_FILE)}", quiet)
 
     if json_out:
         print(json.dumps(report_dict, indent=2))

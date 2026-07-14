@@ -9,6 +9,7 @@ import {
     ChevronRight,
     Home,
     CreditCard,
+    Crown,
     Layers,
     Zap,
     Bot,
@@ -113,6 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
             items: [
                 { label: "PDF Orkester", icon: FileCog, path: "/center/pdf-orchestrator" },
                 { label: "PDF Editorid", icon: FileStack, path: "/center/pdf-editors" },
+                { label: "KingPDF", icon: Crown, path: "/center/kingpdf" },
                 { label: "PDF agendid", icon: Network, path: "/center/pdf-agents" },
                 { label: "NexusPDF Alchemy", icon: Wand2, path: "/center/nexuspdf-alchemy" },
                 { label: "OnePDF klient", icon: FileText, path: "/center/onepdf-client" },

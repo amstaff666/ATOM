@@ -1,0 +1,17 @@
+---
+pid: 28472
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-14T21:45:39.392Z
+running_for_ms: 42085010 
+---
+
+> ai-influencer@0.0.1 dev
+> vite
+
+Port 5173 is in use, trying another one...
+
+  VITE v5.4.21  ready in 337 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: use --host to expose

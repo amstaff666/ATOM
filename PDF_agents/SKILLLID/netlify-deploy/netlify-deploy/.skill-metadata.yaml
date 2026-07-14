@@ -1,0 +1,33 @@
+examples:
+  - id: preview-deploy
+    title:
+      zh: 预览部署到Netlify
+      en: Preview Deployment to Netlify
+    description:
+      zh: 将当前项目部署到Netlify，创建预览URL进行测试
+      en: Deploy current project to Netlify and create a preview URL for testing
+    prompt:
+      zh: |-
+        请帮我把当前项目部署到Netlify，先创建一个预览部署来测试。
+
+        项目已有Git仓库。请先检查Netlify CLI认证状态，如果未认证请引导我登录，然后关联站点并完成部署。
+      en: |-
+        Please help me deploy the current project to Netlify. Create a preview deployment for testing first.
+
+        The project already has a Git repository. Please check Netlify CLI auth status first, guide me through login if not authenticated, then link the site and deploy.
+  - id: production-deploy
+    title:
+      zh: 生产环境部署到Netlify
+      en: Production Deployment to Netlify
+    description:
+      zh: 将当前项目部署到Netlify生产环境
+      en: Deploy current project to Netlify production environment
+    prompt:
+      zh: |-
+        请帮我把当前项目部署到Netlify的生产环境。
+
+        项目已有Git仓库。请完成认证检查、站点关联，并使用 --prod 参数直接部署到生产环境。部署完成后给我站点URL。
+      en: |-
+        Please help me deploy the current project to Netlify production.
+
+        The project already has a Git repo. Please check authentication, link the site, and deploy with --prod flag directly to production. Give me the site URL when done.

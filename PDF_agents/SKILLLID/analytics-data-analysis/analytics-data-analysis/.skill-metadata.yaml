@@ -1,0 +1,209 @@
+examples:
+  - id: business-analytics
+    title:
+      zh: 商业数据分析报告
+      en: Business Analytics Report
+    description:
+      zh: 分析业务数据并生成可视化报告
+      en: Analyze business data and generate visualization reports
+    prompt:
+      zh: |-
+        我需要分析公司最近一个季度的销售数据。
+
+        数据情况：
+        - 数据源：CSV文件包含销售记录
+        - 时间范围：2024年Q1（1-3月）
+        - 关键指标：销售额、订单量、客户数量、产品类别
+
+        分析要求：
+        1. 月度销售趋势分析
+        2. 产品类别销售占比
+        3. 客户购买行为分析
+        4. 地区销售表现对比
+        5. 关键绩效指标(KPI)计算
+
+        请帮我：
+        1. 设计数据分析流程
+        2. 编写数据清洗和处理代码
+        3. 创建交互式可视化图表
+        4. 生成完整的分析报告
+        5. 提供业务洞察和建议
+      en: |-
+        I need to analyze the company's sales data for the recent quarter.
+
+        Data situation:
+        - Data source: CSV file containing sales records
+        - Time range: Q1 2024 (January-March)
+        - Key metrics: Sales revenue, order volume, customer count, product categories
+
+        Analysis requirements:
+        1. Monthly sales trend analysis
+        2. Product category sales proportion
+        3. Customer purchasing behavior analysis
+        4. Regional sales performance comparison
+        5. Key Performance Indicator (KPI) calculation
+
+        Please help me:
+        1. Design data analysis workflow
+        2. Write data cleaning and processing code
+        3. Create interactive visualization charts
+        4. Generate complete analysis report
+        5. Provide business insights and recommendations
+  - id: customer-segmentation
+    title:
+      zh: 客户细分和画像分析
+      en: Customer Segmentation and Profiling Analysis
+    description:
+      zh: 基于客户行为数据进行细分和画像构建
+      en: Perform segmentation and profiling based on customer behavior data
+    prompt:
+      zh: |-
+        我们电商平台需要对用户进行精细化运营。
+
+        数据包含：
+        - 用户基本信息（年龄、性别、地区）
+        - 购买行为数据（浏览、加购、下单）
+        - 消费金额和频次
+        - 产品偏好标签
+
+        分析目标：
+        1. 构建客户价值模型(RFM分析)
+        2. 进行客户聚类细分
+        3. 描绘各类客户画像
+        4. 识别高价值客户群体
+        5. 制定个性化营销策略
+
+        请帮我：
+        1. 选择合适的聚类算法
+        2. 处理数据标准化和特征工程
+        3. 验证聚类结果的有效性
+        4. 可视化客户分布和特征
+        5. 输出可执行的运营建议
+      en: |-
+        Our e-commerce platform needs refined user operation.
+
+        Data includes:
+        - User basic information (age, gender, region)
+        - Purchase behavior data (browsing, adding to cart, ordering)
+        - Spending amount and frequency
+        - Product preference tags
+
+        Analysis goals:
+        1. Build customer value model (RFM analysis)
+        2. Perform customer clustering segmentation
+        3. Profile different customer segments
+        4. Identify high-value customer groups
+        5. Develop personalized marketing strategies
+
+        Please help me:
+        1. Select appropriate clustering algorithms
+        2. Handle data standardization and feature engineering
+        3. Validate clustering results effectiveness
+        4. Visualize customer distribution and characteristics
+        5. Output actionable operational recommendations
+  - id: ab-testing
+    title:
+      zh: A/B测试统计分析
+      en: A/B Testing Statistical Analysis
+    description:
+      zh: 设计和分析A/B测试实验结果
+      en: Design and analyze A/B testing experiment results
+    prompt:
+      zh: |-
+        我们要测试网站首页改版的效果。
+
+        实验设计：
+        - 对照组：原版首页
+        - 实验组：新版首页
+        - 样本量：各10000用户
+        - 观测指标：点击率、转化率、停留时间
+
+        分析需求：
+        1. 验证样本分布的随机性
+        2. 进行假设检验(显著性水平α=0.05)
+        3. 计算效应量和置信区间
+        4. 评估统计功效
+        5. 提供实验结论和建议
+
+        请帮我：
+        1. 设计统计分析方案
+        2. 编写假设检验代码
+        3. 创建结果可视化图表
+        4. 解释统计学意义
+        5. 撰写实验报告
+      en: |-
+        We want to test the effectiveness of homepage redesign.
+
+        Experiment design:
+        - Control group: Original homepage
+        - Treatment group: New homepage
+        - Sample size: 10,000 users each
+        - Metrics observed: Click-through rate, conversion rate, dwell time
+
+        Analysis needs:
+        1. Validate sample distribution randomness
+        2. Perform hypothesis testing (significance level α=0.05)
+        3. Calculate effect size and confidence intervals
+        4. Evaluate statistical power
+        5. Provide experimental conclusions and recommendations
+
+        Please help me:
+        1. Design statistical analysis plan
+        2. Write hypothesis testing code
+        3. Create result visualization charts
+        4. Explain statistical significance
+        5. Write experiment report
+  - id: predictive-modeling
+    title:
+      zh: 预测建模和机器学习
+      en: Predictive Modeling and Machine Learning
+    description:
+      zh: 构建预测模型解决业务问题
+      en: Build predictive models to solve business problems
+    prompt:
+      zh: |-
+        我需要预测下个月的产品销量。
+
+        可用数据：
+        - 历史销售数据（过去2年）
+        - 季节性因素
+        - 市场活动记录
+        - 竞品价格变化
+        - 经济指标数据
+
+        建模要求：
+        1. 选择合适的预测算法
+        2. 进行特征工程和选择
+        3. 模型训练和验证
+        4. 误差分析和优化
+        5. 预测结果解释
+
+        请帮我：
+        1. 设计预测建模流程
+        2. 处理时间序列特性
+        3. 实现多种算法比较
+        4. 评估模型性能指标
+        5. 提供预测置信区间
+      en: |-
+        I need to predict next month's product sales.
+
+        Available data:
+        - Historical sales data (past 2 years)
+        - Seasonal factors
+        - Marketing campaign records
+        - Competitor price changes
+        - Economic indicator data
+
+        Modeling requirements:
+        1. Select appropriate prediction algorithms
+        2. Perform feature engineering and selection
+        3. Model training and validation
+        4. Error analysis and optimization
+        5. Prediction result interpretation
+
+        Please help me:
+        1. Design prediction modeling workflow
+        2. Handle time series characteristics
+        3. Implement multiple algorithm comparison
+        4. Evaluate model performance metrics
+        5. Provide prediction confidence intervals

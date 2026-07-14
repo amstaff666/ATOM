@@ -1,11 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "@/lib/get-api-base-url";
 
-const backendUrl =
-  process.env.NEXT_PUBLIC_API_URL ||
-  process.env.API_BASE_URL ||
-  process.env.BACKEND_URL ||
-  process.env.PYTHON_BACKEND_URL ||
-  "http://127.0.0.1:4490";
+const backendUrl = getServerApiBaseUrl();
 
 function fallbackFor(path: string, status = 200, error?: string) {
   if (path === "executions") {

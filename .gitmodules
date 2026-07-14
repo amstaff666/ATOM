@@ -1,0 +1,3 @@
+[submodule "frontend-nextjs/optaplanner_build_docker"]
+	path = frontend-nextjs/optaplanner_build_docker
+	url = https://github.com/rush86999/atomic-scheduler.git

@@ -1,0 +1,51 @@
+examples:
+  - id: landing-page
+    title:
+      zh: 创建产品落地页
+      en: Create a Product Landing Page
+    description:
+      zh: 快速搭建一个精美的产品落地页 MVP 原型
+      en: Quickly build a beautiful product landing page MVP prototype
+    prompt:
+      zh: |-
+        帮我创建一个产品落地页。这是一个AI写作助手工具，需要包含：
+        - 有视觉冲击力的首屏 Hero 区域
+        - 核心功能介绍
+        - 用户评价
+        - 定价方案
+        - 页脚
+
+        风格参考 Linear 或 Stripe 的简洁现代感。
+      en: |-
+        Help me create a product landing page. It's for an AI writing assistant tool and should include:
+        - A visually striking Hero section
+        - Core features introduction
+        - User testimonials
+        - Pricing plans
+        - Footer
+
+        Style reference: Clean and modern like Linear or Stripe.
+  - id: dashboard
+    title:
+      zh: 创建管理后台仪表板
+      en: Create an Admin Dashboard
+    description:
+      zh: 搭建一个功能完备的管理后台仪表板界面
+      en: Build a fully functional admin dashboard interface
+    prompt:
+      zh: |-
+        帮我创建一个管理后台仪表板，包含：
+        - 侧边栏导航
+        - 数据概览卡片（用户数、收入、订单等）
+        - 数据图表区域
+        - 最近活动列表
+
+        支持深色模式，风格简洁专业。
+      en: |-
+        Help me create an admin dashboard with:
+        - Sidebar navigation
+        - Data overview cards (users, revenue, orders, etc.)
+        - Data chart area
+        - Recent activity list
+
+        Support dark mode, clean and professional style.

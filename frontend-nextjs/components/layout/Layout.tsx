@@ -2,6 +2,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import { cn } from '../../lib/utils';
+import { AiVoiceHelper } from '../Voice/AiVoiceHelper';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ children, className = '' }) => {
           {children}
         </main>
       </div>
+      <AiVoiceHelper />
     </div>
   );
 };

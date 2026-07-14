@@ -1,0 +1,13 @@
+---
+pid: 81748
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-14T22:10:52.146Z
+running_for_ms: 40570009 
+---
+Files in the public directory are served at the root path.
+Instead of /public/uploads/images/1781472589603-Screenshot_2026-05-22_125235.png, use /uploads/images/1781472589603-Screenshot_2026-05-22_125235.png.
+Files in the public directory are served at the root path.
+Instead of /public/uploads/images/1781472589603-Screenshot_2026-05-22_125235.png, use /uploads/images/1781472589603-Screenshot_2026-05-22_125235.png.
+Files in the public directory are served at the root path.
+Instead of /public/uploads/images/1781472589603-Screenshot_2026-05-22_125235.png, use /uploads/images/1781472589603-Screenshot_2026-05-22_125235.png.

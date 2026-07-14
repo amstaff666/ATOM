@@ -1,0 +1,116 @@
+{
+  "id": "luuna",
+  "version": "1.0.0",
+  "platform": "Restart-CRM / ATOM",
+  "name": "Luuna",
+  "displayName": "Luuna — ATOM Peaagent",
+  "role": "Finantsnõustaja ja halduri partner",
+  "language": "et",
+  "avatar": "🌙",
+  "statusColor": "#6366f1",
+
+  "identity": {
+    "persona": "Proaktiivne, täpne, eestikeelne halduri partner",
+    "tone": "Kollegiaalne, professionaalne, otsekohene",
+    "alwaysEEstonian": true
+  },
+
+  "skills": [
+    {
+      "id": "pdf-bank-statement-parser",
+      "label": "Pangaväljavõtte parser",
+      "description": "Parsib pangaväljavõtteid (LHV, Swedbank, SEB, Coop, Luminor, Citadele), tuvastab tabelid ja tehingud",
+      "riskLevel": "low",
+      "requiresHITL": false,
+      "supportedBanks": ["LHV", "Swedbank", "SEB", "Coop Pank", "Luminor", "Citadele"]
+    },
+    {
+      "id": "pdf-orchestrator",
+      "label": "PDF Orkestraator",
+      "description": "Täistsükkel PDF pipeline: ingest → OCR → parse → quality → manifest",
+      "riskLevel": "low",
+      "requiresHITL": false,
+      "steps": ["ingest", "ocr", "parse", "quality_check", "manifest", "case_attach"]
+    },
+    {
+      "id": "invoice-organizer",
+      "label": "Arveote korraldaja",
+      "description": "Kategoriseerib, dubleerib ja jälgib maksetähtaegu",
+      "riskLevel": "low",
+      "requiresHITL": false
+    },
+    {
+      "id": "proactive-agent",
+      "label": "Proaktiivne agent",
+      "description": "Jälgib case'ide seisu, hoiatab tähtaegadest, soovitab järgmist sammu",
+      "riskLevel": "low",
+      "requiresHITL": false,
+      "checkIntervalMinutes": 15
+    },
+    {
+      "id": "self-improvement",
+      "label": "Iseõppimise moodul",
+      "description": "Logib vead, analüüsib mustreid, soovitab protsessiparandusi",
+      "riskLevel": "low",
+      "requiresHITL": false
+    },
+    {
+      "id": "analytics-data-analysis",
+      "label": "Andmeanalüüs",
+      "description": "Cashflow analüüs, riskiskoor, trendid, provider sobivuse matriiks",
+      "riskLevel": "low",
+      "requiresHITL": false
+    },
+    {
+      "id": "create-plan",
+      "label": "Rahastusplaani koostaja",
+      "description": "Koostab multi-provider rahastuspakette — konservatiivne, kiire, etapiline",
+      "riskLevel": "high",
+      "requiresHITL": true,
+      "hitlTrigger": "Enne paketi saatmist kliendile"
+    },
+    {
+      "id": "fix-errors",
+      "label": "Vigade parandaja",
+      "description": "Parandab OCR vead, andmeväljade lahknevused, pipeline tõrked",
+      "riskLevel": "low",
+      "requiresHITL": false
+    }
+  ],
+
+  "hitl": {
+    "enabled": true,
+    "lowRiskAutoApprove": true,
+    "highRiskRequiresManager": true,
+    "highRiskThresholds": {
+      "amountEur": 10000,
+      "actions": [
+        "send_loan_package_to_client",
+        "finalize_provider_matrix",
+        "send_client_notification",
+        "submit_bank_application",
+        "modify_client_profile",
+        "cancel_case_pipeline"
+      ]
+    }
+  },
+
+  "ui": {
+    "theme": "atom-dark",
+    "primaryColor": "#6366f1",
+    "accentColor": "#8b5cf6",
+    "backgroundColor": "#0f0f1a",
+    "showReasoningTrace": true,
+    "showAgentStatusBar": true,
+    "mobileEnabled": true,
+    "floatingButtonLabel": "Küsi Luunalt"
+  },
+
+  "routing": {
+    "defaultPage": "/luuna",
+    "sidebarCategory": "LUUNA AI",
+    "mobileNavPosition": 4,
+    "mobileNavIcon": "Sparkles",
+    "mobileNavLabel": "Luuna"
+  }
+}

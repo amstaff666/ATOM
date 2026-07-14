@@ -1,0 +1,113 @@
+---
+pid: 73780
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-14T16:39:50.141Z
+running_for_ms: 12290008 
+---
+✘ [ERROR] Multiple exports with the same name "sanitizeCommandsList"
+
+    lib/appCommands.js:160:16:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  The name "sanitizeCommandsList" was originally exported here:
+
+    lib/appCommands.js:155:16:
+      155 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] The symbol "sanitizeCommandsList" has already been declared
+
+    lib/appCommands.js:160:16:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  The symbol "sanitizeCommandsList" was originally declared here:
+
+    lib/appCommands.js:155:16:
+      155 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  Duplicate top-level function declarations are not allowed in an ECMAScript module. This file is considered to be an ECMAScript module because of the "export" keyword here:
+
+    lib/appCommands.js:160:0:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵ ~~~~~~
+
+failed to load config from C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main\vite.config.js
+8:46:57 PM [vite] Build failed with 2 errors:
+lib/appCommands.js:160:16: ERROR: Multiple exports with the same name "sanitizeCommandsList"
+lib/appCommands.js:160:16: ERROR: The symbol "sanitizeCommandsList" has already been declared
+8:46:57 PM [vite] server restart failed
+✘ [ERROR] Multiple exports with the same name "sanitizeCommandsList"
+
+    lib/appCommands.js:160:16:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  The name "sanitizeCommandsList" was originally exported here:
+
+    lib/appCommands.js:155:16:
+      155 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+✘ [ERROR] The symbol "sanitizeCommandsList" has already been declared
+
+    lib/appCommands.js:160:16:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  The symbol "sanitizeCommandsList" was originally declared here:
+
+    lib/appCommands.js:155:16:
+      155 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵                 ~~~~~~~~~~~~~~~~~~~~
+
+  Duplicate top-level function declarations are not allowed in an ECMAScript module. This file is considered to be an ECMAScript module because of the "export" keyword here:
+
+    lib/appCommands.js:160:0:
+      160 │ export function sanitizeCommandsList(commands, context = {}) {
+          ╵ ~~~~~~
+
+failed to load config from C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main\vite.config.js
+8:47:06 PM [vite] Build failed with 2 errors:
+lib/appCommands.js:160:16: ERROR: Multiple exports with the same name "sanitizeCommandsList"
+lib/appCommands.js:160:16: ERROR: The symbol "sanitizeCommandsList" has already been declared
+8:47:06 PM [vite] server restart failed
+▲ [WARNING] Import "callChatWithSystem" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    lib/commandInterpreter.js:1:388:
+      1 │ ...terpreter.js";import { callChatWithSystem } from './chatProvider...
+        ╵                           ~~~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Import "callChatWithSystem" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    lib/sourceEditor.js:3:9:
+      3 │ import { callChatWithSystem } from './chatProviders.js'
+        ╵          ~~~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Import "callChatWithSystem" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    lib/areaAdvisor.js:1:374:
+      1 │ ...eaAdvisor.js";import { callChatWithSystem } from './chatProvider...
+        ╵                           ~~~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Import "callChatProvider" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    vite.config.js:9:9:
+      9 │ import { callChatProvider, isValidChatProvider } from './lib/chatPr...
+        ╵          ~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Import "isValidChatProvider" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    vite.config.js:9:27:
+      9 │ ...rt { callChatProvider, isValidChatProvider } from './lib/chatPro...
+        ╵                           ~~~~~~~~~~~~~~~~~~~
+
+▲ [WARNING] Import "CHAT_PROVIDER_IDS" will always be undefined because the file "lib/chatProviders.js" has no exports [import-is-undefined]
+
+    vite.config.js:16:9:
+      16 │ import { CHAT_PROVIDER_IDS } from './lib/chatProviders.js'
+         ╵          ~~~~~~~~~~~~~~~~~
+

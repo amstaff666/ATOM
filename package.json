@@ -1,0 +1,16 @@
+{
+  "name": "atom-platform",
+  "private": true,
+  "scripts": {
+    "self-heal": "python scripts/atom_self_heal.py",
+    "self-heal:check": "python scripts/atom_self_heal.py --check-only",
+    "fix:typescript": "python scripts/atom_fix_typescript.py",
+    "predev": "python scripts/pre_dev.py",
+    "dev": "cd frontend-nextjs && npm run dev",
+    "prestart": "python scripts/pre_dev.py",
+    "start": "cd frontend-nextjs && npm run start"
+  },
+  "dependencies": {
+    "next": "16.2.2"
+  }
+}

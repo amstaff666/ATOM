@@ -1,0 +1,195 @@
+{
+  "name": "VisuaFlow - AI Music Video Generator",
+  "short_name": "VisuaFlow",
+  "description": "Professional AI-powered music video creation platform with offline capabilities",
+  "version": "4.5.0",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#2b5fff",
+  "background_color": "#101010",
+  "scope": "/",
+  
+  "icons": [
+    {
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-1.jpg",
+      "sizes": "1920x1080",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Main interface with audio visualization"
+    },
+    {
+      "src": "/screenshots/mobile-1.jpg",
+      "sizes": "750x1334",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Mobile video generation view"
+    }
+  ],
+  
+  "categories": [
+    "music",
+    "video",
+    "productivity",
+    "entertainment"
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "New Project",
+      "short_name": "New",
+      "description": "Create a new music video project",
+      "url": "/new",
+      "icons": [
+        {
+          "src": "/icons/new-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Projects",
+      "short_name": "Projects",
+      "description": "View all your projects",
+      "url": "/projects",
+      "icons": [
+        {
+          "src": "/icons/projects-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "short_name": "Templates",
+      "description": "Browse video templates",
+      "url": "/templates",
+      "icons": [
+        {
+          "src": "/icons/templates-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "audio",
+          "accept": ["audio/*"]
+        }
+      ]
+    }
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/open",
+      "accept": {
+        "audio/*": [".mp3", ".wav", ".flac", ".ogg", ".m4a"],
+        "video/*": [".mp4", ".webm", ".mov"]
+      }
+    }
+  ],
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+visuaflow",
+      "url": "/open?url=%s"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  
+  "offline_enabled": true,
+  
+  "permissions": [
+    "storage",
+    "notifications",
+    "audioCapture",
+    "backgroundSync",
+    "periodicBackgroundSync"
+  ],
+  
+  "serviceworker": {
+    "src": "/sw.js",
+    "scope": "/",
+    "update_via_cache": "none"
+  },
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui",
+    "standalone",
+    "browser"
+  ],
+  
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

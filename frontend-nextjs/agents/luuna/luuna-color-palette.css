@@ -1,0 +1,241 @@
+/**
+ * Luuna / ATOM Manager — Värvipalett
+ * Restart-CRM platvormi visuaalne identiteet
+ * 
+ * Kasuta: import './luuna-color-palette.css'
+ * Või lisa globals.css faili @import kaudu
+ */
+
+/* ═══════════════════════════════════════════════════
+   ATOM DARK THEME — Default palett
+   ═══════════════════════════════════════════════════ */
+:root,
+[data-theme="atom-dark"],
+.atom-dark {
+  /* ── Põhivärvid ─────────────────────────────────── */
+  --color-primary:          #6366f1;  /* indigo-500  */
+  --color-primary-hover:    #4f46e5;  /* indigo-600  */
+  --color-primary-light:    rgba(99, 102, 241, 0.15);
+  --color-primary-border:   rgba(99, 102, 241, 0.30);
+  --color-primary-glow:     rgba(99, 102, 241, 0.40);
+
+  /* ── Accent värvid ──────────────────────────────── */
+  --color-accent:           #8b5cf6;  /* violet-500  */
+  --color-accent-hover:     #7c3aed;  /* violet-600  */
+  --color-accent-light:     rgba(139, 92, 246, 0.15);
+  --color-accent2:          #06b6d4;  /* cyan-500    */
+  --color-accent2-hover:    #0891b2;  /* cyan-600    */
+  --color-accent2-light:    rgba(6, 182, 212, 0.15);
+
+  /* ── Taust värvid ───────────────────────────────── */
+  --color-bg:               #0f0f1a;  /* deep dark navy    */
+  --color-bg-card:          #1a1a2e;  /* dark card         */
+  --color-bg-secondary:     #16213e;  /* secondary dark    */
+  --color-bg-elevated:      #1e1e35;  /* elevated surface  */
+  --color-bg-hover:         rgba(255, 255, 255, 0.04);
+
+  /* ── Border värvid ──────────────────────────────── */
+  --color-border:           #2d2d4e;  /* subtle border     */
+  --color-border-light:     rgba(45, 45, 78, 0.60);
+  --color-border-focus:     #6366f1;
+
+  /* ── Tekst värvid ───────────────────────────────── */
+  --color-text:             #e2e8f0;  /* light text        */
+  --color-text-muted:       #94a3b8;  /* muted             */
+  --color-text-subtle:      #64748b;  /* very muted        */
+  --color-text-inverted:    #0f0f1a;
+
+  /* ── Semantilised värvid ────────────────────────── */
+  --color-success:          #10b981;  /* emerald-500       */
+  --color-success-light:    rgba(16, 185, 129, 0.15);
+  --color-success-border:   rgba(16, 185, 129, 0.30);
+
+  --color-warning:          #f59e0b;  /* amber-500         */
+  --color-warning-light:    rgba(245, 158, 11, 0.15);
+  --color-warning-border:   rgba(245, 158, 11, 0.30);
+
+  --color-error:            #ef4444;  /* red-500           */
+  --color-error-light:      rgba(239, 68, 68, 0.15);
+  --color-error-border:     rgba(239, 68, 68, 0.30);
+
+  --color-info:             #06b6d4;  /* cyan-500          */
+  --color-info-light:       rgba(6, 182, 212, 0.15);
+  --color-info-border:      rgba(6, 182, 212, 0.30);
+
+  /* ── Glow efektid ───────────────────────────────── */
+  --glow-primary:           0 0 20px rgba(99, 102, 241, 0.30);
+  --glow-primary-strong:    0 0 40px rgba(99, 102, 241, 0.50);
+  --glow-accent:            0 0 20px rgba(139, 92, 246, 0.30);
+  --glow-success:           0 0 20px rgba(16, 185, 129, 0.30);
+  --glow-warning:           0 0 20px rgba(245, 158, 11, 0.30);
+  --glow-error:             0 0 20px rgba(239, 68, 68, 0.30);
+  --glow-cyan:              0 0 20px rgba(6, 182, 212, 0.30);
+
+  /* ── Gradient ───────────────────────────────────── */
+  --gradient-primary:       linear-gradient(135deg, #6366f1, #8b5cf6);
+  --gradient-accent:        linear-gradient(135deg, #8b5cf6, #06b6d4);
+  --gradient-bg:            linear-gradient(180deg, #0f0f1a 0%, #16213e 100%);
+  --gradient-card:          linear-gradient(135deg, #1a1a2e, #16213e);
+
+  /* ── Glassmorphism ──────────────────────────────── */
+  --glass-bg:               rgba(26, 26, 46, 0.70);
+  --glass-border:           rgba(99, 102, 241, 0.10);
+  --glass-blur:             blur(12px);
+
+  /* ── Spacing & radius ───────────────────────────── */
+  --radius-sm:              0.375rem;  /* 6px  */
+  --radius-md:              0.75rem;   /* 12px */
+  --radius-lg:              1rem;      /* 16px */
+  --radius-xl:              1.25rem;   /* 20px */
+  --radius-full:            9999px;
+
+  /* ── Touch targets (mobiil) ─────────────────────── */
+  --touch-min:              44px;
+
+  /* ── Transitions ────────────────────────────────── */
+  --transition-fast:        150ms ease;
+  --transition-base:        200ms ease;
+  --transition-slow:        300ms ease;
+
+  /* ── Shadows ────────────────────────────────────── */
+  --shadow-card:            0 4px 24px rgba(0, 0, 0, 0.40);
+  --shadow-elevated:        0 8px 32px rgba(0, 0, 0, 0.60);
+  --shadow-primary:         0 4px 16px rgba(99, 102, 241, 0.25);
+}
+
+/* ═══════════════════════════════════════════════════
+   ATOM LIGHT THEME — Valikuline heledus
+   ═══════════════════════════════════════════════════ */
+[data-theme="atom-light"],
+.atom-light {
+  --color-primary:          #4f46e5;
+  --color-primary-hover:    #4338ca;
+  --color-primary-light:    rgba(79, 70, 229, 0.10);
+  --color-primary-border:   rgba(79, 70, 229, 0.25);
+
+  --color-accent:           #7c3aed;
+  --color-accent2:          #0891b2;
+
+  --color-bg:               #f8f9ff;
+  --color-bg-card:          #ffffff;
+  --color-bg-secondary:     #f1f5f9;
+  --color-bg-elevated:      #ffffff;
+  --color-bg-hover:         rgba(0, 0, 0, 0.04);
+
+  --color-border:           #e2e8f0;
+  --color-border-light:     rgba(226, 232, 240, 0.80);
+
+  --color-text:             #1e293b;
+  --color-text-muted:       #64748b;
+  --color-text-subtle:      #94a3b8;
+  --color-text-inverted:    #ffffff;
+
+  --color-success:          #059669;
+  --color-warning:          #d97706;
+  --color-error:            #dc2626;
+  --color-info:             #0891b2;
+
+  --glow-primary:           0 0 20px rgba(79, 70, 229, 0.20);
+  --glass-bg:               rgba(255, 255, 255, 0.80);
+  --glass-border:           rgba(79, 70, 229, 0.10);
+
+  --shadow-card:            0 1px 12px rgba(0, 0, 0, 0.08);
+  --shadow-elevated:        0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════
+   UTILITY CLASSES — Otsekasutatavad klassid
+   ═══════════════════════════════════════════════════ */
+
+/* Glow efektid */
+.glow-primary  { box-shadow: var(--glow-primary); }
+.glow-accent   { box-shadow: var(--glow-accent); }
+.glow-success  { box-shadow: var(--glow-success); }
+.glow-warning  { box-shadow: var(--glow-warning); }
+.glow-error    { box-shadow: var(--glow-error); }
+.glow-cyan     { box-shadow: var(--glow-cyan); }
+
+/* Glassmorphism */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Gradient tekst */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-accent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* HITL badge värvid */
+.badge-hitl     { background: var(--color-warning-light); color: var(--color-warning); border: 1px solid var(--color-warning-border); }
+.badge-approved { background: var(--color-success-light); color: var(--color-success); border: 1px solid var(--color-success-border); }
+.badge-pending  { background: var(--color-info-light);    color: var(--color-info);    border: 1px solid var(--color-info-border); }
+.badge-error    { background: var(--color-error-light);   color: var(--color-error);   border: 1px solid var(--color-error-border); }
+
+/* Luuna erivärvid */
+.luuna-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+}
+
+.luuna-border {
+  border: 1px solid var(--color-primary-border);
+  box-shadow: var(--glow-primary);
+}
+
+/* Agent status indikaator */
+.status-dot-active   { width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); box-shadow: var(--glow-success); animation: pulse-success 2s infinite; }
+.status-dot-waiting  { width: 8px; height: 8px; border-radius: 50%; background: var(--color-warning); }
+.status-dot-error    { width: 8px; height: 8px; border-radius: 50%; background: var(--color-error); }
+.status-dot-idle     { width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-muted); }
+
+/* Animatsioonid */
+@keyframes pulse-success {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulse-primary {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+@keyframes luuna-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.30); }
+  50%       { box-shadow: 0 0 40px rgba(99, 102, 241, 0.60); }
+}
+
+.animate-luuna-glow { animation: luuna-glow 3s ease-in-out infinite; }
+
+/* ═══════════════════════════════════════════════════
+   TAILWIND TOKEN MAP — globals.css .dark klass jaoks
+   
+   Lisa oma globals.css .dark sektsiooni:
+   
+   .dark {
+     --background: 237 37% 8%;        (= #0f0f1a)
+     --foreground: 214 32% 91%;       (= #e2e8f0)
+     --card: 237 34% 14%;             (= #1a1a2e)
+     --card-foreground: 214 32% 91%;
+     --primary: 239 84% 67%;          (= #6366f1)
+     --primary-foreground: 237 37% 8%;
+     --secondary: 228 54% 17%;        (= #16213e)
+     --secondary-foreground: 214 32% 91%;
+     --muted: 228 54% 17%;
+     --muted-foreground: 215 20% 65%; (= #94a3b8)
+     --accent: 258 90% 66%;           (= #8b5cf6)
+     --border: 237 38% 24%;           (= #2d2d4e)
+     --ring: 239 84% 67%;             (= #6366f1)
+   }
+   ═══════════════════════════════════════════════════ */

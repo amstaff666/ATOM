@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annaator — kliendi dashboard demo</title>
+  <style>
+    :root{
+      --bg:#f5f4ef;
+      --card:#ffffff;
+      --card2:#fbfaf8;
+      --line:#e2ded4;
+      --text:#24221c;
+      --muted:#746f65;
+      --primary:#026670;
+      --primary2:#00a7b5;
+      --ok:#3c7a2b;
+      --warn:#b35900;
+      --bad:#a8244e;
+      --soft:#e0f2f1;
+      --shadow:0 18px 60px rgba(44,41,33,.10);
+      --radius:22px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at top left, rgba(0,167,181,.16), transparent 32%),
+        radial-gradient(circle at top right, rgba(2,102,112,.12), transparent 30%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .shell{max-width:1180px;margin:0 auto;padding:22px}
+    header{
+      display:flex;justify-content:space-between;align-items:center;gap:16px;
+      padding:18px 0 26px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.03em;font-size:22px}
+    .logo{
+      width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary2));
+      color:white;display:grid;place-items:center;font-weight:900;box-shadow:0 10px 28px rgba(2,102,112,.22)
+    }
+    .client-pill{
+      background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:999px;padding:10px 14px;
+      color:var(--muted);font-size:14px;backdrop-filter:blur(10px)
+    }
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+    .card{
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+      backdrop-filter:blur(10px);
+    }
+    .hero{
+      min-height:270px;
+      background:
+        linear-gradient(135deg, rgba(2,102,112,.96), rgba(0,167,181,.82)),
+        linear-gradient(45deg, #026670, #00a7b5);
+      color:#fff;
+      overflow:hidden;
+      position:relative;
+    }
+    .hero:after{
+      content:"";position:absolute;right:-120px;top:-110px;width:320px;height:320px;border-radius:50%;
+      border:38px solid rgba(255,255,255,.12);
+    }
+    .hero-content{position:relative;z-index:2}
+    .status-row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+    .badge{
+      display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 11px;
+      background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);font-size:13px;font-weight:750;
+    }
+    h1{font-size:clamp(28px,4vw,46px);line-height:1;margin:24px 0 10px;letter-spacing:-.055em}
+    .sub{font-size:16px;line-height:1.5;color:rgba(255,255,255,.82);max-width:650px}
+    .progress-wrap{margin-top:26px}
+    .progress-top{display:flex;justify-content:space-between;font-weight:800;margin-bottom:9px}
+    .bar{height:14px;background:rgba(255,255,255,.24);border-radius:999px;overflow:hidden}
+    .fill{height:100%;width:84%;background:#fff;border-radius:999px}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+    .hero-stat{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:13px}
+    .hero-stat b{display:block;font-size:20px}
+    .hero-stat span{display:block;color:rgba(255,255,255,.77);font-size:12px;margin-top:3px}
+    .section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}
+    .section-title h2{font-size:18px;margin:0;letter-spacing:-.03em}
+    .small{font-size:13px;color:var(--muted)}
+    .task{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card2);margin-bottom:10px}
+    .dot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:0 0 auto}
+    .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.info{background:var(--primary)}
+    .task b{display:block;margin-bottom:2px}
+    .task p{margin:0;color:var(--muted);font-size:13px;line-height:1.42}
+    .task .right{margin-left:auto;font-size:12px;font-weight:800;padding:5px 9px;border-radius:999px;white-space:nowrap}
+    .right.ok{background:#e8f5e9;color:var(--ok)}
+    .right.warn{background:rgba(179,89,0,.12);color:var(--warn)}
+    .right.info{background:var(--soft);color:var(--primary)}
+    .banks{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .bank{
+      border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:10px
+    }
+    .bank-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .bank-name{font-weight:900}
+    .bank-meta{font-size:12px;color:var(--muted)}
+    .mini-status{font-size:12px;font-weight:850;border-radius:999px;padding:5px 8px}
+    .s-sent{background:var(--soft);color:var(--primary)}
+    .s-wait{background:rgba(179,89,0,.12);color:var(--warn)}
+    .s-ok{background:#e8f5e9;color:var(--ok)}
+    .s-no{background:rgba(168,36,78,.10);color:var(--bad)}
+    .doc-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:12px 0}
+    .doc-row:last-child{border-bottom:none}
+    .doc-name{font-weight:800}
+    .doc-detail{font-size:12px;color:var(--muted);margin-top:2px}
+    .chat{display:flex;flex-direction:column;gap:10px}
+    .msg{padding:13px 14px;border-radius:16px;max-width:88%;font-size:14px;line-height:1.42}
+    .msg.manager{background:var(--soft);align-self:flex-start}
+    .msg.client{background:#f0eee7;align-self:flex-end}
+    .ai-box{
+      border:1px dashed rgba(2,102,112,.45);background:rgba(224,242,241,.55);border-radius:18px;padding:16px
+    }
+    .ai-box b{display:block;margin-bottom:8px;color:var(--primary)}
+    .ai-box ul{margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.55}
+    .bottom-nav{
+      display:none;position:sticky;bottom:10px;margin-top:18px;background:rgba(255,255,255,.92);border:1px solid var(--line);
+      border-radius:22px;box-shadow:var(--shadow);padding:8px;gap:6px;backdrop-filter:blur(12px)
+    }
+    .bottom-nav button{border:0;background:transparent;border-radius:15px;padding:10px 8px;font-weight:800;color:var(--muted);flex:1}
+    .bottom-nav button.active{background:var(--soft);color:var(--primary)}
+    @media(max-width:860px){
+      .shell{padding:14px}
+      header{align-items:flex-start}
+      .client-pill{font-size:12px}
+      .grid{grid-template-columns:1fr}
+      .hero{min-height:auto}
+      .hero-stats{grid-template-columns:1fr}
+      .banks{grid-template-columns:1fr}
+      .bottom-nav{display:flex}
+      .card{padding:17px;border-radius:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="logo">A</div><div>Annaator<br><span class="small">Kliendi laenuportaal</span></div></div>
+      <div class="client-pill">Demo: pärast ettevõtte taotluse täitmist</div>
+    </header>
+
+    <section class="card hero">
+      <div class="hero-content">
+        <div class="status-row">
+          <span class="badge">Ettevõtte taotlus</span>
+          <span class="badge">Haldur kontrollib dokumente</span>
+        </div>
+        <h1>Demo Ettevõte OÜ</h1>
+        <p class="sub">Taotlus summale <b>50 000 €</b>. Klient näeb ainult protsessi seisu, nõutud dokumente, pankade vastuseid ja halduri küsimusi. Sisemist AI/halduri töölogi ei kuvata.</p>
+
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Laenuvalmidus</span><span>84%</span></div>
+          <div class="bar"><div class="fill"></div></div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat"><b>50 000 €</b><span>soovitud laenusumma</span></div>
+          <div class="hero-stat"><b>12 kuud</b><span>väljavõtete kontroll</span></div>
+          <div class="hero-stat"><b>3 tegevust</b><span>kliendilt veel vaja</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid" style="margin-top:18px">
+      <div>
+        <section class="card">
+          <div class="section-title"><h2>Järgmised tegevused</h2><span class="small">Kliendile nähtav</span></div>
+
+          <div class="task">
+            <div class="dot warn"></div>
+            <div>
+              <b>Lisa Swedbanki 12 kuu väljavõte</b>
+              <p>Periood 01.06.2025–31.05.2026. Sobib PDF, CSV või XLSX.</p>
+            </div>
+            <span class="right warn">Vajalik</span>
+          </div>
+
+          <div class="task">
+            <div class="dot warn"></div>
+            <div>
+              <b>Lisa jooksva aasta bilanss</b>
+              <p>Bilanss seisuga vähemalt 31.05.2026. Sobib PDF või Excel.</p>
+            </div>
+            <span class="right warn">Vajalik</span>
+          </div>
+
+          <div class="task">
+            <div class="dot info"></div>
+            <div>
+              <b>Vasta halduri küsimusele</b>
+              <p>Palun selgita veebruari madalamat käivet ja lisa, kas see oli hooajaline.</p>
+            </div>
+            <span class="right info">Ootel</span>
+          </div>
+
+          <div class="task">
+            <div class="dot ok"></div>
+            <div>
+              <b>Kasumiaruanne loetud</b>
+              <p>Haldur on faili üle vaadanud. Kliendile dokumendi sisu ei kuvata.</p>
+            </div>
+            <span class="right ok">Korras</span>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="section-title"><h2>Pankade staatus</h2><span class="small">Avalik kliendivaade</span></div>
+          <div class="banks">
+            <div class="bank">
+              <div class="bank-head"><div><div class="bank-name">LHV Pank</div><div class="bank-meta">Taotlus saadetud</div></div><span class="mini-status s-sent">Ülevaatamisel</span></div>
+              <div class="small">Haldur vastas pangale: jah</div>
+            </div>
+            <div class="bank">
+              <div class="bank-head"><div><div class="bank-name">Swedbank</div><div class="bank-meta">Pank küsis lisa</div></div><span class="mini-status s-wait">Lisa vaja</span></div>
+              <div class="small">Vajalik: 12 kuu väljavõte</div>
+            </div>
+            <div class="bank">
+              <div class="bank-head"><div><div class="bank-name">Coop Pank</div><div class="bank-meta">Esialgne positiivne indikatsioon</div></div><span class="mini-status s-ok">Positiivne</span></div>
+              <div class="small">Pakkumise detailid kinnitab haldur.</div>
+            </div>
+            <div class="bank">
+              <div class="bank-head"><div><div class="bank-name">SEB</div><div class="bank-meta">Ei ole veel saadetud</div></div><span class="mini-status s-no">Ootel</span></div>
+              <div class="small">Ootab bilansi lisamist.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="card">
+          <div class="section-title"><h2>Dokumendid</h2><span class="small">Sisu ei kuvata</span></div>
+          <div class="doc-row">
+            <div><div class="doc-name">Kasumiaruanne 2026</div><div class="doc-detail">PDF · loetud halduri poolt</div></div>
+            <span class="right ok">Korras</span>
+          </div>
+          <div class="doc-row">
+            <div><div class="doc-name">Bilanss 31.05.2026</div><div class="doc-detail">Puudub · klient peab lisama</div></div>
+            <span class="right warn">Puudu</span>
+          </div>
+          <div class="doc-row">
+            <div><div class="doc-name">LHV 12 kuu väljavõte</div><div class="doc-detail">CSV · AI loetud, haldur kinnitab</div></div>
+            <span class="right info">Kontrollis</span>
+          </div>
+          <div class="doc-row">
+            <div><div class="doc-name">Swedbank 12 kuu väljavõte</div><div class="doc-detail">Puudub · pank küsis juurde</div></div>
+            <span class="right warn">Vajalik</span>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="section-title"><h2>AI abiline</h2><span class="small">Simulatsioon</span></div>
+          <div class="ai-box">
+            <b>50 000 € taotluse tugevdamiseks:</b>
+            <ul>
+              <li>Lisa 12 kuu põhipanga väljavõte.</li>
+              <li>Lisa bilanss ja kinnitatud kasumiaruanne.</li>
+              <li>Selgita veebruari käibelangust.</li>
+              <li>Lisa üks suurem kliendileping või korduva tulu tõend.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card" style="margin-top:18px">
+          <div class="section-title"><h2>Vestlus halduriga</h2><span class="small">Kliendile nähtav</span></div>
+          <div class="chat">
+            <div class="msg manager"><b>Haldur:</b><br>Palun lisa Swedbanki 12 kuu väljavõte ja bilanss seisuga 31.05.2026.</div>
+            <div class="msg client"><b>Klient:</b><br>Saan lisada bilansi täna õhtul. Väljavõtte küsin raamatupidajalt.</div>
+            <div class="msg manager"><b>Haldur:</b><br>Sobib. Kui failid lisatud, liigub taotlus SEB ja Swedbanki paketti.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="active">Ülevaade</button>
+      <button>Dokumendid</button>
+      <button>Pangad</button>
+      <button>Vestlus</button>
+    </nav>
+  </div>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "@/lib/get-api-base-url";
 
 interface ServiceHealth {
   status: 'healthy' | 'unhealthy' | 'degraded';
@@ -31,7 +32,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const backendUrl = process.env.PYTHON_API_SERVICE_BASE_URL || 'http://localhost:5059';
+  const backendUrl = getServerApiBaseUrl();
   const startTime = Date.now();
 
   try {

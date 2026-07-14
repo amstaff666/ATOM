@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "@/lib/get-api-base-url";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const backendUrl = process.env.PYTHON_API_SERVICE_BASE_URL || 'http://localhost:5059';
+  const backendUrl = getServerApiBaseUrl();
 
   try {
     const response = await fetch(`${backendUrl}/api/notion/status`);

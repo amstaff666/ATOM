@@ -1,0 +1,33 @@
+---
+pid: 80820
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-14T21:58:26.553Z
+running_for_ms: 41320010 
+---
+Files in the public directory are served at the root path.
+Instead of /public/uploads/images/1781472589603-Screenshot_2026-05-22_125235.png, use /uploads/images/1781472589603-Screenshot_2026-05-22_125235.png.
+Files in the public directory are served at the root path.
+Instead of /public/uploads/images/1781472589603-Screenshot_2026-05-22_125235.png, use /uploads/images/1781472589603-Screenshot_2026-05-22_125235.png.
+
+> ai-influencer@0.0.1 dev
+> vite
+
+
+  VITE v5.4.21  ready in 299 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+1:04:18 AM [vite] hmr update /src/pages/Influencers.jsx
+1:07:50 AM [vite] lib/sourceEditor.js changed, restarting server...
+1:07:50 AM [vite] hmr update /src/context/pageEditor.jsx
+1:07:50 AM [vite] server restarted.
+1:08:23 AM [vite] lib/sourceEditor.js changed, restarting server...
+1:08:23 AM [vite] vite.config.js changed, restarting server...
+1:08:23 AM [vite] server restarted.
+1:08:23 AM [vite] server restarted.
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+1:09:02 AM [vite] hmr update /src/components/ChatWindow.jsx
+1:09:02 AM [vite] hmr update /src/components/ChatWindow.jsx

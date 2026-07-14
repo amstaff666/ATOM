@@ -1,0 +1,58 @@
+---
+pid: 37968
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "npm run dev"
+started_at: 2026-06-14T14:55:29.868Z
+running_for_ms: 18549999 
+---
+✘ [ERROR] The symbol "OPENAI_COMPAT" has already been declared
+
+    lib/chatProviders.js:80:6:
+      80 │ const OPENAI_COMPAT = (url, model) => ({
+         ╵       ~~~~~~~~~~~~~
+
+  The symbol "OPENAI_COMPAT" was originally declared here:
+
+    lib/chatProviders.js:11:6:
+      11 │ const OPENAI_COMPAT = (url, model) => ({
+         ╵       ~~~~~~~~~~~~~
+
+failed to load config from C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main\vite.config.js
+7:38:14 PM [vite] Build failed with 1 error:
+lib/chatProviders.js:80:6: ERROR: The symbol "OPENAI_COMPAT" has already been declared
+7:38:14 PM [vite] server restart failed
+
+> ai-influencer@0.0.1 dev
+> vite
+
+
+  VITE v5.4.21  ready in 647 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+7:18:16 PM [vite] vite.config.js changed, restarting server...
+Re-optimizing dependencies because vite config has changed
+7:18:16 PM [vite] server restarted.
+7:20:58 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:20:58 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:21:04 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:21:04 PM [vite] hmr update /src/pages/Settings.jsx
+7:21:09 PM [vite] vite.config.js changed, restarting server...
+7:21:09 PM [vite] server restarted.
+7:25:54 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:25:54 PM [vite] lib/chatProviders.js changed, restarting server...
+7:25:54 PM [vite] vite.config.js changed, restarting server...
+7:25:54 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:25:55 PM [vite] server restarted.
+7:26:01 PM [vite] hmr update /src/pages/Settings.jsx
+7:26:01 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:38:14 PM [vite] lib/chatProviders.js changed, restarting server...
+7:38:28 PM [vite] lib/chatProviders.js changed, restarting server...
+7:38:28 PM [vite] server restarted.
+7:38:33 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:38:33 PM [vite] hmr update /src/context/theme.jsx
+7:38:33 PM [vite] hmr invalidate /src/context/theme.jsx Could not Fast Refresh ("useTheme" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+7:38:33 PM [vite] hmr update /src/App.jsx, /src/components/Nav.jsx, /src/components/ChatWindow.jsx, /src/pages/Settings.jsx, /src/pages/Influencers.jsx
+7:38:48 PM [vite] hmr update /src/components/ChatWindow.jsx
+7:38:48 PM [vite] vite.config.js changed, restarting server...
+7:38:48 PM [vite] server restarted.

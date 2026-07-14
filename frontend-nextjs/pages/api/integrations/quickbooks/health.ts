@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getServerApiBaseUrl } from "@/lib/get-api-base-url";
 
 export default async function handler(
   req: NextApiRequest,
@@ -6,7 +7,7 @@ export default async function handler(
 ) {
   try {
     // Check backend QuickBooks service health
-    const backendUrl = process.env.PYTHON_API_SERVICE_BASE_URL || 'http://localhost:5059';
+    const backendUrl = getServerApiBaseUrl();
     const response = await fetch(`${backendUrl}/api/quickbooks/status`, {
       method: 'GET',
       headers: {

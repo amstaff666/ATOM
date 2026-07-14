@@ -1,0 +1,18 @@
+# PDF Agents — sõltuvused
+# Paigalda: pip install -r requirements.txt
+
+# ── Kohustuslikud ────────────────────────────────────────────────────────────
+Pillow>=10.0.0
+pytesseract>=0.3.10
+numpy>=1.24.0
+
+# ── Soovitatavad ─────────────────────────────────────────────────────────────
+pypdfium2>=4.0.0        # PDF native text layer + renderdamine (kiireim)
+langdetect>=1.0.9       # Täpsem keeletuvastus
+
+# ── Valikulised ekspordi jaoks ───────────────────────────────────────────────
+reportlab>=4.0.0        # PDF eksport
+
+# ── Arenduseks ───────────────────────────────────────────────────────────────
+pytest>=7.0.0
+pytest-cov>=4.0.0

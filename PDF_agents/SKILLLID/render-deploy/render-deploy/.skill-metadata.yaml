@@ -1,0 +1,33 @@
+examples:
+  - id: blueprint-single-service
+    title:
+      zh: 通过Blueprint部署Web服务到Render
+      en: Deploy Web Service to Render via Blueprint
+    description:
+      zh: 生成render.yaml Blueprint并通过Dashboard深链接部署单个Web服务
+      en: Generate render.yaml Blueprint and deploy a single web service via Dashboard deeplink
+    prompt:
+      zh: |-
+        请帮我把当前项目部署到Render。
+
+        项目已推送到GitHub仓库。请分析项目结构，生成render.yaml Blueprint文件，使用免费计划，然后提供Dashboard深链接让我完成部署。
+      en: |-
+        Please help me deploy the current project to Render.
+
+        The project is already pushed to a GitHub repo. Please analyze the project, generate a render.yaml Blueprint file using the free plan, then provide a Dashboard deeplink for me to complete the deployment.
+  - id: blueprint-with-database
+    title:
+      zh: Blueprint部署应用+数据库到Render
+      en: Deploy App with Database to Render via Blueprint
+    description:
+      zh: 生成包含Web服务和PostgreSQL数据库的render.yaml Blueprint
+      en: Generate render.yaml Blueprint with web service and PostgreSQL database
+    prompt:
+      zh: |-
+        我的项目需要部署到Render，包含一个Web服务和PostgreSQL数据库。
+
+        项目已推送到GitHub。请分析代码，生成render.yaml Blueprint，包含Web服务和数据库，自动将数据库连接字符串注入环境变量，敏感变量标记为sync: false让我在Dashboard中填写。提供Dashboard深链接完成部署。
+      en: |-
+        My project needs to be deployed to Render with a web service and PostgreSQL database.
+
+        The project is already pushed to GitHub. Please analyze the code, generate a render.yaml Blueprint with both web service and database, auto-inject the database connection string as an env var, mark sensitive vars as sync: false for me to fill in Dashboard. Provide a Dashboard deeplink to complete deployment.

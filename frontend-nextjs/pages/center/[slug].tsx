@@ -7,6 +7,7 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Crown,
   Database,
   FileCog,
   FileStack,
@@ -37,6 +38,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { AiWorkbenchDashboard } from "@/components/workbench/AiWorkbenchDashboard";
 import { PdfOrchestratorPanel } from "@/components/pdf/PdfOrchestratorPanel";
+import { KingPdfPanel } from "@/components/pdf/KingPdfPanel";
 
 type CenterModule = {
   title: string;
@@ -112,6 +114,14 @@ const modules: Record<string, CenterModule> = {
     status: "planeeritud",
     description: "Kõik PDF tööriistad ühes kohas: editor, converter, OCR, annotatsioon, redaktsioon ja eksport.",
     nextSteps: ["Editorite kaart", "Failide routing", "Batch töötlus", "Kvaliteedikontroll"],
+  },
+  "kingpdf": {
+    title: "KingPDF",
+    group: "PDF Editor Orkester",
+    icon: Crown,
+    status: "registreeritud",
+    description: "KingPDF adapter Annaatori PDF Orkestri jaoks: PDF editori, konversiooni, laenudokumentide ja Autoflow plaanide ühenduspunkt.",
+    nextSteps: ["Backend adapter", "Frontend paneel", "Failide routing", "Autoflow bridge"],
   },
   "pdf-agents": {
     title: "PDF agendid",
@@ -249,6 +259,7 @@ export default function CenterModulePage() {
   const slug = Array.isArray(router.query.slug) ? router.query.slug[0] : router.query.slug;
   const module = (slug && modules[slug]) || fallbackModule;
   const Icon = module.icon;
+  const showWorkbench = router.isReady && slug !== "kingpdf";
   const isPdfModule = Boolean(
     slug && ["pdf-orchestrator", "pdf-editors", "pdf-agents", "nexuspdf-alchemy", "onepdf-client"].includes(slug),
   );
@@ -298,12 +309,15 @@ export default function CenterModulePage() {
           </Card>
         )}
 
-        <AiWorkbenchDashboard
-          initialModuleId={slug || "pdf-orchestrator"}
-          title={`${module.title} AI mooduliplaan`}
-          description="Vali moodul, genereeri lokaalne plaan ja vaata enne backend integratsiooni vajalikud agendid, endpointid, riskid ning järgmine tegevus."
-        />
+        {showWorkbench && (
+          <AiWorkbenchDashboard
+            initialModuleId={slug || "pdf-orchestrator"}
+            title={`${module.title} AI mooduliplaan`}
+            description="Vali moodul, genereeri lokaalne plaan ja vaata enne backend integratsiooni vajalikud agendid, endpointid, riskid ning järgmine tegevus."
+          />
+        )}
 
+        {slug === "kingpdf" && <KingPdfPanel />}
         {isPdfModule && <PdfOrchestratorPanel />}
 
         <div className="grid gap-4 lg:grid-cols-3">

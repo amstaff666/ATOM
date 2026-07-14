@@ -1,0 +1,12 @@
+---
+pid: 59176
+cwd: "C:\Luuna-Video-AI\ai-influencer-main\ai-influencer-main"
+command: "$proc = Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess; if ($proc) { Stop-Process -Id $proc -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 1; npm run dev"
+started_at: 2026-06-14T16:38:58.333Z
+running_for_ms: 12340007 
+---
+ParserError: 
+Line |
+   1 |  . -Video-AI\\ai-influencer-main\\ai-influencer-main" && $proc = Get-Net .
+     |                                                                ~
+     | Unexpected token '=' in expression or statement.

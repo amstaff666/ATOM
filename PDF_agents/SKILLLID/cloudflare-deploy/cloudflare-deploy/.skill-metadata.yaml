@@ -1,0 +1,105 @@
+examples:
+  - id: static-website
+    title:
+      zh: 静态网站部署到Cloudflare Pages
+      en: Static Website Deployment to Cloudflare Pages
+    description:
+      zh: 将静态网站一键部署到Cloudflare Pages服务
+      en: Deploy static websites to Cloudflare Pages service with one click
+    prompt:
+      zh: |-
+        我有一个使用React构建的静态网站，需要部署到Cloudflare Pages。
+
+        项目情况：
+        - 前端框架：React + Vite
+        - 构建命令：npm run build
+        - 输出目录：dist/
+        - 自定义域名：my-site.example.com
+
+        部署要求：
+        1. 自动化CI/CD流程
+        2. 自定义域名配置
+        3. SSL证书自动申请
+        4. 性能优化设置
+        5. 访问日志监控
+
+        请帮我：
+        1. 配置wrangler.toml文件
+        2. 设置GitHub Actions部署流程
+        3. 配置自定义域名和DNS
+        4. 优化缓存和安全设置
+        5. 提供部署监控方案
+      en: |-
+        I have a static website built with React that needs to be deployed to Cloudflare Pages.
+
+        Project situation:
+        - Frontend framework: React + Vite
+        - Build command: npm run build
+        - Output directory: dist/
+        - Custom domain: my-site.example.com
+
+        Deployment requirements:
+        1. Automated CI/CD pipeline
+        2. Custom domain configuration
+        3. Automatic SSL certificate
+        4. Performance optimization settings
+        5. Access log monitoring
+
+        Please help me:
+        1. Configure wrangler.toml file
+        2. Set up GitHub Actions deployment workflow
+        3. Configure custom domain and DNS
+        4. Optimize caching and security settings
+        5. Provide deployment monitoring solution
+  - id: serverless-api
+    title:
+      zh: Serverless API部署到Cloudflare Workers
+      en: Serverless API Deployment to Cloudflare Workers
+    description:
+      zh: 部署无服务器API到Cloudflare Workers平台
+      en: Deploy serverless API to Cloudflare Workers platform
+    prompt:
+      zh: |-
+        我需要将一个Node.js API服务部署到Cloudflare Workers。
+
+        API功能：
+        - 用户认证和授权
+        - 数据库查询接口
+        - 文件上传处理
+        - 第三方服务集成
+
+        技术要求：
+        1. 使用Workers KV存储用户数据
+        2. 集成Durable Objects处理WebSocket
+        3. 配置CORS和安全策略
+        4. 实现请求限流和监控
+        5. 设置环境变量管理
+
+        请帮我：
+        1. 设计Workers架构方案
+        2. 编写worker代码和路由
+        3. 配置绑定和服务依赖
+        4. 设置开发和生产环境
+        5. 实现错误处理和日志
+      en: |-
+        I need to deploy a Node.js API service to Cloudflare Workers.
+
+        API functions:
+        - User authentication and authorization
+        - Database query interfaces
+        - File upload processing
+        - Third-party service integration
+
+        Technical requirements:
+        1. Use Workers KV to store user data
+        2. Integrate Durable Objects for WebSocket handling
+        3. Configure CORS and security policies
+        4. Implement request rate limiting and monitoring
+        5. Set up environment variable management
+
+        Please help me:
+        1. Design Workers architecture solution
+        2. Write worker code and routing
+        3. Configure bindings and service dependencies
+        4. Set up development and production environments
+        5. Implement error handling and logging

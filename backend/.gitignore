@@ -1,0 +1,90 @@
+
+# Credentials and secrets
+**/credentials.json
+**/api_keys.json
+**/secrets.json
+**/.env
+**/.env.local
+**/.env.production
+**/private_keys.json
+
+# API Keys patterns
+*sk-proj*
+*sk-ant*
+*sk-8fd*
+*xoxb*
+*github_pat*
+*AIza*
+*secret_*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test reports and logs
+*.log
+test_reports/
+coverage/
+
+# Coverage trend dashboards (committed for visibility)
+!tests/coverage_reports/dashboards/
+
+# Test result JSON files
+*_oauth_test_*.json
+*_OAUTH_TEST_*.json
+*_test_*.json
+*_TEST_*.json
+tests/artifacts/*.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Large files
+*.sqlite3
+*.db
+
+# Development and test files
+dev/
+tests/legacy/
+logs/
+
+# Additional log patterns
+# *.log
+*.out
+*.err
+
+# Development artifacts
+# test_*.py
+# *_test.py
+temp_*.py
+debug_*.py
+
+# OpenAPI specs (baseline committed, temp files ignored)
+# NOTE: openapi.json and frontend api-generated.ts are committed intentionally
+# They are source code for API type consumers (frontend, mobile, desktop)
+# Single source of truth for cross-platform type synchronization
+openapi_*.json
+!openapi.json
+/openapi*.json
+!/openapi.json
