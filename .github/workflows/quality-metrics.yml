@@ -58,7 +58,7 @@ jobs:
           GITHUB_RUN_ID: ${{ github.run_id }}
 
       - name: Upload metrics artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: quality-metrics
           path: backend/tests/coverage_reports/metrics/quality_metrics.json
