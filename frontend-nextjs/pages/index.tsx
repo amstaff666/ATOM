@@ -29,6 +29,7 @@ import {
 } from "../components/ui/card";
 import { OnboardingWizard } from "../components/Onboarding/OnboardingWizard";
 import { AiWorkbenchDashboard } from "../components/workbench/AiWorkbenchDashboard";
+import { AnnatorTodoPanel } from "../components/dashboard/AnnatorTodoPanel";
 import { safeJson } from "../lib/safe-fetch";
 
 type DashboardMetric = {
@@ -205,6 +206,8 @@ const Home = () => {
           </AlertDescription>
         </Alert>
       )}
+
+      <AnnatorTodoPanel />
 
       <AiWorkbenchDashboard compact />
 
