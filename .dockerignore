@@ -1,8 +1,42 @@
-﻿node_modules
-.next
+# Version control / editor metadata
 .git
+.github
+.vscode
+.idea
+
+# Secrets and local environments
+.env
+.env.*
+!.env.example
 .venv
 venv
+
+# Python caches
 __pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+
+# Node / Next build artifacts
+node_modules
+**/node_modules
+.next
+**/.next
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test / coverage / generated output
+coverage
+**/coverage
+playwright-report
+test-results
 *.log
-.env
+
+# Local databases and large transient artifacts
+*.db
+*.sqlite
+*.sqlite3
+.tmp
+tmp
+cache
