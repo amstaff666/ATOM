@@ -1,0 +1,43 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'Dockerfile'
+      - 'backend/**'
+      - 'frontend-nextjs/**'
+      - 'scripts/**'
+      - 'README.md'
+  workflow_dispatch: {}
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push subset to HF Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: techprotrade/annator-full-system
+        run: |
+          set -e
+          if [ -z "$HF_TOKEN" ]; then
+            echo "HF_TOKEN secret is not set. Add it in repo Settings > Secrets > Actions."
+            exit 1
+          fi
+          rm -rf /tmp/hf-space && mkdir -p /tmp/hf-space
+          cp -r Dockerfile backend frontend-nextjs scripts README.md /tmp/hf-space/
+          cd /tmp/hf-space
+          git init -q
+          git lfs install
+          git config user.email "actions@github.com"
+          git config user.name "github-actions"
+          git remote add space https://user:$HF_TOKEN@huggingface.co/spaces/$HF_SPACE
+          git add -A
+          git commit -q -m "Sync from ATOM master $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push --force space HEAD:main
