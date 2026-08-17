@@ -38,7 +38,7 @@ class PDFOrchestratorAdapter(BaseAdapter):
     """Creates safe build plans for the PDF Orkester."""
 
     def __init__(self) -> None:
-        self.capabilities = AdapterCapabilities(
+        self._capabilities = AdapterCapabilities(
             id="pdf-orchestrator",
             name="PDF Orchestrator Adapter",
             description="Orkestreerib PDF tööriistu ja agente.",
@@ -52,6 +52,10 @@ class PDFOrchestratorAdapter(BaseAdapter):
                 "external_apis": False,
             },
         )
+
+        @property
+    def capabilities(self) -> AdapterCapabilities:
+        return self._capabilities
 
     def can_handle(self, task: AutoflowTask) -> bool:
         """Prefer this adapter for PDF domain and PDF-like goals."""
