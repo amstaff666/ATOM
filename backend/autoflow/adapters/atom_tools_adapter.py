@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from backend.autoflow.adapters.base import BaseAdapter
-from backend.autoflow.models import AdapterCapabilities, AutoflowTask, TaskDomain
+from autoflow.adapters.base import BaseAdapter
+from autoflow.models import AdapterCapabilities, AutoflowTask, TaskDomain
 
 
 WORKFLOW_KEYWORDS = (
