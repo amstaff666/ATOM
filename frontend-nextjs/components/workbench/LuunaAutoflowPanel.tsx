@@ -60,7 +60,7 @@ type AutoflowTaskResponse = {
 type TaskMode = "plan_only" | "execute_mock";
 type TaskDomain = "pdf" | "workflow" | "agent" | "document" | "general";
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4490";
+const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
 
 const fallbackHealth: AutoflowHealth = {
   status: "offline",
