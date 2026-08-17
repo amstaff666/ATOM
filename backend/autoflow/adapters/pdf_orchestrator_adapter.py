@@ -54,8 +54,8 @@ class PDFOrchestratorAdapter(BaseAdapter):
         )
 
         @property
-    def capabilities(self) -> AdapterCapabilities:
-        return self._capabilities
+        def capabilities(self) -> AdapterCapabilities:
+            return self._capabilities
 
     def can_handle(self, task: AutoflowTask) -> bool:
         """Prefer this adapter for PDF domain and PDF-like goals."""
