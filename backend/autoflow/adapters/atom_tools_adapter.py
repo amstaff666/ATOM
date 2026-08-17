@@ -61,8 +61,8 @@ class AtomToolsAdapter(BaseAdapter):
         )
 
         @property
-    def capabilities(self) -> AdapterCapabilities:
-        return self._capabilities
+        def capabilities(self) -> AdapterCapabilities:
+            return self._capabilities
 
     async def can_handle(self, task: AutoflowTask) -> bool:
         """Prefer ATOM tools for local workflow, agent, document and general tasks."""
