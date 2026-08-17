@@ -52,7 +52,7 @@ type KingPdfPlan = {
   error?: string;
 };
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4490";
+const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
 
 export function KingPdfPanel() {
   const [health, setHealth] = useState<KingPdfHealth>({ status: "offline" });
