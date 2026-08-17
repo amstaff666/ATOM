@@ -7,8 +7,19 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Redis from 'ioredis';
 
 // Priority: DRAGONFLY_URL → UPSTASH_REDIS_URL → REDIS_URL
-const redisUrl = process.env.DRAGONFLY_URL || process.env.UPSTASH_REDIS_URL || process.env.REDIS_URL || 'redis://localhost:6379';
-const redis = new Redis(redisUrl);
+const redisUrl = process.env.DRAGONFLY_URL || process.env.UPSTASH_REDIS_URL || process.env.REDIS_URL;
+let redis: Redis | null = null;
+if (redisUrl) {
+  redis = new Redis(redisUrl, {
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    retryStrategy: () => null,
+    reconnectOnError: () => false,
+  });
+  redis.on('error', (err) => {
+    console.error('[analytics] Redis connection error (non-fatal):', err.message);
+  });
+}
 
 interface AnalyticsData {
   timestamp: string;
