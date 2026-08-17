@@ -186,6 +186,10 @@ const nextConfig = {
         source: "/api/agents/:path*",
         destination: `${backendUrl}/api/agents/:path*`,
       },
+    {
+      source: "/api/autoflow/:path*",
+      destination: `${backendUrl}/api/autoflow/:path*`,
+        },
       // WebSocket Proxy - REMOVED to prevent ECONNRESET crashes
       // Frontend now connects directly to port 8000 (see hooks/useWebSocket.ts)
       /*
