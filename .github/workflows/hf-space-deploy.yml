@@ -32,6 +32,14 @@ jobs:
           fi
           rm -rf /tmp/hf-space && mkdir -p /tmp/hf-space
           cp -r Dockerfile backend frontend-nextjs scripts README.md /tmp/hf-space/
+          rm -rf /tmp/hf-space/frontend-nextjs/src-tauri/target
+          rm -rf /tmp/hf-space/frontend-nextjs/node_modules
+          rm -rf /tmp/hf-space/backend/node_modules
+          find /tmp/hf-space -name '*.exe' -delete
+          find /tmp/hf-space -name '*.rlib' -delete
+          find /tmp/hf-space -name '*.rmeta' -delete
+          find /tmp/hf-space -name '*.dll' -delete
+          find /tmp/hf-space -name '*.pdb' -delete
           cd /tmp/hf-space
           git init -q
           git lfs install
