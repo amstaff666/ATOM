@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from autoflow.adapters.base import BaseAdapter
-from autoflow.models import AdapterCapabilities, AutoflowTask, TaskDomain
+from ..adapters.base import BaseAdapter
+from ..models import AdapterCapabilities, AutoflowTask, TaskDomain
 
 
 WORKFLOW_KEYWORDS = (
@@ -40,7 +40,7 @@ class AtomToolsAdapter(BaseAdapter):
     """Build safe local ATOM workflow plans without executing real tools."""
 
     def __init__(self) -> None:
-        self.capabilities = AdapterCapabilities(
+        self._capabilities = AdapterCapabilities(
             id="atom-tools",
             name="ATOM Tools Adapter",
             description="Koostab lokaalse ATOM arendustöö plaani ilma päris tööriistu käivitamata.",
@@ -59,6 +59,10 @@ class AtomToolsAdapter(BaseAdapter):
                 "external_tools_called": False,
             },
         )
+
+        @property
+    def capabilities(self) -> AdapterCapabilities:
+        return self._capabilities
 
     async def can_handle(self, task: AutoflowTask) -> bool:
         """Prefer ATOM tools for local workflow, agent, document and general tasks."""
