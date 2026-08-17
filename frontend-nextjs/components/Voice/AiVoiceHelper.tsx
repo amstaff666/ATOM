@@ -30,7 +30,7 @@ type SpeechRecognitionLike = {
   abort?: () => void;
 };
 
-const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4490";
+const apiBase = process.env.NEXT_PUBLIC_API_URL || "";
 
 const routeCommands = [
   { terms: ["kingpdf", "king pdf"], route: "/center/kingpdf", label: "KingPDF" },
