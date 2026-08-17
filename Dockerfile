@@ -3,7 +3,8 @@ FROM node:20-bookworm-slim AS frontend-builder
 WORKDIR /workspace
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 ca-certificates \
+    && apt-get install -y --no-install-recommends python3 ca-certificates \ \
+    && ln -sf /usr/bin/python3 /usr/bin/python
     && rm -rf /var/lib/apt/lists/*
 
 # Install frontend dependencies from the real application directory.
