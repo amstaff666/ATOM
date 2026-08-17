@@ -190,6 +190,10 @@ const nextConfig = {
       source: "/api/autoflow/:path*",
       destination: `${backendUrl}/api/autoflow/:path*`,
         },
+    {
+      source: "/api/kingpdf/:path*",
+      destination: `${backendUrl}/api/kingpdf/:path*`,
+    },
       // WebSocket Proxy - REMOVED to prevent ECONNRESET crashes
       // Frontend now connects directly to port 8000 (see hooks/useWebSocket.ts)
       /*
