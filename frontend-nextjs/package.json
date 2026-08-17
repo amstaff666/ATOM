@@ -191,6 +191,7 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@netlify/plugin-nextjs": "^5.15.13",
     "@next/bundle-analyzer": "^16.1.1",
     "@percy/cli": "^1.31.8",
     "@percy/playwright": "^1.0.10",
