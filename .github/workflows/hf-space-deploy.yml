@@ -31,16 +31,27 @@ jobs:
             exit 1
           fi
           rm -rf /tmp/hf-space && mkdir -p /tmp/hf-space
-          cp -r Dockerfile backend frontend-nextjs scripts README.md /tmp/hf-space/
-          rm -rf /tmp/hf-space/frontend-nextjs/src-tauri/target
-          rm -rf /tmp/hf-space/frontend-nextjs/node_modules
-          rm -rf /tmp/hf-space/backend/node_modules
-          find /tmp/hf-space -name '*.exe' -delete
-          find /tmp/hf-space -name '*.rlib' -delete
-          find /tmp/hf-space -name '*.rmeta' -delete
-          find /tmp/hf-space -name '*.dll' -delete
-          find /tmp/hf-space -name '*.pdb' -delete
+          rsync -a \
+            --exclude 'node_modules' \
+            --exclude 'target' \
+            --exclude 'src-tauri' \
+            --exclude '.next' \
+            --exclude '.next.temp-backup' \
+            --exclude 'dist' \
+            --exclude 'build' \
+            --exclude '.git' \
+            --exclude '*.exe' \
+            --exclude '*.rlib' \
+            --exclude '*.rmeta' \
+            --exclude '*.dll' \
+            --exclude '*.pdb' \
+            --exclude '*.profraw' \
+            --exclude '*.pack.gz' \
+            --exclude '__pycache__' \
+            --exclude '*.log' \
+            Dockerfile backend frontend-nextjs scripts README.md /tmp/hf-space/
           cd /tmp/hf-space
+          find . -size +50M -type f -print -delete
           git init -q
           git lfs install
           git config user.email "actions@github.com"
