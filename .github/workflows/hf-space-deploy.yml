@@ -53,6 +53,18 @@ jobs:
             --exclude '__pycache__' \
             --exclude '*.log' \
             --exclude 'coverage*.json' \
+            --exclude '*.zip' \
+            --exclude '*.png' \
+            --exclude '*.jpg' \
+            --exclude '*.jpeg' \
+            --exclude '*.ico' \
+            --exclude '*.gif' \
+            --exclude '*.woff' \
+            --exclude '*.woff2' \
+            --exclude '*.ttf' \
+            --exclude '*.db' \
+            --exclude '*.sqlite' \
+            --exclude '*.sqlite3' \
             Dockerfile backend frontend-nextjs scripts README.md /tmp/hf-space/
           cd /tmp/hf-space
           find . -size +9M -type f -print -delete
