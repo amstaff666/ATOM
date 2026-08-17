@@ -1571,25 +1571,3 @@ if __name__ == "__main__":
 # Forced reload: 1618
 # Forced reload: 1619
 # Forced reload: 1621
-# --- ANNATOR DEV SHIM: clients endpoint ---
-try:
-    @app.get("/clients")
-    async def annator_dev_clients():
-        return [
-            {
-                "id": "demo-client-001",
-                "name": "Demo EttevÃµte OÃœ",
-                "status": "active",
-                "case_id": "AN-1042",
-                "amount": 100000,
-                "cap": 20000
-            }
-        ]
-    @app.get("/api/clients")
-    async def annator_dev_api_clients():
-        return await annator_dev_clients()
-except NameError:
-    pass
-# --- /ANNATOR DEV SHIM ---
-
-
